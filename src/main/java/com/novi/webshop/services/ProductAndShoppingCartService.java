@@ -36,7 +36,7 @@ public class ProductAndShoppingCartService {
 
 
 
-    public ProductAndShoppingCartDto connectProductWithShoppingCart(ProductAndShoppingCartDto productAndShoppingCartDto) {
+    public ProductAndShoppingCartDto connectProductWithShoppingCart(Long productId, Long shoppingCartId, ProductAndShoppingCartDto productAndShoppingCartDto) {
         boolean productExists = false;
         int existingProductIndex = 0;
         boolean shoppingCartExists = false;
@@ -46,14 +46,14 @@ public class ProductAndShoppingCartService {
         List<ShoppingCart> shoppingCarts = shoppingCartRepository.findAll();
 
         for (int i = 0; i < products.size(); i++) {
-            if (Objects.equals(products.get(i).getId(), productAndShoppingCartDto.getProductId())) {
+            if (Objects.equals(products.get(i).getId(), productId)) {
                 productExists = true;
                 existingProductIndex = i;
             }
         }
 
         for (int i = 0; i < shoppingCarts.size(); i++) {
-            if (Objects.equals(shoppingCarts.get(i).getId(), productAndShoppingCartDto.getShoppingCartId())) {
+            if (Objects.equals(shoppingCarts.get(i).getId(), shoppingCartId)) {
                 shoppingCartExists = true;
                 existingShoppingCartIndex = i;
             }
@@ -71,8 +71,8 @@ public class ProductAndShoppingCartService {
             List<ProductAndShoppingCart> productAndShoppingCartShoppingCarts = newShoppingCart.getProductAndShoppingCarts();
 
             for (int i = 0; i < productAndShoppingCartProducts.size(); i++) {
-                if (Objects.equals(productAndShoppingCartProducts.get(i).getProduct().getId(), productAndShoppingCartDto.getProductId())
-                        && Objects.equals(productAndShoppingCartProducts.get(i).getShoppingCart().getId(), productAndShoppingCartDto.getShoppingCartId())) {
+                if (Objects.equals(productAndShoppingCartProducts.get(i).getProduct().getId(), productId)
+                        && Objects.equals(productAndShoppingCartProducts.get(i).getShoppingCart().getId(), shoppingCartId)) {
                     relationAlreadyExists = true;
                 }
             }
@@ -82,6 +82,7 @@ public class ProductAndShoppingCartService {
 
             productAndShoppingCart.setProduct(newProduct);
             productAndShoppingCart.setShoppingCart(newShoppingCart);
+            productAndShoppingCart.setAmountOfProduct(productAndShoppingCartDto.getAmountOfProduct());
 
             productAndShoppingCartProducts.add(productAndShoppingCart);
             productAndShoppingCartShoppingCarts.add(productAndShoppingCart);
@@ -93,6 +94,9 @@ public class ProductAndShoppingCartService {
             productRepository.save(newProduct);
             shoppingCartRepository.save(newShoppingCart);
             productAndShoppingCartRepository.save(productAndShoppingCart);
+
+            productAndShoppingCartDto.setShoppingCartId(shoppingCartId);
+            productAndShoppingCartDto.setProductId(productId);
 
             return productAndShoppingCartDto;
         } else {
@@ -114,12 +118,41 @@ public class ProductAndShoppingCartService {
         return shoppingCartDtoList;
     }
 
+    public ShoppingCartDto addProductsToShoppingCart(ShoppingCart shoppingCart) {
+        ShoppingCartDto shoppingCartDto = transferToShoppingCartDto(shoppingCart);
+            List<ProductDto> productDtoList = new ArrayList<>();
+            for (int j = 0; j < shoppingCart.getProductAndShoppingCarts().size(); j++) {
+                productDtoList.add(transferToProductDto(shoppingCart.getProductAndShoppingCarts().get(j).getProduct()));
+            }
+            shoppingCartDto.setProduct(productDtoList);
+        return shoppingCartDto;
+    }
+
+    public ProductAndShoppingCartDto changeAmountOfProduct(Long id, int amountOfProduct) {
+        ProductAndShoppingCart productAndShoppingCart = productAndShoppingCartRepository.findById(id).orElseThrow();
+        if (productAndShoppingCartRepository.findById(id).isPresent()) {
+            productAndShoppingCart.setAmountOfProduct(amountOfProduct);
+            ProductAndShoppingCart savedProductAndShoppingCart = productAndShoppingCartRepository.save(productAndShoppingCart);
+            return transferToProductAndShoppingCartDto(savedProductAndShoppingCart);
+        } else {
+            throw new RecordNotFoundException("Product and shopping cart combination not found!");
+        }
+    }
+
+    private ProductAndShoppingCartDto transferToProductAndShoppingCartDto(ProductAndShoppingCart productAndShoppingCart) {
+        ProductAndShoppingCartDto productAndShoppingCartDto = new ProductAndShoppingCartDto();
+        productAndShoppingCartDto.setProductId(productAndShoppingCart.getId());
+        productAndShoppingCartDto.setShoppingCartId(productAndShoppingCart.getId());
+        productAndShoppingCartDto.setAmountOfProduct(productAndShoppingCart.getAmountOfProduct());
+        return productAndShoppingCartDto;
+    }
 
     private ShoppingCartDto transferToShoppingCartDto(ShoppingCart shoppingCart) {
         ShoppingCartDto shoppingCartDto = new ShoppingCartDto();
         shoppingCartDto.setId(shoppingCart.getId());
         shoppingCartDto.setTotalPrice(shoppingCart.getTotalPrice());
         shoppingCartDto.setProcessed(false);
+        shoppingCartDto.setOrderDate(shoppingCart.getOrderDate());
         shoppingCartDto.setCustomerDto(customerService.transferToCustomerDto(shoppingCart.getCustomer()));
         return shoppingCartDto;
     }
@@ -133,5 +166,6 @@ public class ProductAndShoppingCartService {
         productDto.setRetailPrice(product.getRetailPrice());
         return productDto;
     }
+
 
 }

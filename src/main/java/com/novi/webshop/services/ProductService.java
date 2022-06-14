@@ -6,8 +6,6 @@ import com.novi.webshop.model.Product;
 import com.novi.webshop.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -121,6 +119,7 @@ public class ProductService {
         product.setCategory(productDto.getCategory());
         product.setSellingPrice(productDto.getSellingPrice());
         product.setRetailPrice(productDto.getRetailPrice());
+//        product.setPurchasedAmount(productDto.getPurchasedAmount());
         return product;
     }
 
@@ -131,6 +130,7 @@ public class ProductService {
         productDto.setCategory(product.getCategory());
         productDto.setSellingPrice(product.getSellingPrice());
         productDto.setRetailPrice(product.getRetailPrice());
+//        productDto.setPurchasedAmount(product.getPurchasedAmount());
         return productDto;
     }
 }

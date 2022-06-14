@@ -8,7 +8,7 @@ public class ProductDto {
 
     private double sellingPrice;
     private double retailPrice;
-
+    private int purchasedAmount;
 
     public Long getId() {
         return id;
@@ -48,5 +48,13 @@ public class ProductDto {
 
     public void setRetailPrice(double retailPrice) {
         this.retailPrice = retailPrice;
+    }
+
+    public int getPurchasedAmount() {
+        return purchasedAmount;
+    }
+
+    public void setPurchasedAmount(int purchasedAmount) {
+        this.purchasedAmount = purchasedAmount;
     }
 }

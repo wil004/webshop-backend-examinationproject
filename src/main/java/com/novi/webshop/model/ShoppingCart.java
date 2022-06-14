@@ -1,6 +1,7 @@
 package com.novi.webshop.model;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -13,11 +14,18 @@ public class ShoppingCart {
 
     private boolean processed;
 
+    private LocalDateTime orderDate;
+
+    private Long orderDateInMilliSeconds;
+
     @ManyToOne(optional = false)
     private Customer customer;
 
     @OneToMany(mappedBy = "shoppingCart")
     private List<ProductAndShoppingCart> productAndShoppingCarts;
+
+    @OneToMany(mappedBy = "shoppingCart")
+    private List<ReturnCart> returnProducts;
 
 
     public Long getId() {
@@ -42,6 +50,22 @@ public class ShoppingCart {
         this.processed = processed;
     }
 
+    public LocalDateTime getOrderDate() {
+        return orderDate;
+    }
+
+    public void setOrderDate(LocalDateTime orderDate) {
+        this.orderDate = orderDate;
+    }
+
+    public Long getOrderDateInMilliSeconds() {
+        return orderDateInMilliSeconds;
+    }
+
+    public void setOrderDateInMilliSeconds(Long orderDateInMilliSeconds) {
+        this.orderDateInMilliSeconds = orderDateInMilliSeconds;
+    }
+
     public List<ProductAndShoppingCart> getProductAndShoppingCarts() {
         return productAndShoppingCarts;
     }
@@ -56,5 +80,13 @@ public class ShoppingCart {
 
     public void setCustomer(Customer customer) {
         this.customer = customer;
+    }
+
+    public List<ReturnCart> getReturnProducts() {
+        return returnProducts;
+    }
+
+    public void setReturnProducts(List<ReturnCart> returnProducts) {
+        this.returnProducts = returnProducts;
     }
 }

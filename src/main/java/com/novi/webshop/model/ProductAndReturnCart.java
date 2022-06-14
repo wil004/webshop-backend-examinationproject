@@ -1,9 +1,12 @@
 package com.novi.webshop.model;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 
 @Entity
-public class ProductAndShoppingCart {
+public class ProductAndReturnCart {
     @Id
     @GeneratedValue
     private Long id;
@@ -14,7 +17,7 @@ public class ProductAndShoppingCart {
     private Product product;
 
     @ManyToOne
-    private ShoppingCart shoppingCart;
+    private ReturnCart returnCart;
 
     public Long getId() {
         return id;
@@ -40,11 +43,11 @@ public class ProductAndShoppingCart {
         this.product = product;
     }
 
-    public ShoppingCart getShoppingCart() {
-        return shoppingCart;
+    public ReturnCart getReturnCart() {
+        return returnCart;
     }
 
-    public void setShoppingCart(ShoppingCart shoppingCart) {
-        this.shoppingCart = shoppingCart;
+    public void setReturnCart(ReturnCart returnCart) {
+        this.returnCart = returnCart;
     }
 }

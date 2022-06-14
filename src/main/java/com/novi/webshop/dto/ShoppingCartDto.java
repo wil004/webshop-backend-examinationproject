@@ -2,6 +2,7 @@ package com.novi.webshop.dto;
 
 import com.novi.webshop.model.Customer;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class ShoppingCartDto {
@@ -10,6 +11,8 @@ public class ShoppingCartDto {
     private double totalPrice;
 
     private boolean processed;
+
+    private LocalDateTime orderDate;
     private CustomerDto customerDto;
     private List<ProductDto> product;
 
@@ -35,6 +38,14 @@ public class ShoppingCartDto {
 
     public void setProcessed(boolean processed) {
         this.processed = processed;
+    }
+
+    public LocalDateTime getOrderDate() {
+        return orderDate;
+    }
+
+    public void setOrderDate(LocalDateTime orderDate) {
+        this.orderDate = orderDate;
     }
 
     public CustomerDto getCustomerDto() {

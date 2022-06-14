@@ -1,17 +1,17 @@
 package com.novi.webshop.model;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
-public class ProductAndShoppingCart {
+public class ReturnCart {
+
     @Id
     @GeneratedValue
     private Long id;
 
-    private int amountOfProduct;
-
-    @ManyToOne
-    private Product product;
+    @OneToMany(mappedBy = "returnCart")
+    private List<ProductAndReturnCart> productAndReturnCartList;
 
     @ManyToOne
     private ShoppingCart shoppingCart;
@@ -24,20 +24,12 @@ public class ProductAndShoppingCart {
         this.id = id;
     }
 
-    public int getAmountOfProduct() {
-        return amountOfProduct;
+    public List<ProductAndReturnCart> getProductAndReturnCartList() {
+        return productAndReturnCartList;
     }
 
-    public void setAmountOfProduct(int amountOfProduct) {
-        this.amountOfProduct = amountOfProduct;
-    }
-
-    public Product getProduct() {
-        return product;
-    }
-
-    public void setProduct(Product product) {
-        this.product = product;
+    public void setProductAndReturnCartList(List<ProductAndReturnCart> productAndReturnCartList) {
+        this.productAndReturnCartList = productAndReturnCartList;
     }
 
     public ShoppingCart getShoppingCart() {

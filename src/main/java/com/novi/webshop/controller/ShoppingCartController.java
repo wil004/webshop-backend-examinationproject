@@ -44,10 +44,10 @@ public class ShoppingCartController {
         return ResponseEntity.ok(shoppingCartService.getShoppingCartsByNameAndAddress(firstName, lastName, zipcode, houseNumber, additionalHouseNumber));
     }
 
-    @PostMapping(consumes = { MediaType.APPLICATION_JSON_VALUE })
-    public ResponseEntity<ShoppingCartDto> createShoppingCart(@RequestBody ShoppingCartInputDto shoppingCartInputDto) {
+    @PostMapping(path = "/{customerId}",consumes = { MediaType.APPLICATION_JSON_VALUE })
+    public ResponseEntity<ShoppingCartDto> createShoppingCart(@PathVariable Long customerId,@RequestBody ShoppingCartInputDto shoppingCartInputDto) {
         final URI location = URI.create("/shoppingcart" + shoppingCartInputDto.getCustomerId());
-        return ResponseEntity.created(location).body(shoppingCartService.createShoppingCard(shoppingCartInputDto));
+        return ResponseEntity.created(location).body(shoppingCartService.createShoppingCard(customerId));
     }
 
     @DeleteMapping("/{id}")

@@ -16,17 +16,17 @@ import java.util.List;
 @RequestMapping("product-shoppingcart")
 public class ProductAndShoppingCartController {
 
-    private ProductAndShoppingCartService productAndShoppingCartService;
+    private final ProductAndShoppingCartService productAndShoppingCartService;
 
     @Autowired
     public ProductAndShoppingCartController(ProductAndShoppingCartService productAndShoppingCartService) {
         this.productAndShoppingCartService = productAndShoppingCartService;
     }
 
-    @PostMapping(consumes = { MediaType.APPLICATION_JSON_VALUE })
-    public ResponseEntity<ProductAndShoppingCartDto> connectTelevisionsAndWallBracketsInModel(@RequestBody ProductAndShoppingCartDto productAndShoppingCartDto) {
+    @PostMapping(path = "/{productId}/{shoppingCartId}" , consumes = { MediaType.APPLICATION_JSON_VALUE })
+    public ResponseEntity<ProductAndShoppingCartDto> connectProductAndShoppingCart(@PathVariable Long productId, @PathVariable Long shoppingCartId, @RequestBody ProductAndShoppingCartDto productAndShoppingCartDto) {
         final URI location = URI.create("/product-shoppingcart" + productAndShoppingCartDto.getProductId() + productAndShoppingCartDto.getShoppingCartId());
-        return ResponseEntity.created(location).body(productAndShoppingCartService.connectProductWithShoppingCart(productAndShoppingCartDto));
+        return ResponseEntity.created(location).body(productAndShoppingCartService.connectProductWithShoppingCart(productId, shoppingCartId, productAndShoppingCartDto));
     }
 
 }

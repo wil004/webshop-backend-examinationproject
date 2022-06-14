@@ -17,6 +17,7 @@ public class Product {
 
     private double sellingPrice;
     private double retailPrice;
+//    private int purchasedAmount;
 
     @OneToMany(mappedBy = "product")
     private List<ProductAndShoppingCart> productAndShoppingCarts;
@@ -60,6 +61,14 @@ public class Product {
     public void setRetailPrice(double buyingPrice) {
         this.retailPrice = buyingPrice;
     }
+
+//    public int getPurchasedAmount() {
+//        return purchasedAmount;
+//    }
+//
+//    public void setPurchasedAmount(int purchasedAmount) {
+//        this.purchasedAmount = purchasedAmount;
+//    }
 
     public List<ProductAndShoppingCart> getProductAndShoppingCarts() {
         return productAndShoppingCarts;

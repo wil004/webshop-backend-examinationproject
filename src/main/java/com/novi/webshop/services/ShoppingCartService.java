@@ -9,6 +9,7 @@ import com.novi.webshop.repository.CustomerRepository;
 import com.novi.webshop.repository.ShoppingCartRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,7 +43,14 @@ private final ProductAndShoppingCartService productAndShoppingCartService;
         return productAndShoppingCartService.addProductsToShoppingCarts(allNotProcessedShoppingCarts);
     }
 
-
+    public ShoppingCartDto getShoppingCartById(Long id) {
+        ShoppingCart shoppingCart = shoppingCartRepository.findById(id).orElseThrow();
+        if(shoppingCartRepository.findById(id).isPresent()) {
+            return productAndShoppingCartService.addProductsToShoppingCart(shoppingCart);
+        } else {
+            throw new RecordNotFoundException("Couldn't find shopping cart");
+        }
+    }
 
 
     public List<ShoppingCartDto> getShoppingCartsByNameAndAddress(String firstName, String lastName, String zipcode, int houseNumber) {
@@ -81,10 +89,12 @@ private final ProductAndShoppingCartService productAndShoppingCartService;
 
 
 
-    public ShoppingCartDto createShoppingCard(ShoppingCartInputDto shoppingCartInputDto) {
-        Customer customer = customerRepository.findById(shoppingCartInputDto.getCustomerId()).orElseThrow();
+    public ShoppingCartDto createShoppingCard(Long id) {
+        Customer customer = customerRepository.findById(id).orElseThrow();
         ShoppingCart shoppingCart = new ShoppingCart();
         shoppingCart.setProcessed(false);
+        shoppingCart.setOrderDate(LocalDateTime.now());
+        shoppingCart.setOrderDateInMilliSeconds(System.currentTimeMillis());
         shoppingCart.setCustomer(customer);
         ShoppingCart savedShoppingCart = shoppingCartRepository.save(shoppingCart);
         ShoppingCartDto shoppingCartDto = transferToShoppingCartDto(savedShoppingCart);
@@ -100,11 +110,21 @@ private final ProductAndShoppingCartService productAndShoppingCartService;
         }
     }
 
+    protected ShoppingCart transferToShoppingCart(ShoppingCartDto shoppingCartDto) {
+        ShoppingCart shoppingCart = new ShoppingCart();
+        shoppingCart.setId(shoppingCartDto.getId());
+        shoppingCart.setTotalPrice(shoppingCartDto.getTotalPrice());
+        shoppingCart.setProcessed(shoppingCartDto.isProcessed());
+        shoppingCart.setOrderDate(shoppingCartDto.getOrderDate());
+        shoppingCart.setCustomer(shoppingCart.getCustomer());
+        return shoppingCart;
+    }
     protected ShoppingCartDto transferToShoppingCartDto(ShoppingCart shoppingCart) {
         ShoppingCartDto shoppingCartDto = new ShoppingCartDto();
         shoppingCartDto.setId(shoppingCart.getId());
         shoppingCartDto.setTotalPrice(shoppingCart.getTotalPrice());
-        shoppingCartDto.setProcessed(false);
+        shoppingCartDto.setProcessed(shoppingCart.isProcessed());
+        shoppingCartDto.setOrderDate(shoppingCart.getOrderDate());
         shoppingCartDto.setCustomerDto(customerService.transferToCustomerDto(shoppingCart.getCustomer()));
         return shoppingCartDto;
     }

@@ -1,18 +1,17 @@
 package com.novi.webshop.dto;
 
-import com.novi.webshop.model.Product;
-import com.novi.webshop.model.ShoppingCart;
 
-public class ProductAndShoppingCartDto {
+public class ProductAndReturnCartDto {
 
     private int amountOfProduct;
     private Long productId;
-    private Long shoppingCartId;
 
+    private Long returnCartId;
 
     public int getAmountOfProduct() {
         return amountOfProduct;
     }
+
     public void setAmountOfProduct(int amountOfProduct) {
         this.amountOfProduct = amountOfProduct;
     }
@@ -25,11 +24,11 @@ public class ProductAndShoppingCartDto {
         this.productId = productId;
     }
 
-    public Long getShoppingCartId() {
-        return shoppingCartId;
+    public Long getReturnCartId() {
+        return returnCartId;
     }
 
-    public void setShoppingCartId(Long shoppingCartId) {
-        this.shoppingCartId = shoppingCartId;
+    public void setReturnCartId(Long returnCartId) {
+        this.returnCartId = returnCartId;
     }
 }
