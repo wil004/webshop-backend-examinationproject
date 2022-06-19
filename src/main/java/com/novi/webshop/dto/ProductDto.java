@@ -8,7 +8,8 @@ public class ProductDto {
 
     private double sellingPrice;
     private double retailPrice;
-    private int purchasedAmount;
+    private int amountOfProducts;
+    private int amountOfReturningProducts;
 
     public Long getId() {
         return id;
@@ -50,11 +51,19 @@ public class ProductDto {
         this.retailPrice = retailPrice;
     }
 
-    public int getPurchasedAmount() {
-        return purchasedAmount;
+    public int getAmountOfProducts() {
+        return amountOfProducts;
     }
 
-    public void setPurchasedAmount(int purchasedAmount) {
-        this.purchasedAmount = purchasedAmount;
+    public void setAmountOfProducts(int amountOfProducts) {
+        this.amountOfProducts = amountOfProducts;
+    }
+
+    public int getAmountOfReturningProducts() {
+        return amountOfReturningProducts;
+    }
+
+    public void setAmountOfReturningProducts(int amountOfReturningProducts) {
+        this.amountOfReturningProducts = amountOfReturningProducts;
     }
 }

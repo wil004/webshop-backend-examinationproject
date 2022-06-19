@@ -119,7 +119,6 @@ public class ProductService {
         product.setCategory(productDto.getCategory());
         product.setSellingPrice(productDto.getSellingPrice());
         product.setRetailPrice(productDto.getRetailPrice());
-//        product.setPurchasedAmount(productDto.getPurchasedAmount());
         return product;
     }
 
@@ -130,7 +129,6 @@ public class ProductService {
         productDto.setCategory(product.getCategory());
         productDto.setSellingPrice(product.getSellingPrice());
         productDto.setRetailPrice(product.getRetailPrice());
-//        productDto.setPurchasedAmount(product.getPurchasedAmount());
         return productDto;
     }
 }

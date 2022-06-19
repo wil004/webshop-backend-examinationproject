@@ -10,11 +10,24 @@ public class ReturnCart {
     @GeneratedValue
     private Long id;
 
-    @OneToMany(mappedBy = "returnCart")
-    private List<ProductAndReturnCart> productAndReturnCartList;
 
+    private double totalPrice;
+
+    private boolean processed;
     @ManyToOne
     private ShoppingCart shoppingCart;
+
+    @ManyToMany
+    private List<Product> returnProductList;
+
+    @ManyToOne
+    private Admin adminForProcessedList;
+    @ManyToOne
+    private Admin adminForUnProcessedList;
+
+    @ManyToOne
+    private Employee employeeReturnCartList;
+
 
     public Long getId() {
         return id;
@@ -24,12 +37,20 @@ public class ReturnCart {
         this.id = id;
     }
 
-    public List<ProductAndReturnCart> getProductAndReturnCartList() {
-        return productAndReturnCartList;
+    public double getTotalPrice() {
+        return totalPrice;
     }
 
-    public void setProductAndReturnCartList(List<ProductAndReturnCart> productAndReturnCartList) {
-        this.productAndReturnCartList = productAndReturnCartList;
+    public void setTotalPrice(double totalPrice) {
+        this.totalPrice = totalPrice;
+    }
+
+    public boolean isProcessed() {
+        return processed;
+    }
+
+    public void setProcessed(boolean processed) {
+        this.processed = processed;
     }
 
     public ShoppingCart getShoppingCart() {
@@ -38,5 +59,37 @@ public class ReturnCart {
 
     public void setShoppingCart(ShoppingCart shoppingCart) {
         this.shoppingCart = shoppingCart;
+    }
+
+    public List<Product> getReturnProductList() {
+        return returnProductList;
+    }
+
+    public void setReturnProductList(List<Product> productList) {
+        this.returnProductList = productList;
+    }
+
+    public Admin getAdminForProcessedList() {
+        return adminForProcessedList;
+    }
+
+    public void setAdminForProcessedList(Admin adminForProcessedList) {
+        this.adminForProcessedList = adminForProcessedList;
+    }
+
+    public Admin getAdminForUnProcessedList() {
+        return adminForUnProcessedList;
+    }
+
+    public void setAdminForUnProcessedList(Admin adminForUnProcessedList) {
+        this.adminForUnProcessedList = adminForUnProcessedList;
+    }
+
+    public Employee getEmployeeReturnCartList() {
+        return employeeReturnCartList;
+    }
+
+    public void setEmployeeReturnCartList(Employee employeeReturnCartList) {
+        this.employeeReturnCartList = employeeReturnCartList;
     }
 }

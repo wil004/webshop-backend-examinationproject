@@ -1,9 +1,6 @@
 package com.novi.webshop.model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import java.util.List;
 
 @Entity
@@ -15,12 +12,18 @@ public class Product {
     private String product;
     private String category;
 
+    private int amountOfProducts;
+
+    private int amountOfReturningProducts;
+
     private double sellingPrice;
     private double retailPrice;
-//    private int purchasedAmount;
 
-    @OneToMany(mappedBy = "product")
-    private List<ProductAndShoppingCart> productAndShoppingCarts;
+    @ManyToMany
+    private List<ShoppingCart> shoppingCartList;
+
+    @ManyToMany
+    private List<ReturnCart> returnCartList;
 
     public Long getId() {
         return id;
@@ -46,6 +49,22 @@ public class Product {
         this.category = category;
     }
 
+    public int getAmountOfProducts() {
+        return amountOfProducts;
+    }
+
+    public void setAmountOfProducts(int amountOfProducts) {
+        this.amountOfProducts = amountOfProducts;
+    }
+
+    public int getAmountOfReturningProducts() {
+        return amountOfReturningProducts;
+    }
+
+    public void setAmountOfReturningProducts(int amountOfReturningProducts) {
+        this.amountOfReturningProducts = amountOfReturningProducts;
+    }
+
     public double getSellingPrice() {
         return sellingPrice;
     }
@@ -62,19 +81,19 @@ public class Product {
         this.retailPrice = buyingPrice;
     }
 
-//    public int getPurchasedAmount() {
-//        return purchasedAmount;
-//    }
-//
-//    public void setPurchasedAmount(int purchasedAmount) {
-//        this.purchasedAmount = purchasedAmount;
-//    }
-
-    public List<ProductAndShoppingCart> getProductAndShoppingCarts() {
-        return productAndShoppingCarts;
+    public List<ShoppingCart> getShoppingCartList() {
+        return shoppingCartList;
     }
 
-    public void setProductAndShoppingCarts(List<ProductAndShoppingCart> productAndShoppingCarts) {
-        this.productAndShoppingCarts = productAndShoppingCarts;
+    public void setShoppingCartList(List<ShoppingCart> shoppingCartList) {
+        this.shoppingCartList = shoppingCartList;
+    }
+
+    public List<ReturnCart> getReturnCartList() {
+        return returnCartList;
+    }
+
+    public void setReturnCartList(List<ReturnCart> returnCartList) {
+        this.returnCartList = returnCartList;
     }
 }

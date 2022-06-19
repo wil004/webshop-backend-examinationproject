@@ -1,9 +1,8 @@
 package com.novi.webshop.controller;
 
+import com.novi.webshop.dto.ProductDto;
 import com.novi.webshop.dto.ShoppingCartDto;
-import com.novi.webshop.dto.ShoppingCartInputDto;
 import com.novi.webshop.services.ShoppingCartService;
-import org.apache.coyote.Response;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,9 +25,14 @@ public class ShoppingCartController {
         return ResponseEntity.ok(shoppingCartService.getAllShoppingCarts());
     }
 
-    @GetMapping("/notprocessed")
-    public ResponseEntity<List<ShoppingCartDto>> getAllNotProcessedShoppingCarts() {
-        return ResponseEntity.ok(shoppingCartService.getStillToProcessShoppingCarts());
+    @GetMapping("/get-by-id/{id}")
+    public ResponseEntity<ShoppingCartDto> getShoppingCartById(@PathVariable Long id) {
+        return ResponseEntity.ok(shoppingCartService.getShoppingCartById(id));
+    }
+
+    @GetMapping("/processed-status={processed}")
+    public ResponseEntity<List<ShoppingCartDto>> getAllProcessedOrNotProcessedShoppingCarts(@PathVariable boolean processed) {
+        return ResponseEntity.ok(shoppingCartService.getProcessedOrNotProcessedShoppingCarts(processed));
     }
 
     @GetMapping("/{firstName}/{lastName}/{zipcode}/{houseNumber}")
@@ -44,11 +48,26 @@ public class ShoppingCartController {
         return ResponseEntity.ok(shoppingCartService.getShoppingCartsByNameAndAddress(firstName, lastName, zipcode, houseNumber, additionalHouseNumber));
     }
 
+    @PutMapping(value = "change-processed-status={processed}/id={id}",
+    consumes = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<ShoppingCartDto> changeProcessedStatus(@PathVariable Long id, @PathVariable boolean processed) {
+        return ResponseEntity.ok(shoppingCartService.changeProcessedStatus(id, processed));
+    }
+
+
+    @PutMapping(value = "id={shoppingCartId}/productid={productId}",
+            consumes = { MediaType.APPLICATION_JSON_VALUE })
+    public ResponseEntity<ShoppingCartDto> addProductToShoppingCart(@PathVariable Long shoppingCartId ,@PathVariable Long productId, @RequestBody ProductDto productDto) {
+        return ResponseEntity.ok(shoppingCartService.connectProductWithShoppingCart(shoppingCartId, productId, productDto));
+    }
+
     @PostMapping(path = "/{customerId}",consumes = { MediaType.APPLICATION_JSON_VALUE })
-    public ResponseEntity<ShoppingCartDto> createShoppingCart(@PathVariable Long customerId,@RequestBody ShoppingCartInputDto shoppingCartInputDto) {
-        final URI location = URI.create("/shoppingcart" + shoppingCartInputDto.getCustomerId());
+    public ResponseEntity<ShoppingCartDto> createShoppingCart(@PathVariable Long customerId) {
+        final URI location = URI.create("/shoppingcart" + customerId);
         return ResponseEntity.created(location).body(shoppingCartService.createShoppingCard(customerId));
     }
+
+
 
     @DeleteMapping("/{id}")
     public void deleteShoppingCart(@PathVariable long id) {

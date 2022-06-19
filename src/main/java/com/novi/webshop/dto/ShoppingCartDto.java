@@ -1,7 +1,5 @@
 package com.novi.webshop.dto;
 
-import com.novi.webshop.model.Customer;
-
 import java.time.LocalDateTime;
 import java.util.List;
 

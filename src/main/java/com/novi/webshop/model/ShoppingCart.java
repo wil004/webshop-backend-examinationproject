@@ -1,5 +1,7 @@
 package com.novi.webshop.model;
 
+import net.bytebuddy.asm.Advice;
+
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,11 +24,18 @@ public class ShoppingCart {
     private Customer customer;
 
     @OneToMany(mappedBy = "shoppingCart")
-    private List<ProductAndShoppingCart> productAndShoppingCarts;
+    private List<ReturnCart> returnCartList;
 
-    @OneToMany(mappedBy = "shoppingCart")
-    private List<ReturnCart> returnProducts;
+    @ManyToMany
+    private List<Product> productList;
 
+    @ManyToOne
+    private Admin adminForProcessedList;
+    @ManyToOne
+    private Admin adminForUnProcessedList;
+
+    @ManyToOne
+    private Employee employeeShoppingCartList;
 
     public Long getId() {
         return id;
@@ -66,13 +75,6 @@ public class ShoppingCart {
         this.orderDateInMilliSeconds = orderDateInMilliSeconds;
     }
 
-    public List<ProductAndShoppingCart> getProductAndShoppingCarts() {
-        return productAndShoppingCarts;
-    }
-
-    public void setProductAndShoppingCarts(List<ProductAndShoppingCart> productAndShoppingCarts) {
-        this.productAndShoppingCarts = productAndShoppingCarts;
-    }
 
     public Customer getCustomer() {
         return customer;
@@ -82,11 +84,44 @@ public class ShoppingCart {
         this.customer = customer;
     }
 
-    public List<ReturnCart> getReturnProducts() {
-        return returnProducts;
+    public List<Product> getProductList() {
+        return productList;
     }
 
-    public void setReturnProducts(List<ReturnCart> returnProducts) {
-        this.returnProducts = returnProducts;
+    public void setProductList(List<Product> productList) {
+        this.productList = productList;
+    }
+
+    public List<ReturnCart> getReturnCartList() {
+        return returnCartList;
+    }
+
+    public void setReturnCartList(List<ReturnCart> returnCartList) {
+        this.returnCartList = returnCartList;
+    }
+
+    public User getAdminForProcessedList() {
+        return adminForProcessedList;
+    }
+
+    public void setAdminForProcessedList(Admin adminForProcessedList) {
+        this.adminForProcessedList = adminForProcessedList;
+    }
+
+    public Admin getAdminForUnProcessedList() {
+        return adminForUnProcessedList;
+    }
+
+    public void setAdminForUnProcessedList(Admin adminForUnProcessedList) {
+        this.adminForUnProcessedList = adminForUnProcessedList;
+    }
+
+    public Employee getEmployeeShoppingCartList() {
+        return employeeShoppingCartList;
+    }
+
+    public void setEmployeeShoppingCartList(Employee employeeShoppingCartList) {
+        this.employeeShoppingCartList = employeeShoppingCartList;
     }
 }
+
