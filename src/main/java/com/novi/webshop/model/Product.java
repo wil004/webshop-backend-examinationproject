@@ -9,10 +9,10 @@ public class Product {
     @GeneratedValue
     private Long id;
 
-    private String product;
+    private String productName;
     private String category;
 
-    private int amountOfProducts;
+    private int amountOfOrderedProducts;
 
     private int amountOfReturningProducts;
 
@@ -21,6 +21,9 @@ public class Product {
 
     @ManyToMany
     private List<ShoppingCart> shoppingCartList;
+
+    @ManyToMany
+    private List<Orders> orderList;
 
     @ManyToMany
     private List<ReturnCart> returnCartList;
@@ -33,12 +36,12 @@ public class Product {
         this.id = id;
     }
 
-    public String getProduct() {
-        return product;
+    public String getProductName() {
+        return productName;
     }
 
-    public void setProduct(String product) {
-        this.product = product;
+    public void setProductName(String product) {
+        this.productName = product;
     }
 
     public String getCategory() {
@@ -49,12 +52,12 @@ public class Product {
         this.category = category;
     }
 
-    public int getAmountOfProducts() {
-        return amountOfProducts;
+    public int getAmountOfOrderedProducts() {
+        return amountOfOrderedProducts;
     }
 
-    public void setAmountOfProducts(int amountOfProducts) {
-        this.amountOfProducts = amountOfProducts;
+    public void setAmountOfOrderedProducts(int amountOfProducts) {
+        this.amountOfOrderedProducts = amountOfProducts;
     }
 
     public int getAmountOfReturningProducts() {
@@ -87,6 +90,14 @@ public class Product {
 
     public void setShoppingCartList(List<ShoppingCart> shoppingCartList) {
         this.shoppingCartList = shoppingCartList;
+    }
+
+    public List<Orders> getOrderList() {
+        return orderList;
+    }
+
+    public void setOrderList(List<Orders> orderList) {
+        this.orderList = orderList;
     }
 
     public List<ReturnCart> getReturnCartList() {

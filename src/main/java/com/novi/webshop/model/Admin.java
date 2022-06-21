@@ -1,7 +1,5 @@
 package com.novi.webshop.model;
 
-import org.springframework.stereotype.Component;
-
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -15,11 +13,11 @@ public class Admin extends User {
     @GeneratedValue
     private Long id;
 
-    private String role;
     @OneToMany(mappedBy = "adminForUnProcessedList")
-    private List<ShoppingCart> allNotProcessedShoppingCarts;
+    private List<Orders> allNotProcessedOrders;
     @OneToMany(mappedBy = "adminForProcessedList")
-    private List<ShoppingCart> allProcessedShoppingCarts;
+    private List<Orders> allProcessedOrders;
+
     @OneToMany(mappedBy = "adminForUnProcessedList")
     private List<ReturnCart> allNotProcessedReturnCarts;
     @OneToMany(mappedBy = "adminForProcessedList")
@@ -29,7 +27,7 @@ public class Admin extends User {
     private List<Employee> employees;
 
     public Admin() {
-        this.role = "ADMIN";
+        super.setRole("ADMIN");
     }
 
     public Long getId() {
@@ -40,20 +38,21 @@ public class Admin extends User {
         this.id = id;
     }
 
-    public List<ShoppingCart> getAllNotProcessedShoppingCarts() {
-        return allNotProcessedShoppingCarts;
+
+    public List<Orders> getAllNotProcessedOrders() {
+        return allNotProcessedOrders;
     }
 
-    public void setAllNotProcessedShoppingCarts(List<ShoppingCart> allNotProcessedShoppingCarts) {
-        this.allNotProcessedShoppingCarts = allNotProcessedShoppingCarts;
+    public void setAllNotProcessedOrders(List<Orders> allNotProcessedOrders) {
+        this.allNotProcessedOrders = allNotProcessedOrders;
     }
 
-    public List<ShoppingCart> getAllProcessedShoppingCarts() {
-        return allProcessedShoppingCarts;
+    public List<Orders> getAllProcessedOrders() {
+        return allProcessedOrders;
     }
 
-    public void setAllProcessedShoppingCarts(List<ShoppingCart> allProcessedShoppingCarts) {
-        this.allProcessedShoppingCarts = allProcessedShoppingCarts;
+    public void setAllProcessedOrders(List<Orders> allProcessedOrders) {
+        this.allProcessedOrders = allProcessedOrders;
     }
 
     public List<ReturnCart> getAllNotProcessedReturnCarts() {

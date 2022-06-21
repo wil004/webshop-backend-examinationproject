@@ -1,17 +1,17 @@
 package com.novi.webshop.model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import java.util.List;
 
 @Entity
-public class Customer {
+public class Customer extends User {
     @Id
     @GeneratedValue
     private Long id;
-
+    private String emailAddress;
+    private String username;
+    private String password;
+    private String role;
     private String firstName;
     private String lastName;
 
@@ -22,8 +22,12 @@ public class Customer {
     private String city;
     private String zipcode;
 
+    @OneToOne
+    private ShoppingCart shoppingCart;
+
     @OneToMany(mappedBy = "customer")
-    private List<ShoppingCart> shoppingHistory;
+    private List<Orders> orderHistory;
+
 
     public Long getId() {
         return id;
@@ -31,6 +35,46 @@ public class Customer {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    @Override
+    public String getEmailAddress() {
+        return emailAddress;
+    }
+
+    @Override
+    public void setEmailAddress(String emailAddress) {
+        this.emailAddress = emailAddress;
+    }
+
+    @Override
+    public String getUsername() {
+        return username;
+    }
+
+    @Override
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    @Override
+    public String getPassword() {
+        return password;
+    }
+
+    @Override
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    @Override
+    public String getRole() {
+        return role;
+    }
+
+    @Override
+    public void setRole(String role) {
+        this.role = role;
     }
 
     public String getFirstName() {
@@ -89,11 +133,20 @@ public class Customer {
         this.zipcode = zipcode;
     }
 
-    public List<ShoppingCart> getShoppingHistory() {
-        return shoppingHistory;
+
+    public ShoppingCart getShoppingCart() {
+        return shoppingCart;
     }
 
-    public void setShoppingHistory(List<ShoppingCart> shoppingHistory) {
-        this.shoppingHistory = shoppingHistory;
+    public void setShoppingCart(ShoppingCart shoppingCart) {
+        this.shoppingCart = shoppingCart;
+    }
+
+    public List<Orders> getOrderHistory() {
+        return orderHistory;
+    }
+
+    public void setOrderHistory(List<Orders> orderHistory) {
+        this.orderHistory = orderHistory;
     }
 }

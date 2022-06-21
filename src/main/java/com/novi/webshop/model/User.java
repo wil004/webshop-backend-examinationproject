@@ -2,14 +2,12 @@ package com.novi.webshop.model;
 
 import org.springframework.stereotype.Component;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-
+@Component
 public abstract class User {
     private String emailAddress;
     private String username;
     private String password;
+    private String role;
 
     public String getEmailAddress() {
         return emailAddress;
@@ -33,5 +31,13 @@ public abstract class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 }

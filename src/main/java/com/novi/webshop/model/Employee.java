@@ -1,7 +1,5 @@
 package com.novi.webshop.model;
 
-import org.springframework.stereotype.Component;
-
 import javax.persistence.*;
 import java.util.List;
 
@@ -16,11 +14,15 @@ public class Employee extends User{
     @OneToMany(mappedBy = "employeeReturnCartList")
     private List<ReturnCart> returnCartList;
 
-    @OneToMany(mappedBy = "employeeShoppingCartList")
-    private List<ShoppingCart> shoppingCartList;
+    @OneToMany(mappedBy = "employeeOrderList")
+    private List<Orders> orderList;
 
     @ManyToOne
     private Admin admin;
+
+    public Employee() {
+        super.setRole("EMPLOYEE");
+    }
 
     public Long getId() {
         return id;
@@ -54,12 +56,12 @@ public class Employee extends User{
         this.returnCartList = returnCartList;
     }
 
-    public List<ShoppingCart> getShoppingCartList() {
-        return shoppingCartList;
+    public List<Orders> getOrderList() {
+        return orderList;
     }
 
-    public void setShoppingCartList(List<ShoppingCart> shoppingCartList) {
-        this.shoppingCartList = shoppingCartList;
+    public void setOrderList(List<Orders> orderList) {
+        this.orderList = orderList;
     }
 
     public Admin getAdmin() {

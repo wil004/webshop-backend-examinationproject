@@ -14,8 +14,9 @@ public class ReturnCart {
     private double totalPrice;
 
     private boolean processed;
+
     @ManyToOne
-    private ShoppingCart shoppingCart;
+    private Orders customerOrder;
 
     @ManyToMany
     private List<Product> returnProductList;
@@ -53,12 +54,12 @@ public class ReturnCart {
         this.processed = processed;
     }
 
-    public ShoppingCart getShoppingCart() {
-        return shoppingCart;
+    public Orders getCustomerOrder() {
+        return customerOrder;
     }
 
-    public void setShoppingCart(ShoppingCart shoppingCart) {
-        this.shoppingCart = shoppingCart;
+    public void setCustomerOrder(Orders customerOrder) {
+        this.customerOrder = customerOrder;
     }
 
     public List<Product> getReturnProductList() {

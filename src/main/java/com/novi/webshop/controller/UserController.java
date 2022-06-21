@@ -21,10 +21,10 @@ public class UserController {
         this.adminService = adminService;
     }
 
-    @GetMapping("/divide-shoppingcarts-employees")
-    public ResponseEntity<List<UserEmployeeDto>> divideShoppingCarts(){
-        return ResponseEntity.ok(adminService.divideShoppingCartOrdersToEmployees());
-    }
+//    @PutMapping("/divide-shoppingcarts-employees")
+//    public ResponseEntity<List<UserEmployeeDto>> divideShoppingCarts(){
+//        return ResponseEntity.ok(adminService.divideShoppingCartOrdersToEmployees());
+//    }
 
     @PostMapping(path = "create-employee", consumes = { MediaType.APPLICATION_JSON_VALUE })
     public ResponseEntity<UserEmployeeDto> createEmployeeAccount(@RequestBody UserEmployeeInputDto userEmployeeInputDto) {

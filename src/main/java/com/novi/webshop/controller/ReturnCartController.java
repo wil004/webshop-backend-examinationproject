@@ -55,9 +55,9 @@ public class ReturnCartController {
         return ResponseEntity.ok(returnCartService.connectProductWithReturnCart(returnCartId, productId, productDto));
     }
 
-    @PostMapping(path = "/{shoppingCartId}", consumes = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<ReturnCartDto> createReturnCart(@PathVariable Long shoppingCartId) {
-        final URI location = URI.create("/returncart" + shoppingCartId);
-        return ResponseEntity.created(location).body(returnCartService.createReturnProducts(shoppingCartId));
+    @PostMapping(path = "/{orderId}", consumes = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<ReturnCartDto> createReturnCart(@PathVariable Long orderId) {
+        final URI location = URI.create("/returncart" + orderId);
+        return ResponseEntity.created(location).body(returnCartService.createReturnProducts(orderId));
     }
 }

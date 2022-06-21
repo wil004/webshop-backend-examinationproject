@@ -1,17 +1,8 @@
-package com.novi.webshop.dto;
+package com.novi.webshop.security;
 
-public abstract class UserDto {
-    private String emailAddress;
-    private String username;
+public class AuthDto {
+    private  String username;
     private String password;
-
-    public String getEmailAddress() {
-        return emailAddress;
-    }
-
-    public void setEmailAddress(String emailAddress) {
-        this.emailAddress = emailAddress;
-    }
 
     public String getUsername() {
         return username;

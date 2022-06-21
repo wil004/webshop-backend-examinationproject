@@ -1,12 +1,11 @@
 package com.novi.webshop.services;
 
-import com.novi.webshop.controller.exceptions.RecordNotFoundException;
 import com.novi.webshop.dto.UserDto;
 import com.novi.webshop.dto.UserEmployeeDto;
 import com.novi.webshop.dto.UserEmployeeInputDto;
 import com.novi.webshop.model.Admin;
 import com.novi.webshop.model.Employee;
-import com.novi.webshop.model.ShoppingCart;
+import com.novi.webshop.model.Orders;
 import com.novi.webshop.repository.AdminRepository;
 import com.novi.webshop.repository.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,32 +26,32 @@ public class AdminService {
         this.employeeRepository = employeeRepository;
     }
 
-    public List<UserEmployeeDto> divideShoppingCartOrdersToEmployees() {
-        List<Admin> adminList = adminRepository.findAll();
+    public List<UserEmployeeDto> divideShoppingCartOrdersToEmployees(long adminId) {
+        Admin admin = adminRepository.findById(adminId).orElseThrow();
         List<Employee> employeeList = employeeRepository.findAll();
         List<UserEmployeeDto> employeeDtoList = new ArrayList<>();
-        Admin admin = adminList.get(0);
+//        Admin admin = adminList.get(0);
 //        if(adminList.size() == 1) {
 //            admin = adminList.get(0);
 //        } else {
 //            throw new RecordNotFoundException("You either don't have an admin or you have too many admins!" +
 //                    "There can only be one admin!");
 //        }
-        List<ShoppingCart> notProcessedShoppingCarts = admin.getAllNotProcessedShoppingCarts();
-        int amountOfNotProcessedShoppingCarts = notProcessedShoppingCarts.size();
+        List<Orders> notProcessedOrders = admin.getAllNotProcessedOrders();
+        int amountOfNotProcessedOrders = notProcessedOrders.size();
         int amountOfEmployees = employeeList.size();
-        int ordersPerEmployee = (amountOfNotProcessedShoppingCarts / amountOfEmployees) + 1;
+        int ordersPerEmployee = (amountOfNotProcessedOrders / amountOfEmployees) + 1;
         for (int i = 0; i < amountOfEmployees; i++) {
             int shoppingCartIndex = 0;
 //            employeeList.get(i).setShoppingCartList(new ArrayList<>());
-            List<ShoppingCart> shoppingCartList = employeeList.get(i).getShoppingCartList();
-            while (shoppingCartList.size() < ordersPerEmployee) {
+            List<Orders> orderList = employeeList.get(i).getOrderList();
+            while (orderList.size() < ordersPerEmployee) {
 
-            for (int j = shoppingCartIndex; j < amountOfNotProcessedShoppingCarts; j++) {
-                shoppingCartList.add(notProcessedShoppingCarts.get(j));
+            for (int j = shoppingCartIndex; j < amountOfNotProcessedOrders; j++) {
+                orderList.add(notProcessedOrders.get(j));
                     shoppingCartIndex = j;
                 }
-                employeeList.get(i).setShoppingCartList(shoppingCartList);
+                employeeList.get(i).setOrderList(orderList);
                 employeeRepository.save(employeeList.get(i));
                 employeeDtoList.add(transferToUserEmployeeDto(employeeList.get(i)));
             }

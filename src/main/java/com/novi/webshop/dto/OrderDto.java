@@ -3,13 +3,17 @@ package com.novi.webshop.dto;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public class ShoppingCartDto {
+public class OrderDto {
     private Long id;
 
+    private boolean processed;
+
     private double totalPrice;
+    private LocalDateTime orderDate;
 
     private CustomerDto customerDto;
-    private List<ProductDto> product;
+
+    private List<ProductDto> productDtoList;
 
     public Long getId() {
         return id;
@@ -17,6 +21,14 @@ public class ShoppingCartDto {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public boolean isProcessed() {
+        return processed;
+    }
+
+    public void setProcessed(boolean processed) {
+        this.processed = processed;
     }
 
     public double getTotalPrice() {
@@ -27,6 +39,13 @@ public class ShoppingCartDto {
         this.totalPrice = totalPrice;
     }
 
+    public LocalDateTime getOrderDate() {
+        return orderDate;
+    }
+
+    public void setOrderDate(LocalDateTime orderDate) {
+        this.orderDate = orderDate;
+    }
 
     public CustomerDto getCustomerDto() {
         return customerDto;
@@ -36,11 +55,11 @@ public class ShoppingCartDto {
         this.customerDto = customerDto;
     }
 
-    public List<ProductDto> getProduct() {
-        return product;
+    public List<ProductDto> getProductDtoList() {
+        return productDtoList;
     }
 
-    public void setProduct(List<ProductDto> product) {
-        this.product = product;
+    public void setProductDtoList(List<ProductDto> productDtoList) {
+        this.productDtoList = productDtoList;
     }
 }

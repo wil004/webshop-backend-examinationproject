@@ -11,7 +11,7 @@ public class UserEmployeeDto {
     private String lastName;
     private List<ReturnCartDto> returnCartDtoList;
 
-    private List<ShoppingCartDto> shoppingCartDtoList;
+    private List<OrderDto> orderDtoList;
 
     public String getEmailAddress() {
         return emailAddress;
@@ -45,11 +45,11 @@ public class UserEmployeeDto {
         this.returnCartDtoList = returnCartDtoList;
     }
 
-    public List<ShoppingCartDto> getShoppingCartDtoList() {
-        return shoppingCartDtoList;
+    public List<OrderDto> getOrderDtoList() {
+        return orderDtoList;
     }
 
-    public void setShoppingCartDtoList(List<ShoppingCartDto> shoppingCartDtoList) {
-        this.shoppingCartDtoList = shoppingCartDtoList;
+    public void setOrderDtoList(List<OrderDto> orderDtoList) {
+        this.orderDtoList = orderDtoList;
     }
 }

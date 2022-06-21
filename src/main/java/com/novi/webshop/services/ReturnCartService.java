@@ -1,15 +1,15 @@
 package com.novi.webshop.services;
 
 import com.novi.webshop.controller.exceptions.RecordNotFoundException;
+import com.novi.webshop.dto.OrderDto;
 import com.novi.webshop.dto.ProductDto;
 import com.novi.webshop.dto.ReturnCartDto;
-import com.novi.webshop.dto.ShoppingCartDto;
+import com.novi.webshop.model.Orders;
 import com.novi.webshop.model.Product;
 import com.novi.webshop.model.ReturnCart;
-import com.novi.webshop.model.ShoppingCart;
+import com.novi.webshop.repository.OrderRepository;
 import com.novi.webshop.repository.ProductRepository;
 import com.novi.webshop.repository.ReturnCartRepository;
-import com.novi.webshop.repository.ShoppingCartRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,15 +21,18 @@ public class ReturnCartService {
 
     private final ReturnCartRepository returnCartRepository;
     private final ProductRepository productRepository;
-    private final ShoppingCartRepository shoppingCartRepository;
-    private final ShoppingCartService shoppingCartService;
+
+
+    private final OrderRepository orderRepository;
+
+    private final OrderService orderService;
 
     @Autowired
-    public ReturnCartService(ReturnCartRepository returnCartRepository, ProductRepository productRepository, ShoppingCartRepository shoppingCartRepository, ShoppingCartService shoppingCartService) {
+    public ReturnCartService(ReturnCartRepository returnCartRepository, ProductRepository productRepository, OrderRepository orderRepository, OrderService orderService) {
         this.returnCartRepository = returnCartRepository;
         this.productRepository = productRepository;
-        this.shoppingCartRepository = shoppingCartRepository;
-        this.shoppingCartService = shoppingCartService;
+        this.orderRepository = orderRepository;
+        this.orderService = orderService;
     }
 
 
@@ -66,30 +69,30 @@ public class ReturnCartService {
         }
 
     public List<ReturnCartDto> getReturnCartByNameAndAddress(String firstName, String lastName, String zipcode, int houseNumber) {
-        List<ShoppingCartDto> shoppingCartDtoList = shoppingCartService.getShoppingCartsByNameAndAddress(firstName, lastName, zipcode, houseNumber);
-        List<ShoppingCart> shoppingCartList = new ArrayList<>();
+        List<OrderDto> orderDtoList = orderService.getOrdersByNameAndAddress(firstName, lastName, zipcode, houseNumber);
+        List<Orders> orderList = new ArrayList<>();
         List<ReturnCartDto> returnCartDtoList = new ArrayList<>();
-        for (int i = 0; i < shoppingCartDtoList.size(); i++) {
-            if(shoppingCartRepository.findById(shoppingCartDtoList.get(i).getId()).isPresent()) {
-                shoppingCartList.add(shoppingCartRepository.findById(shoppingCartDtoList.get(i).getId()).orElseThrow());
+        for (int i = 0; i < orderDtoList.size(); i++) {
+            if(orderRepository.findById(orderDtoList.get(i).getId()).isPresent()) {
+                orderList.add(orderRepository.findById(orderDtoList.get(i).getId()).orElseThrow());
             }
-            for (int j = 0; j < shoppingCartList.get(i).getReturnCartList().size(); j++) {
-                returnCartDtoList.add(transferToReturnCartDto(shoppingCartList.get(i).getReturnCartList().get(j)));
+            for (int j = 0; j < orderList.get(i).getReturnList().size(); j++) {
+                returnCartDtoList.add(transferToReturnCartDto(orderList.get(i).getReturnList().get(j)));
             }
         }
         return returnCartDtoList;
     }
 
     public List<ReturnCartDto> getReturnCartByNameAndAddress(String firstName, String lastName, String zipcode, int houseNumber, String additionalHouseNumber) {
-        List<ShoppingCartDto> shoppingCartDtoList = shoppingCartService.getShoppingCartsByNameAndAddress(firstName, lastName, zipcode, houseNumber, additionalHouseNumber);
-        List<ShoppingCart> shoppingCartList = new ArrayList<>();
+        List<OrderDto> orderDtoList = orderService.getOrdersByNameAndAddress(firstName, lastName, zipcode, houseNumber, additionalHouseNumber);
+        List<Orders> orderList = new ArrayList<>();
         List<ReturnCartDto> returnCartDtoList = new ArrayList<>();
-        for (int i = 0; i < shoppingCartDtoList.size(); i++) {
-            if(shoppingCartRepository.findById(shoppingCartDtoList.get(i).getId()).isPresent()) {
-                shoppingCartList.add(shoppingCartRepository.findById(shoppingCartDtoList.get(i).getId()).orElseThrow());
+        for (int i = 0; i < orderDtoList.size(); i++) {
+            if(orderRepository.findById(orderDtoList.get(i).getId()).isPresent()) {
+                orderList.add(orderRepository.findById(orderDtoList.get(i).getId()).orElseThrow());
             }
-            for (int j = 0; j < shoppingCartList.get(i).getReturnCartList().size(); j++) {
-                returnCartDtoList.add(transferToReturnCartDto(shoppingCartList.get(i).getReturnCartList().get(j)));
+            for (int j = 0; j < orderList.get(i).getReturnList().size(); j++) {
+                returnCartDtoList.add(transferToReturnCartDto(orderList.get(i).getReturnList().get(j)));
             }
         }
         return returnCartDtoList;
@@ -107,12 +110,12 @@ public class ReturnCartService {
         }
     }
 
-    public ReturnCartDto createReturnProducts(Long shoppingCartId) {
+    public ReturnCartDto createReturnProducts(Long orderId) {
         ReturnCart returnCart = new ReturnCart();
-        ShoppingCart shoppingCart = shoppingCartRepository.findById(shoppingCartId).orElseThrow();
-        if (shoppingCartRepository.findById(shoppingCartId).isPresent()) {
-            returnCart.setShoppingCart(shoppingCart);
-            if (within30DaysReturnTime(returnCart.getShoppingCart())) {
+        Orders order = orderRepository.findById(orderId).orElseThrow();
+        if (orderRepository.findById(orderId).isPresent()) {
+            returnCart.setCustomerOrder(order);
+            if (within30DaysReturnTime(returnCart.getCustomerOrder())) {
                 ReturnCart savedReturnCart = returnCartRepository.save(returnCart);
                 return transferToReturnCartDto(savedReturnCart);
             } else {
@@ -123,8 +126,8 @@ public class ReturnCartService {
         }
     }
 
-    private boolean within30DaysReturnTime(ShoppingCart shoppingCart) {
-        long maximumReturnTime = shoppingCart.getOrderDateInMilliSeconds() + 1000L * 60 * 60 * 24 * 30;
+    private boolean within30DaysReturnTime(Orders order) {
+        long maximumReturnTime = order.getOrderDateInMilliSeconds() + 1000L * 60 * 60 * 24 * 30;
         long currentTime = System.currentTimeMillis();
         if (currentTime > maximumReturnTime) {
             return false;
@@ -133,16 +136,18 @@ public class ReturnCartService {
         }
     }
 
+
+
     public ReturnCartDto connectProductWithReturnCart(Long returnCartId, Long productId, ProductDto productDto) {
         ReturnCart returnCart = returnCartRepository.findById(returnCartId).orElseThrow();
         Product product = productRepository.findById(productId).orElseThrow();
-        ShoppingCart shoppingCart = returnCart.getShoppingCart();
+        Orders order = returnCart.getCustomerOrder();
 
         if (returnCartRepository.findById(returnCartId).isPresent() && productRepository.findById(productId).isPresent() &&
-                shoppingCartRepository.findById(returnCart.getShoppingCart().getId()).isPresent()) {
-            for (int i = 0; i < shoppingCart.getProductList().size(); i++) {
-                if (shoppingCart.getProductList().get(i) == product) {
-                    if (productDto.getAmountOfProducts() <= shoppingCart.getProductList().get(i).getAmountOfProducts()) {
+                orderRepository.findById(returnCart.getCustomerOrder().getId()).isPresent()) {
+            for (int i = 0; i < order.getProductList().size(); i++) {
+                if (order.getProductList().get(i) == product) {
+                    if (productDto.getAmountOfOrderedProducts() <= order.getProductList().get(i).getAmountOfOrderedProducts()) {
                         List<ReturnCart> returnCartsInProduct = product.getReturnCartList();
                         returnCartsInProduct.add(returnCart);
                         product.setReturnCartList(returnCartsInProduct);
@@ -151,7 +156,7 @@ public class ReturnCartService {
                         List<Product> productList = returnCart.getReturnProductList();
                         product.setAmountOfReturningProducts(productDto.getAmountOfReturningProducts());
                         for (int j = 0; j < productList.size(); j++) {
-                            if(product.getProduct().equalsIgnoreCase(productList.get(i).getProduct())) {
+                            if(product.getProductName().equalsIgnoreCase(productList.get(i).getProductName())) {
                                 throw new RecordNotFoundException("Product is already in return cart!");
                             }
                         }
@@ -160,10 +165,10 @@ public class ReturnCartService {
                         returnCart.setReturnProductList(productList);
                         returnCart.setTotalPrice(returnCart.getTotalPrice() + product.getSellingPrice() * productDto.getAmountOfReturningProducts());
 
-                        shoppingCart.getProductList().get(i).setAmountOfProducts(shoppingCart.getProductList().get(i).getAmountOfProducts() - productDto.getAmountOfReturningProducts());
-                        shoppingCart.setTotalPrice(shoppingCart.getTotalPrice() - product.getSellingPrice() * productDto.getAmountOfReturningProducts());
+                        order.getProductList().get(i).setAmountOfOrderedProducts(order.getProductList().get(i).getAmountOfOrderedProducts() - productDto.getAmountOfReturningProducts());
+                        order.setTotalPrice(order.getTotalPrice() - product.getSellingPrice() * productDto.getAmountOfReturningProducts());
 
-                        shoppingCartRepository.save(shoppingCart);
+                        orderRepository.save(order);
                         returnCartRepository.save(returnCart);
                         return transferToReturnCartDto(returnCart);
                     } else {
@@ -184,7 +189,7 @@ public class ReturnCartService {
         returnCartDto.setId(returnCart.getId());
         returnCartDto.setTotalPrice(returnCart.getTotalPrice());
         returnCartDto.setProcessed(returnCart.isProcessed());
-        returnCartDto.setShoppingCartDto(shoppingCartService.transferToShoppingCartDto(returnCart.getShoppingCart()));
+        returnCartDto.setOrderDto(orderService.transferToOrderDto(returnCart.getCustomerOrder()));
         if(returnCart.getReturnProductList() != null) {
             List<ProductDto> returnCartDtoProductList = new ArrayList<>();
             for (int i = 0; i < returnCart.getReturnProductList().size(); i++) {
@@ -197,7 +202,7 @@ public class ReturnCartService {
 
     protected Product transferToProduct(ProductDto productDto) {
         Product product = new Product();
-        product.setProduct(productDto.getProduct());
+        product.setProductName(productDto.getProductName());
         product.setCategory(productDto.getCategory());
         product.setSellingPrice(productDto.getSellingPrice());
         product.setRetailPrice(productDto.getRetailPrice());
@@ -207,7 +212,7 @@ public class ReturnCartService {
     protected ProductDto transferToProductDto(Product product) {
         ProductDto productDto = new ProductDto();
         productDto.setId(product.getId());
-        productDto.setProduct(product.getProduct());
+        productDto.setProductName(product.getProductName());
         productDto.setCategory(product.getCategory());
         productDto.setSellingPrice(product.getSellingPrice());
         productDto.setRetailPrice(product.getRetailPrice());

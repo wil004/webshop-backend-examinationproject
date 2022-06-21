@@ -1,22 +1,30 @@
 package com.novi.webshop.dto;
 
 import com.novi.webshop.model.ShoppingCart;
+import com.novi.webshop.model.User;
+import com.sun.istack.NotNull;
 
 import javax.persistence.OneToMany;
 import java.util.List;
 
-public class CustomerDto {
+public class CustomerDto extends UserDto {
     private Long id;
 
+
     private String firstName;
+
     private String lastName;
+
     private String streetName;
+
     private int houseNumber;
     private String additionalToHouseNumber;
 
     private String city;
+
     private String zipcode;
 
+    private ShoppingCartDto shoppingCartDto;
 
 
     public Long getId() {
@@ -75,4 +83,11 @@ public class CustomerDto {
         this.zipcode = zipcode;
     }
 
+    public ShoppingCartDto getShoppingCartDto() {
+        return shoppingCartDto;
+    }
+
+    public void setShoppingCartDto(ShoppingCartDto shoppingCartDto) {
+        this.shoppingCartDto = shoppingCartDto;
+    }
 }

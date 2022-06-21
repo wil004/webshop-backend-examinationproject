@@ -1,7 +1,6 @@
 package com.novi.webshop.controller;
 
 import com.novi.webshop.dto.CustomerDto;
-import com.novi.webshop.dto.ShoppingCartDto;
 import com.novi.webshop.services.CustomerService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;

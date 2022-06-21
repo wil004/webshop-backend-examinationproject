@@ -32,7 +32,7 @@ public class ProductService {
     public ProductDto getProductByName(String productName) {
         List<Product> allProductList = new ArrayList<>(productRepository.findAll());
         for (Product product : allProductList) {
-            if (product.getProduct().equalsIgnoreCase(productName)) {
+            if (product.getProductName().equalsIgnoreCase(productName)) {
                 return transferToProductDto(product);
             }
         }
@@ -71,7 +71,7 @@ public class ProductService {
     }
 
     public ProductDto createProduct(ProductDto productDto) {
-        if (getProductByName(productDto.getProduct()) != null) {
+        if (getProductByName(productDto.getProductName()) != null) {
             throw new RecordNotFoundException("Product already exists");
         } else {
             Product product = transferToProduct(productDto);
@@ -85,7 +85,7 @@ public class ProductService {
         if (productRepository.findById(id).isPresent()) {
             Product chosenProduct = productRepository.findById(id).get();
             if(type.equalsIgnoreCase("product")) {
-                chosenProduct.setProduct(productDto.getProduct());
+                chosenProduct.setProductName(productDto.getProductName());
                 productRepository.save(chosenProduct);
             } else if (type.equalsIgnoreCase("category")) {
                 chosenProduct.setCategory(productDto.getCategory());
@@ -115,7 +115,7 @@ public class ProductService {
 
     protected Product transferToProduct(ProductDto productDto) {
         Product product = new Product();
-        product.setProduct(productDto.getProduct());
+        product.setProductName(productDto.getProductName());
         product.setCategory(productDto.getCategory());
         product.setSellingPrice(productDto.getSellingPrice());
         product.setRetailPrice(productDto.getRetailPrice());
@@ -125,7 +125,7 @@ public class ProductService {
     protected ProductDto transferToProductDto(Product product) {
         ProductDto productDto = new ProductDto();
         productDto.setId(product.getId());
-        productDto.setProduct(product.getProduct());
+        productDto.setProductName(product.getProductName());
         productDto.setCategory(product.getCategory());
         productDto.setSellingPrice(product.getSellingPrice());
         productDto.setRetailPrice(product.getRetailPrice());

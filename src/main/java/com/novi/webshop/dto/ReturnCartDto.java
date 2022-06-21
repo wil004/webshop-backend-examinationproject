@@ -9,7 +9,8 @@ public class ReturnCartDto {
     private double totalPrice;
 
     private boolean processed;
-    private ShoppingCartDto shoppingCartDto;
+
+    private OrderDto orderDto;
 
     private List<ProductDto> returnProductList;
 
@@ -37,12 +38,12 @@ public class ReturnCartDto {
         this.processed = processed;
     }
 
-    public ShoppingCartDto getShoppingCartDto() {
-        return shoppingCartDto;
+    public OrderDto getOrderDto() {
+        return orderDto;
     }
 
-    public void setShoppingCartDto(ShoppingCartDto shoppingCartDto) {
-        this.shoppingCartDto = shoppingCartDto;
+    public void setOrderDto(OrderDto orderDto) {
+        this.orderDto = orderDto;
     }
 
     public List<ProductDto> getReturnProductList() {
