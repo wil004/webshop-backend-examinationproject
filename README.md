@@ -8,6 +8,7 @@ ENDPOINTS WEBSHOP END EXAMINATION PROJECT WILLIAM MEESTER
 @POST
 post product
 http://localhost:8080/product
+
 {
 	"productName": "String",  <--- there can be only one productName!
 	"category": "String",
@@ -28,9 +29,11 @@ http://localhost:8080/product/{minimumprice}/{maximumprice}
 
 @PUT
 http://localhost:8080/product/change/{id}/{type}
+
 for type u can fill in what value of what property-type you want to change.
 Let's say you want to change the category of the product with id=1 you type.
 http://localhost:8080/product/change/1/category
+
 {
 	"category": "another category"
 }
@@ -43,6 +46,7 @@ ________________________________________________________________________________
 *****CUSTOMER*****
 @POST
 http://localhost:8080/customer
+
 {
 	"username": "String",   <-- if null the user will be identified as a guest
 	"password": "String",   <-- if null the user will be identified as a guest
@@ -55,6 +59,7 @@ http://localhost:8080/customer
 	"city": "String",
 	"zipcode": "String"
 }
+
 @GET
 still to be made!
 ___________________________________________________________________________________
@@ -64,12 +69,14 @@ if (customer == null) { make the shoppingCart in the front-end you can post this
 
 @POST
 http://localhost:8080/customerId
+
 {
 *The body is empty! This shoppingCart will be created if the user makes an account*
 }
 
 @PUT
 http://localhost:8080/id={shoppingCartId}/productId={productId}
+
 {
  	"amountOfOrderedProducts": int
 }
@@ -83,6 +90,7 @@ Also with the current order date and the ordertime in mili seconds will be added
 
 @POST
 http://localhost:8080/order/guest={customerId}
+
 [
   {
     "productList": [
@@ -98,6 +106,7 @@ http://localhost:8080/order/guest={customerId}
     ],
   }
 ] 
+
 You basically post the shoppingCart from the front-end instead of the back-end 
 this makes sure that users don't have to be logged in to purchase items.
 If guests would be able to use a shoppingcart in the backend the app would be vulnerable for a ddos attacks.
