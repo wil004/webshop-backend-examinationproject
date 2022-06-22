@@ -3,6 +3,7 @@ package com.novi.webshop.services;
 import com.novi.webshop.dto.UserDto;
 import com.novi.webshop.dto.UserEmployeeDto;
 import com.novi.webshop.dto.UserEmployeeInputDto;
+import com.novi.webshop.helpers.TransferModelToDto;
 import com.novi.webshop.model.Admin;
 import com.novi.webshop.model.Employee;
 import com.novi.webshop.model.Orders;
@@ -53,7 +54,7 @@ public class AdminService {
                 }
                 employeeList.get(i).setOrderList(orderList);
                 employeeRepository.save(employeeList.get(i));
-                employeeDtoList.add(transferToUserEmployeeDto(employeeList.get(i)));
+                employeeDtoList.add(TransferModelToDto.transferToUserEmployeeDto(employeeList.get(i)));
             }
         }
         return employeeDtoList;
@@ -67,7 +68,7 @@ public class AdminService {
         employee.setFirstName(userEmployeeInputDto.getFirstName());
         employee.setLastName(userEmployeeInputDto.getLastName());
         Employee savedEmployee = employeeRepository.save(employee);
-        return transferToUserEmployeeDto(savedEmployee);
+        return TransferModelToDto.transferToUserEmployeeDto(savedEmployee);
     }
 
     public Admin createAdmin(UserDto userDto) {
@@ -77,12 +78,5 @@ public class AdminService {
         return admin;
     }
 
-    protected UserEmployeeDto transferToUserEmployeeDto(Employee employee) {
-        UserEmployeeDto userEmployeeDto = new UserEmployeeDto();
-        userEmployeeDto.setEmailAddress(employee.getEmailAddress());
-        userEmployeeDto.setFirstName(employee.getFirstName());
-        userEmployeeDto.setLastName(employee.getLastName());
-        return userEmployeeDto;
-    }
 
 }

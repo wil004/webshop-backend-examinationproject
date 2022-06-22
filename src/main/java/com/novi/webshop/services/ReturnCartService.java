@@ -4,6 +4,7 @@ import com.novi.webshop.controller.exceptions.RecordNotFoundException;
 import com.novi.webshop.dto.OrderDto;
 import com.novi.webshop.dto.ProductDto;
 import com.novi.webshop.dto.ReturnCartDto;
+import com.novi.webshop.helpers.TransferModelToDto;
 import com.novi.webshop.model.Orders;
 import com.novi.webshop.model.Product;
 import com.novi.webshop.model.ReturnCart;
@@ -40,7 +41,7 @@ public class ReturnCartService {
         List<ReturnCart> returnCartList = returnCartRepository.findAll();
         List<ReturnCartDto> returnCartDtoList = new ArrayList<>();
         for (int i = 0; i < returnCartList.size(); i++) {
-            returnCartDtoList.add(transferToReturnCartDto(returnCartList.get(i)));
+            returnCartDtoList.add(TransferModelToDto.transferToReturnCartDto(returnCartList.get(i)));
         }
         return returnCartDtoList;
     }
@@ -62,7 +63,7 @@ public class ReturnCartService {
 
             List<ReturnCartDto> returnCartDtoList = new ArrayList<>();
             for (int i = 0; i < allReturnCartsWithProcessedStatus.size(); i++) {
-                returnCartDtoList.add(transferToReturnCartDto(allReturnCartsWithProcessedStatus.get(i)));
+                returnCartDtoList.add(TransferModelToDto.transferToReturnCartDto(allReturnCartsWithProcessedStatus.get(i)));
             }
 
             return returnCartDtoList;
@@ -77,7 +78,7 @@ public class ReturnCartService {
                 orderList.add(orderRepository.findById(orderDtoList.get(i).getId()).orElseThrow());
             }
             for (int j = 0; j < orderList.get(i).getReturnList().size(); j++) {
-                returnCartDtoList.add(transferToReturnCartDto(orderList.get(i).getReturnList().get(j)));
+                returnCartDtoList.add(TransferModelToDto.transferToReturnCartDto(orderList.get(i).getReturnList().get(j)));
             }
         }
         return returnCartDtoList;
@@ -92,7 +93,7 @@ public class ReturnCartService {
                 orderList.add(orderRepository.findById(orderDtoList.get(i).getId()).orElseThrow());
             }
             for (int j = 0; j < orderList.get(i).getReturnList().size(); j++) {
-                returnCartDtoList.add(transferToReturnCartDto(orderList.get(i).getReturnList().get(j)));
+                returnCartDtoList.add(TransferModelToDto.transferToReturnCartDto(orderList.get(i).getReturnList().get(j)));
             }
         }
         return returnCartDtoList;
@@ -103,7 +104,7 @@ public class ReturnCartService {
             ReturnCart returnCart = returnCartRepository.findById(id).orElseThrow();
             returnCart.setProcessed(processed);
             ReturnCart savedReturnCart = returnCartRepository.save(returnCart);
-            return transferToReturnCartDto(savedReturnCart);
+            return TransferModelToDto.transferToReturnCartDto(savedReturnCart);
         }
         else {
             throw new RecordNotFoundException("Couldn't find return-cart");
@@ -117,7 +118,7 @@ public class ReturnCartService {
             returnCart.setCustomerOrder(order);
             if (within30DaysReturnTime(returnCart.getCustomerOrder())) {
                 ReturnCart savedReturnCart = returnCartRepository.save(returnCart);
-                return transferToReturnCartDto(savedReturnCart);
+                return TransferModelToDto.transferToReturnCartDto(savedReturnCart);
             } else {
                 throw new RecordNotFoundException("Returning time has been expired, you can't return products anymore!");
             }
@@ -170,7 +171,7 @@ public class ReturnCartService {
 
                         orderRepository.save(order);
                         returnCartRepository.save(returnCart);
-                        return transferToReturnCartDto(returnCart);
+                        return TransferModelToDto.transferToReturnCartDto(returnCart);
                     } else {
                         throw new RecordNotFoundException("You cannot return more products then you ordered");
                     }
@@ -184,21 +185,6 @@ public class ReturnCartService {
         throw new RecordNotFoundException("Couldn't find return cart");
     }
 
-    private ReturnCartDto transferToReturnCartDto(ReturnCart returnCart) {
-        ReturnCartDto returnCartDto = new ReturnCartDto();
-        returnCartDto.setId(returnCart.getId());
-        returnCartDto.setTotalPrice(returnCart.getTotalPrice());
-        returnCartDto.setProcessed(returnCart.isProcessed());
-        returnCartDto.setOrderDto(orderService.transferToOrderDto(returnCart.getCustomerOrder()));
-        if(returnCart.getReturnProductList() != null) {
-            List<ProductDto> returnCartDtoProductList = new ArrayList<>();
-            for (int i = 0; i < returnCart.getReturnProductList().size(); i++) {
-                returnCartDtoProductList.add(transferToProductDto(returnCart.getReturnProductList().get(i)));
-            }
-            returnCartDto.setReturnProductList(returnCartDtoProductList);
-        }
-        return returnCartDto;
-    }
 
     protected Product transferToProduct(ProductDto productDto) {
         Product product = new Product();

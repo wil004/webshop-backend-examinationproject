@@ -8,6 +8,10 @@ public class Employee extends User{
     @Id
     @GeneratedValue
     private Long id;
+
+    private String emailAddress;
+    private String username;
+    private String password;
     private String firstName;
     private String lastName;
 
@@ -30,6 +34,36 @@ public class Employee extends User{
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    @Override
+    public String getEmailAddress() {
+        return emailAddress;
+    }
+
+    @Override
+    public void setEmailAddress(String emailAddress) {
+        this.emailAddress = emailAddress;
+    }
+
+    @Override
+    public String getUsername() {
+        return username;
+    }
+
+    @Override
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    @Override
+    public String getPassword() {
+        return password;
+    }
+
+    @Override
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public String getFirstName() {

@@ -2,8 +2,8 @@ package com.novi.webshop.services;
 
 import com.novi.webshop.controller.exceptions.RecordNotFoundException;
 import com.novi.webshop.dto.OrderDto;
-import com.novi.webshop.dto.ProductDto;
 import com.novi.webshop.dto.ShoppingCartDto;
+import com.novi.webshop.helpers.TransferModelToDto;
 import com.novi.webshop.model.*;
 import com.novi.webshop.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,15 +17,13 @@ import java.util.List;
 public class OrderService {
 
     private final OrderRepository orderRepository;
-    private final CustomerService customerService;
     private final AdminRepository adminRepository;
     private final CustomerRepository customerRepository;
     private final ProductRepository productRepository;
 
     @Autowired
-    public OrderService(OrderRepository orderRepository, CustomerService customerService, AdminRepository adminRepository, CustomerRepository customerRepository, ProductRepository productRepository) {
+    public OrderService(OrderRepository orderRepository, AdminRepository adminRepository, CustomerRepository customerRepository, ProductRepository productRepository) {
         this.orderRepository = orderRepository;
-        this.customerService = customerService;
         this.adminRepository = adminRepository;
         this.customerRepository = customerRepository;
         this.productRepository = productRepository;
@@ -35,7 +33,7 @@ public class OrderService {
         List<Orders> orderList = orderRepository.findAll();
         List<OrderDto> orderDtoList = new ArrayList<>();
         for (int i = 0; i < orderList.size(); i++) {
-            orderDtoList.add(transferToOrderDto(orderList.get(i)));
+            orderDtoList.add(TransferModelToDto.transferToOrderDto(orderList.get(i)));
         }
         return orderDtoList;
     }
@@ -63,7 +61,7 @@ public class OrderService {
         }
         List<OrderDto> orderDtoList = new ArrayList<>();
         for (int i = 0; i < allOrdersWithProcessedStatus.size(); i++) {
-            orderDtoList.add(transferToOrderDto(allOrdersWithProcessedStatus.get(i)));
+            orderDtoList.add(TransferModelToDto.transferToOrderDto(allOrdersWithProcessedStatus.get(i)));
         }
         return orderDtoList;
     }
@@ -71,7 +69,7 @@ public class OrderService {
     public OrderDto getOrderById(Long id) {
         Orders order = orderRepository.findById(id).orElseThrow();
         if(orderRepository.findById(id).isPresent()) {
-            return transferToOrderDto(order);
+            return TransferModelToDto.transferToOrderDto(order);
         } else {
             throw new RecordNotFoundException("Couldn't find order");
         }
@@ -92,7 +90,7 @@ public class OrderService {
         }
         List<OrderDto> orderDtoList = new ArrayList<>();
         for (int i = 0; i < foundOrders.size(); i++) {
-            orderDtoList.add(transferToOrderDto(foundOrders.get(i)));
+            orderDtoList.add(TransferModelToDto.transferToOrderDto(foundOrders.get(i)));
         }
         return orderDtoList;
     }
@@ -112,7 +110,7 @@ public class OrderService {
         }
         List<OrderDto> orderDtoList = new ArrayList<>();
         for (int i = 0; i < foundOrders.size(); i++) {
-            orderDtoList.add(transferToOrderDto(foundOrders.get(i)));
+            orderDtoList.add(TransferModelToDto.transferToOrderDto(foundOrders.get(i)));
         }
         return orderDtoList;
     }
@@ -138,8 +136,8 @@ public class OrderService {
         customer.getShoppingCart().setTotalPrice(0);
         customerRepository.save(customer);
         Orders savedOrder = orderRepository.save(order);
-        OrderDto orderDto = transferToOrderDto(savedOrder);
-        orderDto.setCustomerDto(customerService.transferToCustomerDto(customer));
+        OrderDto orderDto = TransferModelToDto.transferToOrderDto(savedOrder);
+        orderDto.setCustomerDto(TransferModelToDto.transferToCustomerDto(customer));
         return orderDto;
     }
 
@@ -159,8 +157,8 @@ public class OrderService {
         }
         order.setProductList(productList);
         Orders savedOrder = orderRepository.save(order);
-        OrderDto orderDto = transferToOrderDto(savedOrder);
-        orderDto.setCustomerDto(customerService.transferToCustomerDto(customer));
+        OrderDto orderDto = TransferModelToDto.transferToOrderDto(savedOrder);
+        orderDto.setCustomerDto(TransferModelToDto.transferToCustomerDto(customer));
         return orderDto;
     }
 
@@ -170,36 +168,12 @@ public class OrderService {
             Orders order = orderRepository.findById(id).orElseThrow();
             order.setProcessed(processed);
             Orders savedOrder = orderRepository.save(order);
-            return transferToOrderDto(savedOrder);
+            return TransferModelToDto.transferToOrderDto(savedOrder);
         }
         else {
             throw new RecordNotFoundException("Couldn't find order");
         }
     }
 
-    protected OrderDto transferToOrderDto(Orders order) {
-        OrderDto orderDto = new OrderDto();
-        orderDto.setId(order.getId());
-        orderDto.setProcessed(order.isProcessed());
-        orderDto.setOrderDate(order.getOrderDate());
-        orderDto.setTotalPrice(order.getTotalPrice());
-        orderDto.setCustomerDto(customerService.transferToCustomerDto(order.getCustomer()));
-        orderDto.getCustomerDto().setShoppingCartDto(null);
-        List<ProductDto> productDtoList = new ArrayList<>();
-        for (int i = 0; i < order.getProductList().size(); i++) {
-            productDtoList.add(transferToProductDto(order.getProductList().get(i)));
-        }
-        orderDto.setProductDtoList(productDtoList);
-        return orderDto;
-    }
 
-    protected ProductDto transferToProductDto(Product product) {
-        ProductDto productDto = new ProductDto();
-        productDto.setId(product.getId());
-        productDto.setProductName(product.getProductName());
-        productDto.setCategory(product.getCategory());
-        productDto.setSellingPrice(product.getSellingPrice());
-        productDto.setRetailPrice(product.getRetailPrice());
-        return productDto;
-    }
 }
