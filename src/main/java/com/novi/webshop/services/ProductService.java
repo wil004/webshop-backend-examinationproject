@@ -2,6 +2,7 @@ package com.novi.webshop.services;
 
 import com.novi.webshop.controller.exceptions.RecordNotFoundException;
 import com.novi.webshop.dto.ProductDto;
+import com.novi.webshop.helpers.TransferModelToDto;
 import com.novi.webshop.model.Product;
 import com.novi.webshop.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +25,7 @@ public class ProductService {
         List<Product> allProductList = new ArrayList<>(productRepository.findAll());
         List<ProductDto> allProductDtoList = new ArrayList<>();
         for (Product allProduct : allProductList) {
-            allProductDtoList.add(transferToProductDto(allProduct));
+            allProductDtoList.add(TransferModelToDto.transferToProductDto(allProduct));
         }
         return allProductDtoList;
     }
@@ -33,7 +34,7 @@ public class ProductService {
         List<Product> allProductList = new ArrayList<>(productRepository.findAll());
         for (Product product : allProductList) {
             if (product.getProductName().equalsIgnoreCase(productName)) {
-                return transferToProductDto(product);
+                return TransferModelToDto.transferToProductDto(product);
             }
         }
         // Doesn't return a RecordNotFoundException because this method is nested in the createProduct method!
@@ -45,7 +46,7 @@ public class ProductService {
         List<ProductDto> allProductDtoList = new ArrayList<>();
         for (int i = 0; i < allProductList.size(); i++) {
             if(allProductList.get(i).getCategory().equalsIgnoreCase(categoryName)) {
-                allProductDtoList.add(transferToProductDto(allProductList.get(i)));
+                allProductDtoList.add(TransferModelToDto.transferToProductDto(allProductList.get(i)));
             }
         }
         if(allProductDtoList.size() > 0) {
@@ -60,7 +61,7 @@ public class ProductService {
         List<ProductDto> allProductDtoList = new ArrayList<>();
         for (int i = 0; i < allProductList.size(); i++) {
             if (allProductList.get(i).getSellingPrice() > minimumPrice && allProductList.get(i).getSellingPrice() < maximumPrice) {
-                allProductDtoList.add(transferToProductDto(allProductList.get(i)));
+                allProductDtoList.add(TransferModelToDto.transferToProductDto(allProductList.get(i)));
             }
         }
         if (allProductDtoList.size() > 0) {
@@ -77,7 +78,7 @@ public class ProductService {
             Product product = transferToProduct(productDto);
             final Product savedProduct = productRepository.save(product);
 
-            return transferToProductDto(savedProduct);
+            return TransferModelToDto.transferToProductDto(savedProduct);
         }
     }
 
@@ -122,13 +123,4 @@ public class ProductService {
         return product;
     }
 
-    protected ProductDto transferToProductDto(Product product) {
-        ProductDto productDto = new ProductDto();
-        productDto.setId(product.getId());
-        productDto.setProductName(product.getProductName());
-        productDto.setCategory(product.getCategory());
-        productDto.setSellingPrice(product.getSellingPrice());
-        productDto.setRetailPrice(product.getRetailPrice());
-        return productDto;
-    }
 }

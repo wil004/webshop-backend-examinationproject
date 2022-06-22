@@ -3,6 +3,7 @@ package com.novi.webshop.services;
 import com.novi.webshop.controller.exceptions.RecordNotFoundException;
 import com.novi.webshop.dto.ProductDto;
 import com.novi.webshop.dto.ShoppingCartDto;
+import com.novi.webshop.helpers.TransferModelToDto;
 import com.novi.webshop.model.Customer;
 import com.novi.webshop.model.Product;
 import com.novi.webshop.model.ShoppingCart;
@@ -53,7 +54,7 @@ private final CustomerRepository customerRepository;
             shoppingCartRepository.save(shoppingCart);
 
 
-            return transferToShoppingCartDto(shoppingCart);
+            return TransferModelToDto.transferToShoppingCartDto(shoppingCart);
         } else {
             throw new RecordNotFoundException("ShoppingCart Id Or Product Id doesn't exist!");
         }
@@ -68,7 +69,7 @@ private final CustomerRepository customerRepository;
             ShoppingCart savedShoppingCart = shoppingCartRepository.save(shoppingCart);
 
             customerRepository.save(customer);
-            return transferToShoppingCartDto(savedShoppingCart);
+            return TransferModelToDto.transferToShoppingCartDto(savedShoppingCart);
         } else {
             throw new RecordNotFoundException("Customer account doesn't exist or is a guest.");
         }
@@ -89,28 +90,5 @@ private final CustomerRepository customerRepository;
 
         return shoppingCart;
     }
-    protected ShoppingCartDto transferToShoppingCartDto(ShoppingCart shoppingCart) {
-        ShoppingCartDto shoppingCartDto = new ShoppingCartDto();
-        shoppingCartDto.setId(shoppingCart.getId());
-        shoppingCartDto.setTotalPrice(shoppingCart.getTotalPrice());
-        if(shoppingCart.getProductList() != null) {
-            List<ProductDto> productDtoList = new ArrayList<>();
-            for(int i = 0; i < shoppingCart.getProductList().size(); i++) {
-                productDtoList.add(transferToProductDto(shoppingCart.getProductList().get(i)));
-            }
-            shoppingCartDto.setProduct(productDtoList);
-        }
-        return shoppingCartDto;
-    }
 
-    protected ProductDto transferToProductDto(Product product) {
-        ProductDto productDto = new ProductDto();
-        productDto.setId(product.getId());
-        productDto.setProductName(product.getProductName());
-        productDto.setCategory(product.getCategory());
-        productDto.setSellingPrice(product.getSellingPrice());
-        productDto.setRetailPrice(product.getRetailPrice());
-        productDto.setAmountOfOrderedProducts(product.getAmountOfOrderedProducts());
-        return productDto;
-    }
 }

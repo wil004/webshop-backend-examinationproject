@@ -4,6 +4,8 @@ import com.novi.webshop.controller.exceptions.RecordNotFoundException;
 import com.novi.webshop.dto.CustomerDto;
 import com.novi.webshop.dto.ProductDto;
 import com.novi.webshop.dto.ShoppingCartDto;
+import com.novi.webshop.helpers.TransferDtoToModel;
+import com.novi.webshop.helpers.TransferModelToDto;
 import com.novi.webshop.model.*;
 import com.novi.webshop.repository.CustomerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +32,7 @@ public class CustomerService {
         List<Customer> allCustomerList = new ArrayList<>(customerRepository.findAll());
         List<CustomerDto> allCustomerDtoList = new ArrayList<>();
         for (Customer customer : allCustomerList) {
-            allCustomerDtoList.add(transferToCustomerDto(customer));
+            allCustomerDtoList.add(TransferModelToDto.transferToCustomerDto(customer));
         }
         return allCustomerDtoList;
     }
@@ -44,12 +46,12 @@ public class CustomerService {
         }
     }
     public CustomerDto createCustomerAccount(CustomerDto customerDto) {
-                Customer customer = transferToCustomer(customerDto);
+                Customer customer = TransferDtoToModel.transferToCustomer(customerDto);
                 if (!userService.doesUsernameAlreadyExist(customer.getUsername())) {
                     if(customer.getUsername() != null && customer.getPassword() != null && customer.getEmailAddress() != null) {
                         Customer savedCustomer = customerRepository.save(customer);
                         shoppingCartService.createShoppingCard(savedCustomer.getId());
-                        return transferToCustomerDto(savedCustomer);
+                        return TransferModelToDto.transferToCustomerDto(savedCustomer);
                     }
                     else {
                         throw new RecordNotFoundException("You need a username password and email-address to make an account!");
@@ -60,41 +62,9 @@ public class CustomerService {
             }
 
     public CustomerDto createCustomerGuest(CustomerDto customerDto) {
-        Customer customer = transferToCustomer(customerDto);
+        Customer customer = TransferDtoToModel.transferToCustomer(customerDto);
         final Customer savedCustomer = customerRepository.save(customer);
-        return transferToCustomerDto(savedCustomer);
+        return TransferModelToDto.transferToCustomerDto(savedCustomer);
     }
 
-    protected Customer transferToCustomer(CustomerDto customerDto) {
-        Customer customer = new Customer();
-        customer.setEmailAddress(customerDto.getEmailAddress());
-        customer.setUsername(customerDto.getUsername());
-        customer.setPassword(customerDto.getPassword());
-        customer.setFirstName(customerDto.getFirstName());
-        customer.setLastName(customerDto.getLastName());
-        customer.setStreetName(customerDto.getStreetName());
-        customer.setHouseNumber(customerDto.getHouseNumber());
-        customer.setAdditionalToHouseNumber(customerDto.getAdditionalToHouseNumber());
-        customer.setCity(customerDto.getCity());
-        customer.setZipcode(customerDto.getZipcode());
-        return customer;
-    }
-
-    protected CustomerDto transferToCustomerDto(Customer customer) {
-        CustomerDto customerDto = new CustomerDto();
-        customerDto.setId(customer.getId());
-        customerDto.setEmailAddress(customer.getEmailAddress());
-        customerDto.setUsername(customer.getUsername());
-        customerDto.setFirstName(customer.getFirstName());
-        customerDto.setLastName(customer.getLastName());
-        customerDto.setStreetName(customer.getStreetName());
-        customerDto.setHouseNumber(customer.getHouseNumber());
-        customerDto.setAdditionalToHouseNumber(customer.getAdditionalToHouseNumber());
-        customerDto.setCity(customer.getCity());
-        customerDto.setZipcode(customer.getZipcode());
-        if(customer.getShoppingCart() != null) {
-            customerDto.setShoppingCartDto(shoppingCartService.transferToShoppingCartDto(customer.getShoppingCart()));
-        }
-        return customerDto;
-    }
 }
