@@ -14,7 +14,6 @@ public class Customer extends User {
     private String role;
     private String firstName;
     private String lastName;
-
     private String streetName;
     private int houseNumber;
     private String additionalToHouseNumber;
