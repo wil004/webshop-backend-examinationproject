@@ -26,6 +26,7 @@ public class CustomerDto extends UserDto {
 
     private ShoppingCartDto shoppingCartDto;
 
+    private List<OrderDto> orderHistoryDto;
 
     public Long getId() {
         return id;
@@ -89,5 +90,13 @@ public class CustomerDto extends UserDto {
 
     public void setShoppingCartDto(ShoppingCartDto shoppingCartDto) {
         this.shoppingCartDto = shoppingCartDto;
+    }
+
+    public List<OrderDto> getOrderHistoryDto() {
+        return orderHistoryDto;
+    }
+
+    public void setOrderHistoryDto(List<OrderDto> orderHistoryDto) {
+        this.orderHistoryDto = orderHistoryDto;
     }
 }

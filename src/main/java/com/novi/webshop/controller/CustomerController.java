@@ -32,6 +32,11 @@ public class CustomerController {
         return ResponseEntity.ok(customerServiceImpl.getCustomerById(id));
     }
 
+    @GetMapping("/orderhistory/customerid={id}")
+    public ResponseEntity<List<OrderDto>> getCustomerOrderHistory(@PathVariable Long id) {
+        return ResponseEntity.ok(customerServiceImpl.getCustomerOrderHistory(id));
+    }
+
     @PostMapping(consumes = { MediaType.APPLICATION_JSON_VALUE })
     public ResponseEntity<CustomerDto> createCustomer(@RequestBody CustomerDto customerDto) {
         final URI location = URI.create("/customer" + customerDto.getId());

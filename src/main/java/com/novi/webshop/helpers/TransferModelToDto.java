@@ -23,6 +23,14 @@ public class TransferModelToDto {
         if(customer.getShoppingCart() != null) {
             customerDto.setShoppingCartDto(transferToShoppingCartDto(customer.getShoppingCart()));
         }
+        List<OrderDto> orderHistoryList = new ArrayList<>();
+        if (customer.getOrderHistory().size() > 0) {
+            for (int i = 0; i < customer.getOrderHistory().size(); i++) {
+                customer.getOrderHistory().get(i).setCustomer(null);
+                    orderHistoryList.add(TransferModelToDto.transferToOrderDto(customer.getOrderHistory().get(i)));
+            }
+        }
+        customerDto.setOrderHistoryDto(orderHistoryList);
         return customerDto;
     }
 
@@ -74,8 +82,11 @@ public class TransferModelToDto {
         orderDto.setProcessed(order.isProcessed());
         orderDto.setOrderDate(order.getOrderDate());
         orderDto.setTotalPrice(order.getTotalPrice());
-        orderDto.setCustomerDto(TransferModelToDto.transferToCustomerDto(order.getCustomer()));
-        orderDto.getCustomerDto().setShoppingCartDto(null);
+        if(order.getCustomer() != null) {
+            orderDto.setCustomerDto(TransferModelToDto.transferToCustomerDto(order.getCustomer()));
+            orderDto.getCustomerDto().setShoppingCartDto(null);
+            orderDto.getCustomerDto().setOrderHistoryDto(null);
+        }
         List<ProductDto> productDtoList = new ArrayList<>();
         for (int i = 0; i < order.getProductList().size(); i++) {
             productDtoList.add(transferToProductDto(order.getProductList().get(i)));

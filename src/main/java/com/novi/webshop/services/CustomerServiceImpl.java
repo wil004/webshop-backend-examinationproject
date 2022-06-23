@@ -2,6 +2,7 @@ package com.novi.webshop.services;
 
 import com.novi.webshop.controller.exceptions.RecordNotFoundException;
 import com.novi.webshop.dto.CustomerDto;
+import com.novi.webshop.dto.OrderDto;
 import com.novi.webshop.helpers.TransferDtoToModel;
 import com.novi.webshop.helpers.TransferModelToDto;
 import com.novi.webshop.model.*;
@@ -44,6 +45,18 @@ public class CustomerServiceImpl implements CustomerService {
         } else {
             throw new RecordNotFoundException("Couldn't find customer");
         }
+    }
+
+    @Override
+    public List<OrderDto> getCustomerOrderHistory(Long id) {
+        Customer customer = customerRepository.findById(id).orElseThrow();
+        List<OrderDto> orderDtoList = new ArrayList<>();
+        if(customerRepository.findById(id).isPresent()) {
+            for (int i = 0; i < customer.getOrderHistory().size(); i++) {
+                orderDtoList.add(TransferModelToDto.transferToOrderDto(customer.getOrderHistory().get(i)));
+            }
+        }
+        return orderDtoList;
     }
 
     @Override
