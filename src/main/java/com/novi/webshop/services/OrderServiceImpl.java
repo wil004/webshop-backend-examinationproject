@@ -138,8 +138,12 @@ public class OrderServiceImpl implements OrderService{
             }
         }
         order.setProductList(productList);
+        List<Orders> orderHistory = customer.getOrderHistory();
+
         customer.getShoppingCart().setProductList(null);
         customer.getShoppingCart().setTotalPrice(0);
+//        orderHistory.add(order);
+//        customer.setOrderHistory(orderHistory);
         customerRepository.save(customer);
         Orders savedOrder = orderRepository.save(order);
         OrderDto orderDto = TransferModelToDto.transferToOrderDto(savedOrder);
