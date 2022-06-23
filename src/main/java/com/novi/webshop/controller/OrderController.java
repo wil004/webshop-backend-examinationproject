@@ -2,7 +2,7 @@ package com.novi.webshop.controller;
 
 import com.novi.webshop.dto.OrderDto;
 import com.novi.webshop.dto.ShoppingCartDto;
-import com.novi.webshop.services.OrderService;
+import com.novi.webshop.services.OrderServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -15,57 +15,57 @@ import java.util.List;
 @RequestMapping("order")
 public class OrderController {
 
-    private final OrderService orderService;
+    private final OrderServiceImpl orderServiceImpl;
 
     @Autowired
-    public OrderController(OrderService orderService) {
-        this.orderService = orderService;
+    public OrderController(OrderServiceImpl orderServiceImpl) {
+        this.orderServiceImpl = orderServiceImpl;
     }
 
     @GetMapping
     public ResponseEntity<List<OrderDto>> getAllOrders() {
-        return ResponseEntity.ok(orderService.getAllOrders());
+        return ResponseEntity.ok(orderServiceImpl.getAllOrders());
     }
 
-    @GetMapping("/get-by-id/{id}")
+    @GetMapping("/id={id}")
     public ResponseEntity<OrderDto> getOrderById(@PathVariable Long id) {
-        return ResponseEntity.ok(orderService.getOrderById(id));
+        return ResponseEntity.ok(orderServiceImpl.getOrderById(id));
     }
 
     @GetMapping("/processed-status={processed}")
     public ResponseEntity<List<OrderDto>> getAllProcessedOrNotProcessedOrders(@PathVariable boolean processed) {
-        return ResponseEntity.ok(orderService.getProcessedOrNotProcessedOrders(processed));
+        return ResponseEntity.ok(orderServiceImpl.getProcessedOrNotProcessedOrders(processed));
     }
 
     @GetMapping("/{firstName}/{lastName}/{zipcode}/{houseNumber}")
     public ResponseEntity<List<OrderDto>> getOrdersByNameAndAddress(@PathVariable String firstName, @PathVariable String lastName,
                                                                                   @PathVariable String zipcode, @PathVariable int houseNumber) {
-        return ResponseEntity.ok(orderService.getOrdersByNameAndAddress(firstName, lastName, zipcode, houseNumber));
+        return ResponseEntity.ok(orderServiceImpl.getOrdersByNameAndAddress(firstName, lastName, zipcode, houseNumber));
     }
 
     @GetMapping("/{firstName}/{lastName}/{zipcode}/{houseNumber}/{additionalHouseNumber}")
     public ResponseEntity<List<OrderDto>> getOrdersByNameAndAddress2(@PathVariable String firstName, @PathVariable String lastName,
                                                                                    @PathVariable String zipcode, @PathVariable int houseNumber,
                                                                                    @PathVariable String additionalHouseNumber) {
-        return ResponseEntity.ok(orderService.getOrdersByNameAndAddress(firstName, lastName, zipcode, houseNumber, additionalHouseNumber));
+        return ResponseEntity.ok(orderServiceImpl.getOrdersByNameAndAddress(firstName, lastName, zipcode, houseNumber, additionalHouseNumber));
     }
 
     @PutMapping(value = "change-processed-status={processed}/id={id}",
             consumes = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<OrderDto> changeProcessedStatus(@PathVariable Long id, @PathVariable boolean processed) {
-        return ResponseEntity.ok(orderService.changeProcessedStatus(id, processed));
+        return ResponseEntity.ok(orderServiceImpl.changeProcessedStatus(id, processed));
     }
 
     @PostMapping(path = "/customer={customerId}",consumes = { MediaType.APPLICATION_JSON_VALUE })
     public ResponseEntity<OrderDto> createOrderFromCustomer(@PathVariable Long customerId) {
         final URI location = URI.create("/order" + customerId);
-        return ResponseEntity.created(location).body(orderService.createOrderFromCustomer(customerId));
+        return ResponseEntity.created(location).body(orderServiceImpl.createOrderFromCustomer(customerId));
     }
 
     @PostMapping(path = "/guest={customerId}",consumes = { MediaType.APPLICATION_JSON_VALUE })
     public ResponseEntity<OrderDto> createOrderFromGuest(@PathVariable Long customerId, @RequestBody ShoppingCartDto shoppingCartDto) {
         final URI location = URI.create("/order" + customerId);
-        return ResponseEntity.created(location).body(orderService.createOrderFromGuestCustomer(customerId, shoppingCartDto));
+        return ResponseEntity.created(location).body(orderServiceImpl.createOrderFromGuestCustomer(customerId, shoppingCartDto));
     }
 
 }

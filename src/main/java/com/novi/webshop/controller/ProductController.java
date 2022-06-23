@@ -1,8 +1,7 @@
 package com.novi.webshop.controller;
 
 import com.novi.webshop.dto.ProductDto;
-import com.novi.webshop.model.Product;
-import com.novi.webshop.services.ProductService;
+import com.novi.webshop.services.ProductServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -15,48 +14,49 @@ import java.util.List;
 @RequestMapping("product")
 public class ProductController {
 
-    private final ProductService productService;
+    private final ProductServiceImpl productServiceImpl;
 
     @Autowired
-    public ProductController(ProductService productService) {
-        this.productService = productService;
+    public ProductController(ProductServiceImpl productServiceImpl) {
+        this.productServiceImpl = productServiceImpl;
     }
 
     @GetMapping()
     public ResponseEntity<List<ProductDto>> getAllProducts() {
-        return ResponseEntity.ok(productService.getAllProducts());
+        return ResponseEntity.ok(productServiceImpl.getAllProducts());
+
     }
 
     @GetMapping("/name/{productName}")
     public ResponseEntity<ProductDto> getProductByName(@PathVariable String productName) {
-        return ResponseEntity.ok(productService.getProductByName(productName));
+        return ResponseEntity.ok(productServiceImpl.getProductByName(productName));
     }
 
     @GetMapping("/category/{category}")
     public ResponseEntity<List<ProductDto>> getProductsByCategory(@PathVariable String category) {
-        return ResponseEntity.ok(productService.getProductsByCategory(category));
+        return ResponseEntity.ok(productServiceImpl.getProductsByCategory(category));
     }
 
     @GetMapping("/price/{minimumPrice}/{maximumPrice}")
     public ResponseEntity<List<ProductDto>> getProductsByPriceRange(@PathVariable int minimumPrice, @PathVariable int maximumPrice) {
-        return ResponseEntity.ok(productService.getProductsPriceRange(minimumPrice, maximumPrice));
+        return ResponseEntity.ok(productServiceImpl.getProductsPriceRange(minimumPrice, maximumPrice));
     }
 
     @PostMapping(consumes = { MediaType.APPLICATION_JSON_VALUE })
         public ResponseEntity<ProductDto> createProduct(@RequestBody ProductDto productDto) {
         final URI location = URI.create("/product" + productDto.getId());
-        return ResponseEntity.created(location).body(productService.createProduct(productDto));
+        return ResponseEntity.created(location).body(productServiceImpl.createProduct(productDto));
         }
 
     @PutMapping(value = "/change/{id}/{type}",
             consumes = { MediaType.APPLICATION_JSON_VALUE })
     public ResponseEntity<ProductDto> updateTelevision(@PathVariable Long id , @PathVariable String type, @RequestBody ProductDto productDto) {
-        return ResponseEntity.ok(productService.changeProduct(id, type, productDto));
+        return ResponseEntity.ok(productServiceImpl.changeProduct(id, type, productDto));
     }
 
     @DeleteMapping("/{id}")
     public void deleteProduct(@PathVariable Long id) {
-        productService.deleteProduct(id);
+        productServiceImpl.deleteProduct(id);
     }
 
 }
