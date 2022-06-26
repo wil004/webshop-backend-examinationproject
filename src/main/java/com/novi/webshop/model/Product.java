@@ -1,6 +1,8 @@
 package com.novi.webshop.model;
 
 import javax.persistence.*;
+import java.net.URI;
+import java.net.URL;
 import java.util.List;
 
 @Entity
@@ -18,6 +20,9 @@ public class Product {
 
     private double sellingPrice;
     private double retailPrice;
+
+
+    private String productPictureUrl;
 
     @ManyToMany
     private List<ShoppingCart> shoppingCartList;
@@ -82,6 +87,14 @@ public class Product {
 
     public void setRetailPrice(double buyingPrice) {
         this.retailPrice = buyingPrice;
+    }
+
+    public String getProductPictureUrl() {
+        return productPictureUrl;
+    }
+
+    public void setProductPictureUrl(String productPictureUrl) {
+        this.productPictureUrl = productPictureUrl;
     }
 
     public List<ShoppingCart> getShoppingCartList() {

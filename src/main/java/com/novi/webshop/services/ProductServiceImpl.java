@@ -4,11 +4,14 @@ import com.novi.webshop.controller.exceptions.RecordNotFoundException;
 import com.novi.webshop.dto.ProductDto;
 import com.novi.webshop.helpers.TransferDtoToModel;
 import com.novi.webshop.helpers.TransferModelToDto;
+import com.novi.webshop.model.Attachment;
 import com.novi.webshop.model.Product;
 import com.novi.webshop.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,6 +45,18 @@ public class ProductServiceImpl implements ProductService {
         }
         // Doesn't return a RecordNotFoundException because this method is nested in the createProduct method!
         return null;
+    }
+
+    @Override
+    public ProductDto uploadPicture(Long productId, String downloadUrl) {
+        Product product = productRepository.findById(productId).orElseThrow();
+        if(productRepository.findById(productId).isPresent()) {
+            product.setProductPictureUrl(downloadUrl);
+            Product savedProduct = productRepository.save(product);
+            return TransferModelToDto.transferToProductDto(savedProduct);
+        } else {
+            throw new RecordNotFoundException("Couldn't find product");
+        }
     }
 
     @Override
