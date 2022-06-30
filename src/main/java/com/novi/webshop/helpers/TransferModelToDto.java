@@ -2,6 +2,8 @@ package com.novi.webshop.helpers;
 
 import com.novi.webshop.dto.*;
 import com.novi.webshop.model.*;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,6 +75,7 @@ public class TransferModelToDto {
         productDto.setSellingPrice(product.getSellingPrice());
         productDto.setRetailPrice(product.getRetailPrice());
         productDto.setAmountOfOrderedProducts(product.getAmountOfOrderedProducts());
+        productDto.setProductPictureUrl(product.getProductPictureUrl());
         return productDto;
     }
 

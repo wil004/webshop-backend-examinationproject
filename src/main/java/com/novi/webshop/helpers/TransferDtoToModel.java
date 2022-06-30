@@ -63,6 +63,7 @@ public class TransferDtoToModel {
         product.setSellingPrice(productDto.getSellingPrice());
         product.setRetailPrice(productDto.getRetailPrice());
         product.setAmountOfOrderedProducts(productDto.getAmountOfOrderedProducts());
+        product.setProductPictureUrl(productDto.getProductPictureUrl());
         return product;
     }
 
