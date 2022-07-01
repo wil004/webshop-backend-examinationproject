@@ -31,18 +31,24 @@ public class UserServiceImpl implements UserService {
         List<Customer> customers = customerRepository.findAll();
 
         for(int i = 0; i < admin.size(); i++) {
-            if (admin.get(i).getUsername().equalsIgnoreCase(username)) {
-                return true;
+            if(admin.get(i).getUsername() != null) {
+                if (admin.get(i).getUsername().equalsIgnoreCase(username)) {
+                    return true;
+                }
             }
         }
         for(int i = 0; i < employees.size(); i++) {
-            if (employees.get(i).getUsername().equalsIgnoreCase(username)) {
-                return true;
+            if(employees.get(i).getUsername() != null) {
+                if (employees.get(i).getUsername().equalsIgnoreCase(username)) {
+                    return true;
+                }
             }
         }
         for(int i = 0; i < customers.size(); i++) {
-            if (customers.get(i).getUsername().equalsIgnoreCase(username)) {
-                return true;
+            if(customers.get(i).getUsername() != null) {
+                if (customers.get(i).getUsername().equalsIgnoreCase(username)) {
+                    return true;
+                }
             }
         }
         return false;

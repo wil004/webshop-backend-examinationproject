@@ -27,10 +27,10 @@ public class TransferDtoToModel {
         ShoppingCart shoppingCart = new ShoppingCart();
         shoppingCart.setId(shoppingCartDto.getId());
         shoppingCart.setTotalPrice(shoppingCartDto.getTotalPrice());
-        if(shoppingCartDto.getProduct() != null) {
+        if(shoppingCartDto.getProductList() != null) {
             List<Product> productList = new ArrayList<>();
-            for(int i = 0; i < shoppingCartDto.getProduct().size(); i++) {
-                productList.add(transferToProduct(shoppingCartDto.getProduct().get(i)));
+            for(int i = 0; i < shoppingCartDto.getProductList().size(); i++) {
+                productList.add(transferToProduct(shoppingCartDto.getProductList().get(i)));
             }
             shoppingCart.setProductList(productList);
         }
@@ -69,22 +69,28 @@ public class TransferDtoToModel {
 
     public static Orders transferToOrder(OrderDto orderDto) {
         Orders order = new Orders();
-        order.setId(order.getId());
-        order.setProcessed(order.isProcessed());
-        order.setOrderDate(order.getOrderDate());
-        order.setTotalPrice(order.getTotalPrice());
-        order.setCustomer(TransferDtoToModel.transferToCustomer(orderDto.getCustomerDto()));
-        List<Product> productList = new ArrayList<>();
-        for (int i = 0; i < order.getProductList().size(); i++) {
-            productList.add(transferToProduct(orderDto.getProductDtoList().get(i)));
+        order.setId(orderDto.getId());
+        order.setProcessed(orderDto.isProcessed());
+        order.setPaid(orderDto.isPaid());
+        order.setOrderDate(orderDto.getOrderDate());
+        order.setTotalPrice(orderDto.getTotalPrice());
+        if(orderDto.getCustomerDto() != null) {
+            order.setCustomer(TransferDtoToModel.transferToCustomer(orderDto.getCustomerDto()));
         }
-        order.setProductList(productList);
+        if(orderDto.getProductDtoList() != null) {
+            List<Product> productList = new ArrayList<>();
+            for (int i = 0; i < order.getProductList().size(); i++) {
+                productList.add(transferToProduct(orderDto.getProductDtoList().get(i)));
+            }
+            order.setProductList(productList);
+        }
         return order;
     }
 
     public static Employee transferToUserEmployeeDto(UserEmployeeDto employeeDto) {
         Employee employee = new Employee();
         employee.setEmailAddress(employeeDto.getEmailAddress());
+        employee.setUsername(employeeDto.getUsername());
         employee.setFirstName(employeeDto.getFirstName());
         employee.setLastName(employeeDto.getLastName());
         return employee;

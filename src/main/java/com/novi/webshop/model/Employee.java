@@ -21,12 +21,17 @@ public class Employee extends User{
     @OneToMany(mappedBy = "employeeOrderList")
     private List<Orders> orderList;
 
+    @OneToMany(mappedBy = "employeeFinishedOrderList")
+    private List<Orders> finishedOrders;
+
+
     @ManyToOne
     private Admin admin;
 
     public Employee() {
         super.setRole("EMPLOYEE");
     }
+
 
     public Long getId() {
         return id;
@@ -96,6 +101,14 @@ public class Employee extends User{
 
     public void setOrderList(List<Orders> orderList) {
         this.orderList = orderList;
+    }
+
+    public List<Orders> getFinishedOrders() {
+        return finishedOrders;
+    }
+
+    public void setFinishedOrders(List<Orders> finishedOrders) {
+        this.finishedOrders = finishedOrders;
     }
 
     public Admin getAdmin() {

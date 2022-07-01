@@ -12,6 +12,9 @@ public class Orders {
 
     private boolean processed;
 
+    private boolean paid;
+
+
     private LocalDateTime orderDate;
 
     private Long orderDateInMilliSeconds;
@@ -22,7 +25,7 @@ public class Orders {
     @OneToMany(mappedBy = "customerOrder")
     private List<ReturnCart> returnList;
 
-    @ManyToOne(optional = false)
+    @ManyToOne
     private Customer customer;
 
     @ManyToMany
@@ -30,10 +33,9 @@ public class Orders {
 
     @ManyToOne
     private Employee employeeOrderList;
+
     @ManyToOne
-    private Admin adminForUnProcessedList;
-    @ManyToOne
-    private Admin adminForProcessedList;
+    private Employee employeeFinishedOrderList;
 
     public Long getId() {
         return id;
@@ -49,6 +51,14 @@ public class Orders {
 
     public void setProcessed(boolean processed) {
         this.processed = processed;
+    }
+
+    public boolean isPaid() {
+        return paid;
+    }
+
+    public void setPaid(boolean paid) {
+        this.paid = paid;
     }
 
     public LocalDateTime getOrderDate() {
@@ -108,19 +118,11 @@ public class Orders {
         this.employeeOrderList = employeeOrderList;
     }
 
-    public Admin getAdminForUnProcessedList() {
-        return adminForUnProcessedList;
+    public Employee getEmployeeFinishedOrderList() {
+        return employeeFinishedOrderList;
     }
 
-    public void setAdminForUnProcessedList(Admin adminForUnProcessedList) {
-        this.adminForUnProcessedList = adminForUnProcessedList;
-    }
-
-    public Admin getAdminForProcessedList() {
-        return adminForProcessedList;
-    }
-
-    public void setAdminForProcessedList(Admin adminForProcessedList) {
-        this.adminForProcessedList = adminForProcessedList;
+    public void setEmployeeFinishedOrderList(Employee employeeFinishedOrderList) {
+        this.employeeFinishedOrderList = employeeFinishedOrderList;
     }
 }

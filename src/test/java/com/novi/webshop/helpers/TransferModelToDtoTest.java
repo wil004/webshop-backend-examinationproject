@@ -1,11 +1,9 @@
 package com.novi.webshop.helpers;
 
 import com.novi.webshop.dto.CustomerDto;
-import com.novi.webshop.dto.ProductDto;
 import com.novi.webshop.dto.ReturnCartDto;
 import com.novi.webshop.dto.ShoppingCartDto;
 import com.novi.webshop.model.*;
-import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -63,7 +61,7 @@ public class TransferModelToDtoTest {
         ShoppingCartDto shoppingCartDto = TransferModelToDto.transferToShoppingCartDto(shoppingCart);
 
         // Assert
-        assertEquals(shoppingCartDto.getProduct().size(), shoppingCart.getProductList().size());
+        assertEquals(shoppingCartDto.getProductList().size(), shoppingCart.getProductList().size());
     }
 
     @Test

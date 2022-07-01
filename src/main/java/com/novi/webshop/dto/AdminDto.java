@@ -1,30 +1,16 @@
-package com.novi.webshop.model;
-
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
+package com.novi.webshop.dto;
 import java.util.List;
 
-
-@Entity
-public class Admin extends User {
-    @Id
-    @GeneratedValue
+public class AdminDto extends UserDto{
     private Long id;
-
     private String emailAddress;
     private String username;
     private String password;
-
     private String bankAccount;
 
-    @OneToMany(mappedBy = "admin")
-    private List<Employee> employees;
 
-    public Admin() {
-        super.setRole("ADMIN");
-    }
+    private List<UserEmployeeDto> employees;
+
 
     public Long getId() {
         return id;
@@ -72,11 +58,11 @@ public class Admin extends User {
         this.bankAccount = bankAccount;
     }
 
-    public List<Employee> getEmployees() {
+    public List<UserEmployeeDto> getEmployees() {
         return employees;
     }
 
-    public void setEmployees(List<Employee> employees) {
+    public void setEmployees(List<UserEmployeeDto> employees) {
         this.employees = employees;
     }
 }

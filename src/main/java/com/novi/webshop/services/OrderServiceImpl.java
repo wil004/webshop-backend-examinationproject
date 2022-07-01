@@ -17,16 +17,16 @@ import java.util.List;
 public class OrderServiceImpl implements OrderService{
 
     private final OrderRepository orderRepository;
-    private final AdminRepository adminRepository;
     private final CustomerRepository customerRepository;
     private final ProductRepository productRepository;
+    private final EmployeeRepository employeeRepository;
 
     @Autowired
-    public OrderServiceImpl(OrderRepository orderRepository, AdminRepository adminRepository, CustomerRepository customerRepository, ProductRepository productRepository) {
+    public OrderServiceImpl(OrderRepository orderRepository, CustomerRepository customerRepository, ProductRepository productRepository, EmployeeRepository employeeRepository) {
         this.orderRepository = orderRepository;
-        this.adminRepository = adminRepository;
         this.customerRepository = customerRepository;
         this.productRepository = productRepository;
+        this.employeeRepository = employeeRepository;
     }
 
     @Override
@@ -40,7 +40,55 @@ public class OrderServiceImpl implements OrderService{
     }
 
     @Override
-    public List<OrderDto> getProcessedOrNotProcessedOrders(boolean processedOrNotProcessed) {
+    public OrderDto orderIsPaid(Long orderId) {
+        Orders order = orderRepository.findById(orderId).orElseThrow();
+        if(orderRepository.findById(orderId).isPresent()) {
+            order.setPaid(true);
+        Orders savedOrder = orderRepository.save(order);
+        return TransferModelToDto.transferToOrderDto(savedOrder);
+        } else {
+            throw new RecordNotFoundException("Order doesn't exist");
+        }
+    }
+
+    @Override
+    public OrderDto changeProcessedStatus(Long orderId, boolean processed) {
+        if(orderRepository.findById(orderId).isPresent()) {
+            Orders order = orderRepository.findById(orderId).orElseThrow();
+            if(order.isPaid()) {
+                // deleteOrdeInEmployee makes sure the order will not be prepared twice!
+                deleteOrderInEmployee(orderId);
+                order.setProcessed(processed);
+                Orders savedOrder = orderRepository.save(order);
+                return TransferModelToDto.transferToOrderDto(savedOrder);
+            } else {
+                throw new RecordNotFoundException("Please check if the order is paid first!");
+            }
+        }
+        else {
+            throw new RecordNotFoundException("Couldn't find order");
+        }
+    }
+
+    private void deleteOrderInEmployee(Long orderId) {
+        if (orderRepository.findById(orderId).isPresent()) {
+            Orders order = orderRepository.findById(orderId).orElseThrow();
+            List<Employee> employeeList = employeeRepository.findAll();
+            for (int i = 0; i < employeeList.size(); i++) {
+                for (int j = 0; j < employeeList.get(i).getOrderList().size(); j++) {
+                    if (order.equals(employeeList.get(i).getOrderList().get(j))) {
+                        employeeList.get(i).getOrderList().remove(j);
+                        employeeRepository.save(employeeList.get(i));
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+
+    @Override
+    public List<OrderDto> getAllProcessedOrNotProcessedOrders(boolean processedOrNotProcessed) {
         List<Orders> allOrdersList = orderRepository.findAll();
         List<Orders> allOrdersWithProcessedStatus = new ArrayList<>();
 
@@ -48,16 +96,16 @@ public class OrderServiceImpl implements OrderService{
             if(processedOrNotProcessed) {
                 if (allOrdersList.get(i).isProcessed()) {
                     allOrdersWithProcessedStatus.add(allOrdersList.get(i));
-                    Admin admin = new Admin();
-                    admin.setAllProcessedOrders(allOrdersWithProcessedStatus);
-                    adminRepository.save(admin);
                 }
             } else {
                 if (!allOrdersList.get(i).isProcessed()) {
-                    allOrdersWithProcessedStatus.add(allOrdersList.get(i));
-                    Admin admin = new Admin();
-                    admin.setAllNotProcessedOrders(allOrdersWithProcessedStatus);
-                    adminRepository.save(admin);
+                    long orderTime30days = allOrdersList.get(i).getOrderDateInMilliSeconds() + 1000L * 60 * 60 * 24 * 30;
+                    long currentTime = System.currentTimeMillis();
+                    if(currentTime > orderTime30days) {
+                        orderRepository.deleteById(allOrdersList.get(i).getId());
+                    } else {
+                        allOrdersWithProcessedStatus.add(allOrdersList.get(i));
+                    }
                 }
             }
         }
@@ -132,23 +180,27 @@ public class OrderServiceImpl implements OrderService{
         order.setOrderDateInMilliSeconds(System.currentTimeMillis());
         order.setCustomer(customer);
         order.setTotalPrice(customer.getShoppingCart().getTotalPrice());
-        for(int i = 0; i < customer.getShoppingCart().getProductList().size(); i++) {
-            if(productRepository.findById(customer.getShoppingCart().getProductList().get(i).getId()).isPresent()) {
-                productList.add(productRepository.findById(customer.getShoppingCart().getProductList().get(i).getId()).orElseThrow());
+        if(customer.getShoppingCart().getProductList().size() > 0) {
+            for (int i = 0; i < customer.getShoppingCart().getProductList().size(); i++) {
+                if (productRepository.findById(customer.getShoppingCart().getProductList().get(i).getId()).isPresent()) {
+                    productList.add(productRepository.findById(customer.getShoppingCart().getProductList().get(i).getId()).orElseThrow());
+                }
             }
-        }
-        order.setProductList(productList);
-        List<Orders> orderHistory = customer.getOrderHistory();
+            order.setProductList(productList);
+            List<Orders> orderHistory = customer.getOrderHistory();
 
-        customer.getShoppingCart().setProductList(null);
-        customer.getShoppingCart().setTotalPrice(0);
-//        orderHistory.add(order);
-//        customer.setOrderHistory(orderHistory);
-        customerRepository.save(customer);
-        Orders savedOrder = orderRepository.save(order);
-        OrderDto orderDto = TransferModelToDto.transferToOrderDto(savedOrder);
-        orderDto.setCustomerDto(TransferModelToDto.transferToCustomerDto(customer));
-        return orderDto;
+            customer.getShoppingCart().setProductList(null);
+            customer.getShoppingCart().setTotalPrice(0);
+            orderHistory.add(order);
+            customer.setOrderHistory(orderHistory);
+            customerRepository.save(customer);
+            Orders savedOrder = orderRepository.save(order);
+            OrderDto orderDto = TransferModelToDto.transferToOrderDto(savedOrder);
+            orderDto.setCustomerDto(TransferModelToDto.transferToCustomerDto(customer));
+            return orderDto;
+        } else {
+            throw new RecordNotFoundException("Shoppingcart is empty");
+        }
     }
 
     @Override
@@ -161,33 +213,21 @@ public class OrderServiceImpl implements OrderService{
         order.setOrderDate(LocalDateTime.now());
         order.setOrderDateInMilliSeconds(System.currentTimeMillis());
         order.setCustomer(customer);
-        for(int i = 0; i < shoppingCartDto.getProduct().size(); i++) {
-            if(productRepository.findById(shoppingCartDto.getProduct().get(i).getId()).isPresent()) {
-                productList.add(productRepository.findById(shoppingCartDto.getProduct().get(i).getId()).orElseThrow());
+        if(shoppingCartDto.getProductList().size() > 0) {
+            for (int i = 0; i < shoppingCartDto.getProductList().size(); i++) {
+                if (productRepository.findById(shoppingCartDto.getProductList().get(i).getId()).isPresent()) {
+                    productList.add(productRepository.findById(shoppingCartDto.getProductList().get(i).getId()).orElseThrow());
+                }
             }
         }
         if(productList.size() > 0) {
             order.setProductList(productList);
+        } else {
+            throw new RecordNotFoundException("No products in shoppingcart!");
         }
         Orders savedOrder = orderRepository.save(order);
         OrderDto orderDto = TransferModelToDto.transferToOrderDto(savedOrder);
         orderDto.setCustomerDto(TransferModelToDto.transferToCustomerDto(customer));
         return orderDto;
     }
-
-
-    @Override
-    public OrderDto changeProcessedStatus(Long id, boolean processed) {
-        if(orderRepository.findById(id).isPresent()) {
-            Orders order = orderRepository.findById(id).orElseThrow();
-            order.setProcessed(processed);
-            Orders savedOrder = orderRepository.save(order);
-            return TransferModelToDto.transferToOrderDto(savedOrder);
-        }
-        else {
-            throw new RecordNotFoundException("Couldn't find order");
-        }
-    }
-
-
 }
