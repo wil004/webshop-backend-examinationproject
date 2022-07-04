@@ -59,13 +59,13 @@ public class TransferDtoToModelTest {
 
         productDtoList.add(productDto);
         productDtoList.add(productDto2);
-        shoppingCartDto.setProduct(productDtoList);
+        shoppingCartDto.setProductList(productDtoList);
 
         // Act
         ShoppingCart shoppingCart = TransferDtoToModel.transferToShoppingCart(shoppingCartDto);
 
         // Assert
-        assertEquals(shoppingCart.getProductList().size(), shoppingCartDto.getProduct().size());
+        assertEquals(shoppingCart.getProductList().size(), shoppingCartDto.getProductList().size());
     }
 
     @Test

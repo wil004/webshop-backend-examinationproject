@@ -7,6 +7,7 @@ public class OrderDto {
     private Long id;
 
     private boolean processed;
+    private boolean paid;
 
     private double totalPrice;
     private LocalDateTime orderDate;
@@ -29,6 +30,14 @@ public class OrderDto {
 
     public void setProcessed(boolean processed) {
         this.processed = processed;
+    }
+
+    public boolean isPaid() {
+        return paid;
+    }
+
+    public void setPaid(boolean paid) {
+        this.paid = paid;
     }
 
     public double getTotalPrice() {

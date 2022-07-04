@@ -20,16 +20,6 @@ public interface ReturnCartService {
 
     ReturnCartDto createReturnProducts(Long orderId);
 
-    default boolean within30DaysReturnTime(Orders order) {
-        long maximumReturnTime = order.getOrderDateInMilliSeconds() + 1000L * 60 * 60 * 24 * 30;
-        long currentTime = System.currentTimeMillis();
-        if (currentTime > maximumReturnTime) {
-            return false;
-        } else {
-            return true;
-        }
-    }
-
     ReturnCartDto connectProductWithReturnCart(Long returnCartId, Long productId, ProductDto productDto);
 
 }

@@ -2,13 +2,18 @@ package com.novi.webshop.services;
 
 import com.novi.webshop.dto.OrderDto;
 import com.novi.webshop.dto.ShoppingCartDto;
+import com.novi.webshop.dto.UserEmployeeDto;
 
 import java.util.List;
 
 public interface OrderService {
     List<OrderDto> getAllOrders();
 
-    List<OrderDto> getProcessedOrNotProcessedOrders(boolean processedOrNotProcessed);
+    OrderDto orderIsPaid(Long orderId);
+
+    OrderDto changeProcessedStatus(Long id, boolean processed);
+
+    List<OrderDto> getAllProcessedOrNotProcessedOrders(boolean processedOrNotProcessed);
 
     OrderDto getOrderById(Long id);
 
@@ -20,5 +25,4 @@ public interface OrderService {
 
     OrderDto createOrderFromGuestCustomer(Long customerId, ShoppingCartDto shoppingCartDto);
 
-    OrderDto changeProcessedStatus(Long id, boolean processed);
 }

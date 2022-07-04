@@ -1,6 +1,5 @@
 package com.novi.webshop.dto;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 public class ShoppingCartDto {
@@ -9,7 +8,7 @@ public class ShoppingCartDto {
     private double totalPrice;
 
     private CustomerDto customerDto;
-    private List<ProductDto> product;
+    private List<ProductDto> productList;
 
     public Long getId() {
         return id;
@@ -36,11 +35,11 @@ public class ShoppingCartDto {
         this.customerDto = customerDto;
     }
 
-    public List<ProductDto> getProduct() {
-        return product;
+    public List<ProductDto> getProductList() {
+        return productList;
     }
 
-    public void setProduct(List<ProductDto> product) {
-        this.product = product;
+    public void setProductList(List<ProductDto> productList) {
+        this.productList = productList;
     }
 }

@@ -133,6 +133,16 @@ public class ReturnCartServiceImpl implements ReturnCartService {
     }
 
 
+    private boolean within30DaysReturnTime(Orders order) {
+        long maximumReturnTime = order.getOrderDateInMilliSeconds() + 1000L * 60 * 60 * 24 * 30;
+        long currentTime = System.currentTimeMillis();
+        if (currentTime > maximumReturnTime) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
     @Override
     public ReturnCartDto connectProductWithReturnCart(Long returnCartId, Long productId, ProductDto productDto) {
         ReturnCart returnCart = returnCartRepository.findById(returnCartId).orElseThrow();
