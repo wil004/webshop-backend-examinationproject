@@ -1,4 +1,5 @@
 package com.novi.webshop.model;
+
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -12,6 +13,9 @@ public class Orders {
 
     private boolean processed;
 
+    private boolean paid;
+
+
     private LocalDateTime orderDate;
 
     private Long orderDateInMilliSeconds;
@@ -20,20 +24,19 @@ public class Orders {
 
 
     @OneToMany(mappedBy = "customerOrder")
-    private List<ReturnCart> returnList;
+    private List<Returns> returnsList;
 
-    @ManyToOne(optional = false)
+    @ManyToOne
     private Customer customer;
 
-    @ManyToMany
-    private List<Product> productList;
+    @OneToMany(mappedBy = "order")
+    List<QuantityAndProduct> quantityAndProductList;
 
     @ManyToOne
     private Employee employeeOrderList;
+
     @ManyToOne
-    private Admin adminForUnProcessedList;
-    @ManyToOne
-    private Admin adminForProcessedList;
+    private Employee employeeFinishedOrderList;
 
     public Long getId() {
         return id;
@@ -49,6 +52,14 @@ public class Orders {
 
     public void setProcessed(boolean processed) {
         this.processed = processed;
+    }
+
+    public boolean isPaid() {
+        return paid;
+    }
+
+    public void setPaid(boolean paid) {
+        this.paid = paid;
     }
 
     public LocalDateTime getOrderDate() {
@@ -83,21 +94,21 @@ public class Orders {
         this.customer = customer;
     }
 
-    public List<Product> getProductList() {
-        return productList;
+
+    public List<QuantityAndProduct> getQuantityAndProductList() {
+        return quantityAndProductList;
     }
 
-    public void setProductList(List<Product> productList) {
-        this.productList = productList;
+    public void setQuantityAndProductList(List<QuantityAndProduct> quantityAndProductList) {
+        this.quantityAndProductList = quantityAndProductList;
     }
 
-
-    public List<ReturnCart> getReturnList() {
-        return returnList;
+    public List<Returns> getReturnList() {
+        return returnsList;
     }
 
-    public void setReturnList(List<ReturnCart> returnList) {
-        this.returnList = returnList;
+    public void setReturnList(List<Returns> returnsList) {
+        this.returnsList = returnsList;
     }
 
     public Employee getEmployeeOrderList() {
@@ -108,19 +119,11 @@ public class Orders {
         this.employeeOrderList = employeeOrderList;
     }
 
-    public Admin getAdminForUnProcessedList() {
-        return adminForUnProcessedList;
+    public Employee getEmployeeFinishedOrderList() {
+        return employeeFinishedOrderList;
     }
 
-    public void setAdminForUnProcessedList(Admin adminForUnProcessedList) {
-        this.adminForUnProcessedList = adminForUnProcessedList;
-    }
-
-    public Admin getAdminForProcessedList() {
-        return adminForProcessedList;
-    }
-
-    public void setAdminForProcessedList(Admin adminForProcessedList) {
-        this.adminForProcessedList = adminForProcessedList;
+    public void setEmployeeFinishedOrderList(Employee employeeFinishedOrderList) {
+        this.employeeFinishedOrderList = employeeFinishedOrderList;
     }
 }

@@ -10,13 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-
-import java.util.List;
 
 import static org.hamcrest.Matchers.is;
 
@@ -35,7 +32,7 @@ public class OrderControllerTest {
     ProductServiceImpl productService;
 
     @MockBean
-    ReturnCartServiceImpl returnCartService;
+    ReturnsServiceImpl returnCartService;
 
     @MockBean
     ShoppingCartServiceImpl shoppingCartService;
@@ -62,7 +59,7 @@ public class OrderControllerTest {
     ProductRepository productRepository;
 
     @MockBean
-    ReturnCartRepository returnCartRepository;
+    ReturnsRepository returnsRepository;
 
     @MockBean
     ShoppingCartRepository shoppingCartRepository;
@@ -91,18 +88,13 @@ public class OrderControllerTest {
     }
 
 
-    /* We never learned how to mock a list! We learned very little about this subject!
-    If testing will be graded low there will be a complaint, I am extremely dissapointed about this!
-    The internet provides very little information about this subject! I spend hours if it aren't days
-    to figure out how to test right (especially with testing on the service layer)*/
-
     @Test
     void getOrder() throws Exception {
         OrderDto orderDto = new OrderDto();
         orderDto.setId(1L);
         orderDto.setProcessed(true);
 
-        Mockito.when(orderService.getProcessedOrNotProcessedOrders(true));
+        Mockito.when(orderService.getAllProcessedOrNotProcessedOrders(true));
 
         this.mockMvc
                 .perform(MockMvcRequestBuilders.get("/order/processed-status=true"))
@@ -111,10 +103,6 @@ public class OrderControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id", is(1)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.processed", is(true)));
     }
-
-
-
-
 
 
     @Test

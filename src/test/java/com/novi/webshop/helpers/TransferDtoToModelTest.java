@@ -2,10 +2,10 @@ package com.novi.webshop.helpers;
 
 import com.novi.webshop.dto.CustomerDto;
 import com.novi.webshop.dto.ProductDto;
-import com.novi.webshop.dto.ReturnCartDto;
+import com.novi.webshop.dto.ReturnsDto;
 import com.novi.webshop.dto.ShoppingCartDto;
 import com.novi.webshop.model.Customer;
-import com.novi.webshop.model.ReturnCart;
+import com.novi.webshop.model.Returns;
 import com.novi.webshop.model.ShoppingCart;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -59,21 +59,21 @@ public class TransferDtoToModelTest {
 
         productDtoList.add(productDto);
         productDtoList.add(productDto2);
-        shoppingCartDto.setProduct(productDtoList);
+        shoppingCartDto.setProductList(productDtoList);
 
         // Act
         ShoppingCart shoppingCart = TransferDtoToModel.transferToShoppingCart(shoppingCartDto);
 
         // Assert
-        assertEquals(shoppingCart.getProductList().size(), shoppingCartDto.getProduct().size());
+        assertEquals(shoppingCart.getQuantityAndProductList().size(), shoppingCartDto.getProductList().size());
     }
 
     @Test
     void testIfReturnCartDtoTransfersToReturnCart() {
-        ReturnCartDto returnCartDto = new ReturnCartDto();
-        returnCartDto.setId(1L);
-         returnCartDto.setProcessed(true);
-         returnCartDto.setTotalPrice(100);
+        ReturnsDto returnsDto = new ReturnsDto();
+        returnsDto.setId(1L);
+         returnsDto.setProcessed(true);
+         returnsDto.setTotalPrice(100);
         List<ProductDto> productDtoList = new ArrayList<>();
         ProductDto productDto = new ProductDto();
         ProductDto productDto2 = new ProductDto();
@@ -83,19 +83,15 @@ public class TransferDtoToModelTest {
 
         productDtoList.add(productDto);
         productDtoList.add(productDto2);
-        returnCartDto.setReturnProductList(productDtoList);
+        returnsDto.setReturnProductList(productDtoList);
 
         // Act
-        ReturnCart returnCart = TransferDtoToModel.transferToReturnCart(returnCartDto);
+        Returns aReturns = TransferDtoToModel.transferToReturnCart(returnsDto);
 
         // Assert
-        assertEquals(returnCart.getId(), 1L);
-        assertEquals(returnCart.getTotalPrice(), 100);
-        assertTrue(returnCart.isProcessed());
-        assertEquals(returnCart.getReturnProductList().size(), returnCartDto.getReturnProductList().size());
+        assertEquals(aReturns.getId(), 1L);
+        assertEquals(aReturns.getTotalPrice(), 100);
+        assertTrue(aReturns.isProcessed());
+        assertEquals(aReturns.getQuantityAndProductList().size(), returnsDto.getReturnProductList().size());
     }
-
-
-
-
 }

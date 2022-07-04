@@ -1,10 +1,4 @@
 package com.novi.webshop.dto;
-
-import com.novi.webshop.model.ShoppingCart;
-import com.novi.webshop.model.User;
-import com.sun.istack.NotNull;
-
-import javax.persistence.OneToMany;
 import java.util.List;
 
 public class CustomerDto extends UserDto {

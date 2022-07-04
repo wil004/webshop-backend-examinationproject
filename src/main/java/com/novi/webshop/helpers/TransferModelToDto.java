@@ -2,8 +2,6 @@ package com.novi.webshop.helpers;
 
 import com.novi.webshop.dto.*;
 import com.novi.webshop.model.*;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.Resource;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,46 +23,52 @@ public class TransferModelToDto {
         if(customer.getShoppingCart() != null) {
             customerDto.setShoppingCartDto(transferToShoppingCartDto(customer.getShoppingCart()));
         }
-        List<OrderDto> orderHistoryList = new ArrayList<>();
-        if (customer.getOrderHistory().size() > 0) {
+        if(customer.getOrderHistory() != null) {
+            List<OrderDto> orderHistoryList = new ArrayList<>();
             for (int i = 0; i < customer.getOrderHistory().size(); i++) {
-                customer.getOrderHistory().get(i).setCustomer(null);
-                    orderHistoryList.add(TransferModelToDto.transferToOrderDto(customer.getOrderHistory().get(i)));
+                OrderDto orderDto = TransferModelToDto.transferToOrderDto(customer.getOrderHistory().get(i));
+
+               orderHistoryList.add(orderDto);
+               orderHistoryList.get(i).setCustomerDto(null);
             }
+            customerDto.setOrderHistoryDto(orderHistoryList);
         }
-        customerDto.setOrderHistoryDto(orderHistoryList);
+
         return customerDto;
     }
-
 
     public static ShoppingCartDto transferToShoppingCartDto(ShoppingCart shoppingCart) {
         ShoppingCartDto shoppingCartDto = new ShoppingCartDto();
         shoppingCartDto.setId(shoppingCart.getId());
         shoppingCartDto.setTotalPrice(shoppingCart.getTotalPrice());
-        if(shoppingCart.getProductList() != null) {
+        if(shoppingCart.getQuantityAndProductList() != null) {
             List<ProductDto> productDtoList = new ArrayList<>();
-            for(int i = 0; i < shoppingCart.getProductList().size(); i++) {
-                productDtoList.add(transferToProductDto(shoppingCart.getProductList().get(i)));
+            for(int i = 0; i < shoppingCart.getQuantityAndProductList().size(); i++) {
+                productDtoList.add(transferToProductDto(shoppingCart.getQuantityAndProductList().get(i).getProduct()));
+                productDtoList.get(i).setAmountOfProducts(shoppingCart.getQuantityAndProductList().get(i).getAmountOfProducts());
             }
-            shoppingCartDto.setProduct(productDtoList);
+            shoppingCartDto.setProductList(productDtoList);
         }
         return shoppingCartDto;
     }
 
-    public static ReturnCartDto transferToReturnCartDto(ReturnCart returnCart) {
-        ReturnCartDto returnCartDto = new ReturnCartDto();
-        returnCartDto.setId(returnCart.getId());
-        returnCartDto.setTotalPrice(returnCart.getTotalPrice());
-        returnCartDto.setProcessed(returnCart.isProcessed());
-        returnCartDto.setOrderDto(TransferModelToDto.transferToOrderDto(returnCart.getCustomerOrder()));
-        if(returnCart.getReturnProductList() != null) {
+    public static ReturnsDto transferToReturnCartDto(Returns returns) {
+        ReturnsDto returnsDto = new ReturnsDto();
+        returnsDto.setId(returns.getId());
+        returnsDto.setTotalPrice(returns.getTotalPrice());
+        returnsDto.setProcessed(returns.isProcessed());
+        returnsDto.setBankAccountForReturn(returns.getBankAccountForReturn());
+        returnsDto.setOrderDto(TransferModelToDto.transferToOrderDto(returns.getCustomerOrder()));
+        if(returns.getQuantityAndProductList() != null) {
             List<ProductDto> returnCartDtoProductList = new ArrayList<>();
-            for (int i = 0; i < returnCart.getReturnProductList().size(); i++) {
-                returnCartDtoProductList.add(transferToProductDto(returnCart.getReturnProductList().get(i)));
+            for (int i = 0; i < returns.getQuantityAndProductList().size(); i++) {
+                returnCartDtoProductList.add(transferToProductDto(returns.getQuantityAndProductList().get(i).getProduct()));
+                returnCartDtoProductList.get(i).setAmountOfProducts(returns.getQuantityAndProductList().get(i).getAmountOfProducts());
+                returnCartDtoProductList.get(i).setAmountOfReturningProducts(returns.getQuantityAndProductList().get(i).getAmountOfReturningProducts());
             }
-            returnCartDto.setReturnProductList(returnCartDtoProductList);
+            returnsDto.setReturnProductList(returnCartDtoProductList);
         }
-        return returnCartDto;
+        return returnsDto;
     }
 
     public static ProductDto transferToProductDto(Product product) {
@@ -74,10 +78,12 @@ public class TransferModelToDto {
         productDto.setCategory(product.getCategory());
         productDto.setSellingPrice(product.getSellingPrice());
         productDto.setRetailPrice(product.getRetailPrice());
-        productDto.setAmountOfOrderedProducts(product.getAmountOfOrderedProducts());
+        productDto.setAmountOfProducts(product.getAmountOfProducts());
+        productDto.setAmountOfReturningProducts(product.getAmountOfReturningProducts());
         productDto.setProductPictureUrl(product.getProductPictureUrl());
         return productDto;
     }
+
 
     public static OrderDto transferToOrderDto(Orders order) {
         OrderDto orderDto = new OrderDto();
@@ -85,24 +91,62 @@ public class TransferModelToDto {
         orderDto.setProcessed(order.isProcessed());
         orderDto.setOrderDate(order.getOrderDate());
         orderDto.setTotalPrice(order.getTotalPrice());
+        orderDto.setPaid(order.isPaid());
         if(order.getCustomer() != null) {
-            orderDto.setCustomerDto(TransferModelToDto.transferToCustomerDto(order.getCustomer()));
-            orderDto.getCustomerDto().setShoppingCartDto(null);
-            orderDto.getCustomerDto().setOrderHistoryDto(null);
+            // To prevent a StackOverFlowError I did not call the transferToCustomerDto method!
+            CustomerDto customerDto = new CustomerDto();
+            customerDto.setId(order.getCustomer().getId());
+            customerDto.setEmailAddress(order.getCustomer().getEmailAddress());
+            customerDto.setUsername(order.getCustomer().getUsername());
+            customerDto.setFirstName(order.getCustomer().getFirstName());
+            customerDto.setLastName(order.getCustomer().getLastName());
+            customerDto.setStreetName(order.getCustomer().getStreetName());
+            customerDto.setHouseNumber(order.getCustomer().getHouseNumber());
+            customerDto.setAdditionalToHouseNumber(order.getCustomer().getAdditionalToHouseNumber());
+            customerDto.setCity(order.getCustomer().getCity());
+            customerDto.setZipcode(order.getCustomer().getZipcode());
+            orderDto.setCustomerDto(customerDto);
         }
-        List<ProductDto> productDtoList = new ArrayList<>();
-        for (int i = 0; i < order.getProductList().size(); i++) {
-            productDtoList.add(transferToProductDto(order.getProductList().get(i)));
+        if(order.getQuantityAndProductList() != null) {
+            List<ProductDto> productDtoList = new ArrayList<>();
+            for (int i = 0; i < order.getQuantityAndProductList().size(); i++) {
+                productDtoList.add(transferToProductDto(order.getQuantityAndProductList().get(i).getProduct()));
+                productDtoList.get(i).setAmountOfProducts(order.getQuantityAndProductList().get(i).getAmountOfProducts());
+                productDtoList.get(i).setAmountOfReturningProducts(order.getQuantityAndProductList().get(i).getAmountOfReturningProducts());
+            }
+            orderDto.setProductDtoList(productDtoList);
         }
-        orderDto.setProductDtoList(productDtoList);
         return orderDto;
     }
 
     public static UserEmployeeDto transferToUserEmployeeDto(Employee employee) {
         UserEmployeeDto userEmployeeDto = new UserEmployeeDto();
+        userEmployeeDto.setId(employee.getId());
+        userEmployeeDto.setUsername(employee.getUsername());
         userEmployeeDto.setEmailAddress(employee.getEmailAddress());
         userEmployeeDto.setFirstName(employee.getFirstName());
         userEmployeeDto.setLastName(employee.getLastName());
+        List<OrderDto> orderDtoList = new ArrayList<>();
+        if(employee.getOrderList() != null) {
+            for (int i = 0; i < employee.getOrderList().size(); i++) {
+                orderDtoList.add(TransferModelToDto.transferToOrderDto(employee.getOrderList().get(i)));
+            }
+            userEmployeeDto.setOrderDtoList(orderDtoList);
+        }
+        if(employee.getFinishedOrders() != null) {
+            List<OrderDto> orderDtoList2 = new ArrayList<>();
+            for (int i = 0; i < employee.getFinishedOrders().size(); i++) {
+                orderDtoList2.add(TransferModelToDto.transferToOrderDto(employee.getFinishedOrders().get(i)));
+            }
+            userEmployeeDto.setFinishedOrders(orderDtoList2);
+        }
+        if(employee.getReturnCartList() != null) {
+            List<ReturnsDto> returnsDtoList = new ArrayList<>();
+            for (int i = 0; i < employee.getReturnCartList().size(); i++) {
+                returnsDtoList.add(TransferModelToDto.transferToReturnCartDto(employee.getReturnCartList().get(i)));
+            }
+            userEmployeeDto.setReturnCartDtoList(returnsDtoList);
+        }
         return userEmployeeDto;
     }
 }
