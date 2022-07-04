@@ -28,6 +28,7 @@ public class TransferDtoToModel {
         shoppingCart.setId(shoppingCartDto.getId());
         shoppingCart.setTotalPrice(shoppingCartDto.getTotalPrice());
         if(shoppingCartDto.getProductList() != null) {
+
             List<QuantityAndProduct> productList = new ArrayList<>();
             for(int i = 0; i < shoppingCartDto.getProductList().size(); i++) {
                 QuantityAndProduct quantityAndProduct = new QuantityAndProduct();
@@ -35,6 +36,11 @@ public class TransferDtoToModel {
                 quantityAndProduct.setAmountOfProducts(shoppingCartDto.getProductList().get(i).getAmountOfProducts());
                 quantityAndProduct.setAmountOfReturningProducts(shoppingCartDto.getProductList().get(i).getAmountOfReturningProducts());
                 productList.add(quantityAndProduct);
+
+            List<Product> productList = new ArrayList<>();
+            for(int i = 0; i < shoppingCartDto.getProductList().size(); i++) {
+                productList.add(transferToProduct(shoppingCartDto.getProductList().get(i)));
+
             }
             shoppingCart.setQuantityAndProductList(productList);
         }
@@ -88,6 +94,7 @@ public class TransferDtoToModel {
             order.setCustomer(TransferDtoToModel.transferToCustomer(orderDto.getCustomerDto()));
         }
         if(orderDto.getProductDtoList() != null) {
+
             List<QuantityAndProduct> productList = new ArrayList<>();
             for (int i = 0; i < order.getQuantityAndProductList().size(); i++) {
                 QuantityAndProduct quantityAndProduct = new QuantityAndProduct();
@@ -97,6 +104,13 @@ public class TransferDtoToModel {
                 productList.add(quantityAndProduct);
             }
             order.setQuantityAndProductList(productList);
+
+            List<Product> productList = new ArrayList<>();
+            for (int i = 0; i < order.getProductList().size(); i++) {
+                productList.add(transferToProduct(orderDto.getProductDtoList().get(i)));
+            }
+            order.setProductList(productList);
+
         }
         return order;
     }

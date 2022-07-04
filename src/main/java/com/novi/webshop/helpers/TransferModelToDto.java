@@ -25,12 +25,19 @@ public class TransferModelToDto {
         }
         if(customer.getOrderHistory() != null) {
             List<OrderDto> orderHistoryList = new ArrayList<>();
+
             for (int i = 0; i < customer.getOrderHistory().size(); i++) {
                 OrderDto orderDto = TransferModelToDto.transferToOrderDto(customer.getOrderHistory().get(i));
 
                orderHistoryList.add(orderDto);
                orderHistoryList.get(i).setCustomerDto(null);
             }
+
+                for (int i = 0; i < customer.getOrderHistory().size(); i++) {
+                    customer.getOrderHistory().get(i).setCustomer(null);
+                    orderHistoryList.add(TransferModelToDto.transferToOrderDto(customer.getOrderHistory().get(i)));
+                }
+
             customerDto.setOrderHistoryDto(orderHistoryList);
         }
 
@@ -107,12 +114,19 @@ public class TransferModelToDto {
             customerDto.setZipcode(order.getCustomer().getZipcode());
             orderDto.setCustomerDto(customerDto);
         }
+
         if(order.getQuantityAndProductList() != null) {
             List<ProductDto> productDtoList = new ArrayList<>();
             for (int i = 0; i < order.getQuantityAndProductList().size(); i++) {
                 productDtoList.add(transferToProductDto(order.getQuantityAndProductList().get(i).getProduct()));
                 productDtoList.get(i).setAmountOfProducts(order.getQuantityAndProductList().get(i).getAmountOfProducts());
                 productDtoList.get(i).setAmountOfReturningProducts(order.getQuantityAndProductList().get(i).getAmountOfReturningProducts());
+
+        if(order.getProductList() != null) {
+            List<ProductDto> productDtoList = new ArrayList<>();
+            for (int i = 0; i < order.getProductList().size(); i++) {
+                productDtoList.add(transferToProductDto(order.getProductList().get(i)));
+
             }
             orderDto.setProductDtoList(productDtoList);
         }
@@ -141,11 +155,19 @@ public class TransferModelToDto {
             userEmployeeDto.setFinishedOrders(orderDtoList2);
         }
         if(employee.getReturnCartList() != null) {
+
             List<ReturnsDto> returnsDtoList = new ArrayList<>();
             for (int i = 0; i < employee.getReturnCartList().size(); i++) {
                 returnsDtoList.add(TransferModelToDto.transferToReturnCartDto(employee.getReturnCartList().get(i)));
             }
             userEmployeeDto.setReturnCartDtoList(returnsDtoList);
+
+            List<ReturnCartDto> returnCartDtoList = new ArrayList<>();
+            for (int i = 0; i < employee.getReturnCartList().size(); i++) {
+                returnCartDtoList.add(TransferModelToDto.transferToReturnCartDto(employee.getReturnCartList().get(i)));
+            }
+            userEmployeeDto.setReturnCartDtoList(returnCartDtoList);
+
         }
         return userEmployeeDto;
     }

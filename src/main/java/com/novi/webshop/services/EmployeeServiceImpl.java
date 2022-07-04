@@ -1,7 +1,9 @@
 package com.novi.webshop.services;
 
 import com.novi.webshop.controller.exceptions.RecordNotFoundException;
+
 import com.novi.webshop.dto.OrderDto;
+
 import com.novi.webshop.dto.UserEmployeeDto;
 import com.novi.webshop.helpers.TransferModelToDto;
 import com.novi.webshop.model.Customer;
@@ -112,6 +114,7 @@ public class EmployeeServiceImpl implements EmployeeService {
             throw new RecordNotFoundException("Employee or order doesn't exist");
         }
     }
+
 
     @Override
     public List<UserEmployeeDto> divideOrdersOverEmployees() {

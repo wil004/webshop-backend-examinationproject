@@ -65,7 +65,11 @@ public class TransferDtoToModelTest {
         ShoppingCart shoppingCart = TransferDtoToModel.transferToShoppingCart(shoppingCartDto);
 
         // Assert
+
         assertEquals(shoppingCart.getQuantityAndProductList().size(), shoppingCartDto.getProductList().size());
+
+        assertEquals(shoppingCart.getProductList().size(), shoppingCartDto.getProductList().size());
+
     }
 
     @Test
