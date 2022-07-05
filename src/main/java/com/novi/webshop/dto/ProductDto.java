@@ -1,9 +1,5 @@
 package com.novi.webshop.dto;
 
-import org.springframework.core.io.Resource;
-
-import java.util.List;
-
 public class ProductDto {
 
     private Long id;
@@ -12,7 +8,7 @@ public class ProductDto {
 
     private double sellingPrice;
     private double retailPrice;
-    private int amountOfOrderedProducts;
+    private int amountOfProducts;
     private int amountOfReturningProducts;
 
     private String productPictureUrl;
@@ -57,12 +53,12 @@ public class ProductDto {
         this.retailPrice = retailPrice;
     }
 
-    public int getAmountOfOrderedProducts() {
-        return amountOfOrderedProducts;
+    public int getAmountOfProducts() {
+        return amountOfProducts;
     }
 
-    public void setAmountOfOrderedProducts(int amountOfOrderedProducts) {
-        this.amountOfOrderedProducts = amountOfOrderedProducts;
+    public void setAmountOfProducts(int amountOfProducts) {
+        this.amountOfProducts = amountOfProducts;
     }
 
     public int getAmountOfReturningProducts() {

@@ -25,4 +25,7 @@ public interface OrderService {
 
     OrderDto createOrderFromGuestCustomer(Long customerId, ShoppingCartDto shoppingCartDto);
 
+
+    public void deleteOrder(Long orderId);
+
 }

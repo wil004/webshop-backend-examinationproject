@@ -1,8 +1,6 @@
 package com.novi.webshop.model;
 
 import javax.persistence.*;
-import java.net.URI;
-import java.net.URL;
 import java.util.List;
 
 @Entity
@@ -14,7 +12,7 @@ public class Product {
     private String productName;
     private String category;
 
-    private int amountOfOrderedProducts;
+    private int amountOfProducts;
 
     private int amountOfReturningProducts;
 
@@ -24,14 +22,9 @@ public class Product {
 
     private String productPictureUrl;
 
-    @ManyToMany
-    private List<ShoppingCart> shoppingCartList;
+    @OneToMany(mappedBy = "product")
+    private List<QuantityAndProduct> quantityAndProductList;
 
-    @ManyToMany
-    private List<Orders> orderList;
-
-    @ManyToMany
-    private List<ReturnCart> returnCartList;
 
     public Long getId() {
         return id;
@@ -57,12 +50,12 @@ public class Product {
         this.category = category;
     }
 
-    public int getAmountOfOrderedProducts() {
-        return amountOfOrderedProducts;
+    public int getAmountOfProducts() {
+        return amountOfProducts;
     }
 
-    public void setAmountOfOrderedProducts(int amountOfProducts) {
-        this.amountOfOrderedProducts = amountOfProducts;
+    public void setAmountOfProducts(int amountOfProducts) {
+        this.amountOfProducts = amountOfProducts;
     }
 
     public int getAmountOfReturningProducts() {
@@ -97,27 +90,12 @@ public class Product {
         this.productPictureUrl = productPictureUrl;
     }
 
-    public List<ShoppingCart> getShoppingCartList() {
-        return shoppingCartList;
+    public List<QuantityAndProduct> getQuantityAndProductList() {
+        return quantityAndProductList;
     }
 
-    public void setShoppingCartList(List<ShoppingCart> shoppingCartList) {
-        this.shoppingCartList = shoppingCartList;
+    public void setQuantityAndProductList(List<QuantityAndProduct> quantityAndProductList) {
+        this.quantityAndProductList = quantityAndProductList;
     }
 
-    public List<Orders> getOrderList() {
-        return orderList;
-    }
-
-    public void setOrderList(List<Orders> orderList) {
-        this.orderList = orderList;
-    }
-
-    public List<ReturnCart> getReturnCartList() {
-        return returnCartList;
-    }
-
-    public void setReturnCartList(List<ReturnCart> returnCartList) {
-        this.returnCartList = returnCartList;
-    }
 }

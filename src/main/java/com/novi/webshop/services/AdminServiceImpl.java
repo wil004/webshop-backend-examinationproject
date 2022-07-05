@@ -53,7 +53,14 @@ public class AdminServiceImpl implements AdminService {
             throw new RecordNotFoundException("There is already an admin");
         } else {
             Admin admin = new Admin();
+
+            admin.setEmailAddress(adminDto.getEmailAddress());
             admin.setUsername(adminDto.getUsername());
+            admin.setPassword(adminDto.getPassword());
+            admin.setBankAccount(adminDto.getBankAccount());
+
+            admin.setUsername(adminDto.getUsername());
+
             adminRepository.save(admin);
             return admin;
         }

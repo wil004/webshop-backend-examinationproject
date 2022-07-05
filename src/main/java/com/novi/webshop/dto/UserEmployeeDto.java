@@ -13,7 +13,7 @@ public class UserEmployeeDto extends UserDto {
     private String password;
     private String firstName;
     private String lastName;
-    private List<ReturnCartDto> returnCartDtoList;
+    private List<ReturnsDto> returnsDtoList;
 
     private List<OrderDto> orderDtoList;
 
@@ -73,12 +73,12 @@ public class UserEmployeeDto extends UserDto {
         this.lastName = lastName;
     }
 
-    public List<ReturnCartDto> getReturnCartDtoList() {
-        return returnCartDtoList;
+    public List<ReturnsDto> getReturnCartDtoList() {
+        return returnsDtoList;
     }
 
-    public void setReturnCartDtoList(List<ReturnCartDto> returnCartDtoList) {
-        this.returnCartDtoList = returnCartDtoList;
+    public void setReturnCartDtoList(List<ReturnsDto> returnsDtoList) {
+        this.returnsDtoList = returnsDtoList;
     }
 
     public List<OrderDto> getOrderDtoList() {

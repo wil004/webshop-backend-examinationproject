@@ -71,10 +71,16 @@ public class OrderController {
         return ResponseEntity.created(location).body(orderServiceImpl.createOrderFromCustomer(customerId));
     }
 
+
     @PostMapping(path = "/guest={customerId}",consumes = { MediaType.APPLICATION_JSON_VALUE })
     public ResponseEntity<OrderDto> createOrderFromGuest(@PathVariable Long customerId, @RequestBody ShoppingCartDto shoppingCartDto) {
         final URI location = URI.create("/order" + customerId);
         return ResponseEntity.created(location).body(orderServiceImpl.createOrderFromGuestCustomer(customerId, shoppingCartDto));
+    }
+
+    @DeleteMapping("/delete={orderId}")
+    public void deleteOrder(@PathVariable Long orderId) {
+        orderServiceImpl.deleteOrder(orderId);
     }
 
 }

@@ -1,5 +1,4 @@
 package com.novi.webshop.model;
-
 import javax.persistence.*;
 import java.util.List;
 
@@ -23,6 +22,7 @@ public class Customer extends User {
 
     @OneToOne
     private ShoppingCart shoppingCart;
+
 
     @OneToMany(mappedBy = "customer")
     private List<Orders> orderHistory;

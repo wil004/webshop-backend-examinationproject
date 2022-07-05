@@ -34,7 +34,7 @@ public class CustomerControllerTest {
     ProductServiceImpl productService;
 
     @MockBean
-    ReturnCartServiceImpl returnCartService;
+    ReturnsServiceImpl returnCartService;
 
     @MockBean
     ShoppingCartServiceImpl shoppingCartService;
@@ -61,7 +61,7 @@ public class CustomerControllerTest {
     ProductRepository productRepository;
 
     @MockBean
-    ReturnCartRepository returnCartRepository;
+    ReturnsRepository returnsRepository;
 
     @MockBean
     ShoppingCartRepository shoppingCartRepository;

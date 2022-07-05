@@ -6,12 +6,15 @@ import com.novi.webshop.dto.ShoppingCartDto;
 import com.novi.webshop.helpers.TransferModelToDto;
 import com.novi.webshop.model.Customer;
 import com.novi.webshop.model.Product;
+import com.novi.webshop.model.QuantityAndProduct;
 import com.novi.webshop.model.ShoppingCart;
 import com.novi.webshop.repository.CustomerRepository;
 import com.novi.webshop.repository.ProductRepository;
+import com.novi.webshop.repository.QuantityAndProductRepository;
 import com.novi.webshop.repository.ShoppingCartRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -20,11 +23,13 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 private final ShoppingCartRepository shoppingCartRepository;
 private final ProductRepository productRepository;
 private final CustomerRepository customerRepository;
+private final QuantityAndProductRepository quantityAndProductRepository;
 
-    public ShoppingCartServiceImpl(ShoppingCartRepository shoppingCartRepository, ProductRepository productRepository, CustomerRepository customerRepository) {
+    public ShoppingCartServiceImpl(ShoppingCartRepository shoppingCartRepository, ProductRepository productRepository, CustomerRepository customerRepository, QuantityAndProductRepository quantityAndProductRepository) {
         this.shoppingCartRepository = shoppingCartRepository;
         this.productRepository = productRepository;
         this.customerRepository = customerRepository;
+        this.quantityAndProductRepository = quantityAndProductRepository;
     }
 
     @Override
@@ -33,24 +38,27 @@ private final CustomerRepository customerRepository;
         ShoppingCart shoppingCart = shoppingCartRepository.findById(shoppingCartId).orElseThrow();
 
 
-
         if (productRepository.findById(productId).isPresent() && shoppingCartRepository.findById(shoppingCartId).isPresent()) {
-            List<ShoppingCart> shoppingCartsInProductObject = product.getShoppingCartList();
-            List<Product> productsInShoppingCartObject = shoppingCart.getProductList();
 
-            for (int i = 0; i < shoppingCart.getProductList().size(); i++)
-                if (shoppingCart.getProductList().get(i) == product) {
+            List<QuantityAndProduct> productsInShoppingCartObject = shoppingCart.getQuantityAndProductList();
+
+            if(productDto.getAmountOfProducts() <= 0) {
+                throw new RecordNotFoundException("No valid amount of products");
+            }
+            for (int i = 0; i < shoppingCart.getQuantityAndProductList().size(); i++) {
+                if (shoppingCart.getQuantityAndProductList().get(i).getProduct() == product) {
                     throw new RecordNotFoundException("This relation already exists");
                 }
+            }
+            QuantityAndProduct quantityAndProduct = new QuantityAndProduct();
+            quantityAndProduct.setProduct(product);
+            quantityAndProduct.setAmountOfProducts(productDto.getAmountOfProducts());
+            quantityAndProduct.setShoppingCart(shoppingCart);
+            productsInShoppingCartObject.add(quantityAndProduct);
 
-            shoppingCartsInProductObject.add(shoppingCart);
-            product.setShoppingCartList(shoppingCartsInProductObject);
-            productRepository.save(product);
-
-            product.setAmountOfOrderedProducts(productDto.getAmountOfOrderedProducts());
-            productsInShoppingCartObject.add(product);
-            shoppingCart.setProductList(productsInShoppingCartObject);
-            shoppingCart.setTotalPrice(shoppingCart.getTotalPrice() + product.getSellingPrice() * productDto.getAmountOfOrderedProducts());
+            quantityAndProductRepository.save(quantityAndProduct);
+            shoppingCart.setQuantityAndProductList(productsInShoppingCartObject);
+            shoppingCart.setTotalPrice(shoppingCart.getTotalPrice() + product.getSellingPrice() * productDto.getAmountOfProducts());
             shoppingCartRepository.save(shoppingCart);
 
 

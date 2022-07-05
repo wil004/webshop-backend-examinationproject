@@ -3,12 +3,12 @@ package com.novi.webshop.services;
 import com.novi.webshop.controller.exceptions.RecordNotFoundException;
 import com.novi.webshop.dto.OrderDto;
 import com.novi.webshop.dto.ShoppingCartDto;
+import com.novi.webshop.helpers.TransferDtoToModel;
 import com.novi.webshop.helpers.TransferModelToDto;
 import com.novi.webshop.model.*;
 import com.novi.webshop.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +18,17 @@ public class OrderServiceImpl implements OrderService{
 
     private final OrderRepository orderRepository;
     private final CustomerRepository customerRepository;
+
+    private final EmployeeRepository employeeRepository;
+    private final QuantityAndProductRepository quantityAndProductRepository;
+
+    @Autowired
+    public OrderServiceImpl(OrderRepository orderRepository, CustomerRepository customerRepository, EmployeeRepository employeeRepository, QuantityAndProductRepository quantityAndProductRepository) {
+        this.orderRepository = orderRepository;
+        this.customerRepository = customerRepository;
+        this.employeeRepository = employeeRepository;
+        this.quantityAndProductRepository = quantityAndProductRepository;
+
     private final ProductRepository productRepository;
     private final EmployeeRepository employeeRepository;
 
@@ -27,6 +38,7 @@ public class OrderServiceImpl implements OrderService{
         this.customerRepository = customerRepository;
         this.productRepository = productRepository;
         this.employeeRepository = employeeRepository;
+
     }
 
     @Override
@@ -34,8 +46,9 @@ public class OrderServiceImpl implements OrderService{
         List<Orders> orderList = orderRepository.findAll();
         List<OrderDto> orderDtoList = new ArrayList<>();
         for (int i = 0; i < orderList.size(); i++) {
-            orderDtoList.add(TransferModelToDto.transferToOrderDto(orderList.get(i)));
+            orderDtoList.add(TransferModelToDto.transferToOrderDto(orderList.get(i)));;
         }
+
         return orderDtoList;
     }
 
@@ -56,7 +69,9 @@ public class OrderServiceImpl implements OrderService{
         if(orderRepository.findById(orderId).isPresent()) {
             Orders order = orderRepository.findById(orderId).orElseThrow();
             if(order.isPaid()) {
+
                 // deleteOrdeInEmployee makes sure the order will not be prepared twice!
+
                 deleteOrderInEmployee(orderId);
                 order.setProcessed(processed);
                 Orders savedOrder = orderRepository.save(order);
@@ -120,6 +135,7 @@ public class OrderServiceImpl implements OrderService{
     public OrderDto getOrderById(Long id) {
         Orders order = orderRepository.findById(id).orElseThrow();
         if(orderRepository.findById(id).isPresent()) {
+            System.out.println(order);
             return TransferModelToDto.transferToOrderDto(order);
         } else {
             throw new RecordNotFoundException("Couldn't find order");
@@ -172,14 +188,32 @@ public class OrderServiceImpl implements OrderService{
     @Override
     public OrderDto createOrderFromCustomer(Long customerId) {
         Customer customer = customerRepository.findById(customerId).orElseThrow();
-        List<Product> productList = new ArrayList<>();
-
+        List<QuantityAndProduct> quantityAndProductList = new ArrayList<>();
         Orders order = new Orders();
         order.setProcessed(false);
         order.setOrderDate(LocalDateTime.now());
         order.setOrderDateInMilliSeconds(System.currentTimeMillis());
         order.setCustomer(customer);
         order.setTotalPrice(customer.getShoppingCart().getTotalPrice());
+
+
+        if(customer.getShoppingCart().getQuantityAndProductList().size() > 0) {
+            for(int i = 0; i < customer.getShoppingCart().getQuantityAndProductList().size(); i++) {
+                QuantityAndProduct quantityAndProduct = new QuantityAndProduct();
+                quantityAndProduct.setProduct(customer.getShoppingCart().getQuantityAndProductList().get(i).getProduct());
+                quantityAndProduct.setAmountOfProducts(customer.getShoppingCart().getQuantityAndProductList().get(i).getAmountOfProducts());
+                quantityAndProductList.add(quantityAndProduct);
+                quantityAndProductList.get(i).setOrder(order);
+            }
+            order.setQuantityAndProductList(quantityAndProductList);
+            List<Orders> orderHistory = customer.getOrderHistory();
+            customer.getShoppingCart().setTotalPrice(0);
+            orderHistory.add(order);
+            customer.setOrderHistory(orderHistory);
+            quantityAndProductRepository.saveAll(quantityAndProductList);
+            Orders savedOrder = orderRepository.save(order);
+            customerRepository.save(customer);
+
         if(customer.getShoppingCart().getProductList().size() > 0) {
             for (int i = 0; i < customer.getShoppingCart().getProductList().size(); i++) {
                 if (productRepository.findById(customer.getShoppingCart().getProductList().get(i).getId()).isPresent()) {
@@ -195,6 +229,7 @@ public class OrderServiceImpl implements OrderService{
             customer.setOrderHistory(orderHistory);
             customerRepository.save(customer);
             Orders savedOrder = orderRepository.save(order);
+
             OrderDto orderDto = TransferModelToDto.transferToOrderDto(savedOrder);
             orderDto.setCustomerDto(TransferModelToDto.transferToCustomerDto(customer));
             return orderDto;
@@ -206,7 +241,9 @@ public class OrderServiceImpl implements OrderService{
     @Override
     public OrderDto createOrderFromGuestCustomer(Long customerId, ShoppingCartDto shoppingCartDto) {
         Customer customer = customerRepository.findById(customerId).orElseThrow();
-        List<Product> productList = new ArrayList<>();
+        ShoppingCart shoppingCart = TransferDtoToModel.transferToShoppingCart(shoppingCartDto);
+        List<QuantityAndProduct> quantityAndProductList = new ArrayList<>();
+
 
         Orders order = new Orders();
         order.setProcessed(false);
@@ -215,6 +252,18 @@ public class OrderServiceImpl implements OrderService{
         order.setCustomer(customer);
         if(shoppingCartDto.getProductList().size() > 0) {
             for (int i = 0; i < shoppingCartDto.getProductList().size(); i++) {
+                QuantityAndProduct quantityAndProduct = new QuantityAndProduct();
+                quantityAndProduct.setProduct(customer.getShoppingCart().getQuantityAndProductList().get(i).getProduct());
+                quantityAndProduct.setAmountOfProducts(customer.getShoppingCart().getQuantityAndProductList().get(i).getAmountOfProducts());
+                quantityAndProductList.add(quantityAndProduct);
+                quantityAndProductList.get(i).setOrder(order);
+                    if(shoppingCartDto.getProductList().get(i).getAmountOfProducts() <= 0) {
+                        throw new RecordNotFoundException("No valid amount of products!");
+                }
+            }
+        }
+        if(quantityAndProductList.size() > 0) {
+            order.setQuantityAndProductList(quantityAndProductList);
                 if (productRepository.findById(shoppingCartDto.getProductList().get(i).getId()).isPresent()) {
                     productList.add(productRepository.findById(shoppingCartDto.getProductList().get(i).getId()).orElseThrow());
                 }
@@ -225,9 +274,27 @@ public class OrderServiceImpl implements OrderService{
         } else {
             throw new RecordNotFoundException("No products in shoppingcart!");
         }
+        List<Orders> orderHistory = customer.getOrderHistory();
+        orderHistory.add(order);
+        customer.setOrderHistory(orderHistory);
+        quantityAndProductRepository.saveAll(quantityAndProductList);
         Orders savedOrder = orderRepository.save(order);
+        customerRepository.save(customer);
         OrderDto orderDto = TransferModelToDto.transferToOrderDto(savedOrder);
         orderDto.setCustomerDto(TransferModelToDto.transferToCustomerDto(customer));
         return orderDto;
     }
+
+
+    private void saveQuantityAndProduct(Orders order, QuantityAndProduct quantityAndProduct) {
+        quantityAndProduct.setOrder(order);
+        quantityAndProductRepository.save(quantityAndProduct);
+        orderRepository.save(order);
+    }
+
+    @Override
+    public void deleteOrder(Long orderId) {
+        orderRepository.deleteById(orderId);
+    }
+
 }

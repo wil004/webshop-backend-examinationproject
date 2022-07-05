@@ -1,6 +1,9 @@
 package com.novi.webshop.services;
 
 import com.novi.webshop.controller.exceptions.RecordNotFoundException;
+
+import com.novi.webshop.dto.OrderDto;
+
 import com.novi.webshop.dto.UserEmployeeDto;
 import com.novi.webshop.helpers.TransferModelToDto;
 import com.novi.webshop.model.Customer;
@@ -111,4 +114,34 @@ public class EmployeeServiceImpl implements EmployeeService {
             throw new RecordNotFoundException("Employee or order doesn't exist");
         }
     }
+
+
+    @Override
+    public List<UserEmployeeDto> divideOrdersOverEmployees() {
+        List<Employee> employeeList = employeeRepository.findAll();
+        List<OrderDto> orderList = orderService.getAllProcessedOrNotProcessedOrders(false);
+        int ordersPerEmployee = 0;
+        if(orderList.size() > employeeList.size()) {
+           ordersPerEmployee = orderList.size() / employeeList.size() + 1;
+        } else {
+            ordersPerEmployee = 1;
+        }
+        int jIndex= 0;
+        for(int i = 0; i < employeeList.size(); i++) {
+                for (int j = jIndex; j < orderList.size(); j++) {
+                    if(employeeList.get(i).getOrderList().size() < ordersPerEmployee) {
+                        addOrderToEmployeeList(employeeList.get(i).getId(), orderList.get(j).getId());
+                    } else {
+                        jIndex = j;
+                        break;
+                    }
+            }
+        }
+        List<UserEmployeeDto> employeeDtoList = new ArrayList<>();
+        for(int i = 0; i < employeeList.size(); i++) {
+            employeeDtoList.add(TransferModelToDto.transferToUserEmployeeDto(employeeList.get(i)));
+        }
+        return employeeDtoList;
+    }
+
 }

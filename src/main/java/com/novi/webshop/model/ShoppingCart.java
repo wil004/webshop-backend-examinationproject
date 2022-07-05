@@ -1,9 +1,5 @@
 package com.novi.webshop.model;
-
-import net.bytebuddy.asm.Advice;
-
 import javax.persistence.*;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -17,8 +13,8 @@ public class ShoppingCart {
     @OneToOne
     private Customer customer;
 
-    @ManyToMany
-    private List<Product> productList;
+    @OneToMany
+    private List<QuantityAndProduct> quantityAndProductList;
 
     public Long getId() {
         return id;
@@ -42,13 +38,14 @@ public class ShoppingCart {
         this.customer = customer;
     }
 
-    public List<Product> getProductList() {
-        return productList;
+    public List<QuantityAndProduct> getQuantityAndProductList() {
+        return quantityAndProductList;
     }
 
-    public void setProductList(List<Product> productList) {
-        this.productList = productList;
+    public void setQuantityAndProductList(List<QuantityAndProduct> quantityAndProductList) {
+        this.quantityAndProductList = quantityAndProductList;
     }
+
 
 }
 

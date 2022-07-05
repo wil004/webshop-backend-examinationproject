@@ -14,4 +14,8 @@ public interface EmployeeService {
     UserEmployeeDto processOrder(Long employeeId, Long orderId);
 
     UserEmployeeDto addOrderToEmployeeList(Long employeeId, Long orderId);
+
+
+    List<UserEmployeeDto> divideOrdersOverEmployees();
+
 }

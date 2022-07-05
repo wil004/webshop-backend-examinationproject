@@ -1,7 +1,11 @@
 package com.novi.webshop.helpers;
 
 import com.novi.webshop.dto.CustomerDto;
+
+import com.novi.webshop.dto.ReturnsDto;
+
 import com.novi.webshop.dto.ReturnCartDto;
+
 import com.novi.webshop.dto.ShoppingCartDto;
 import com.novi.webshop.model.*;
 import org.junit.jupiter.api.Test;
@@ -46,48 +50,50 @@ public class TransferModelToDtoTest {
     void checksIfProductListInShoppingCartDtoTransfersInProductListDtoInShoppingCart() {
         // Arrange
         ShoppingCart shoppingCart = new ShoppingCart();
-        List<Product> productList = new ArrayList<>();
-        Product product = new Product();
+        List<QuantityAndProduct> productList = new ArrayList<>();
+        QuantityAndProduct product = new QuantityAndProduct();
         Product product2 = new Product();
 
-        product.setProductName("product");
-        product.setProductName("product2");
+        product.setProduct(product2);
+
 
         productList.add(product);
         productList.add(product);
-        shoppingCart.setProductList(productList);
+        shoppingCart.setQuantityAndProductList(productList);
 
         // Act
         ShoppingCartDto shoppingCartDto = TransferModelToDto.transferToShoppingCartDto(shoppingCart);
 
         // Assert
+
+        assertEquals(shoppingCartDto.getProductList().size(), shoppingCart.getQuantityAndProductList().size());
+
         assertEquals(shoppingCartDto.getProductList().size(), shoppingCart.getProductList().size());
+
     }
 
     @Test
     void testIfReturnCartDtoTransfersToReturnCart() {
-        ReturnCart returnCart = new ReturnCart();
-        returnCart.setId(1L);
-        returnCart.setProcessed(true);
-        returnCart.setTotalPrice(100);
-        List<Product> productList = new ArrayList<>();
-        Product product = new Product();
+        Returns returns = new Returns();
+        returns.setId(1L);
+        returns.setProcessed(true);
+        returns.setTotalPrice(100);
+        List<QuantityAndProduct> productList = new ArrayList<>();
+        QuantityAndProduct product = new QuantityAndProduct();
         Product product2 = new Product();
 
-        product.setProductName("product");
-        product2.setProductName("product2");
+        product.setProduct(product2);
 
         productList.add(product);
-        productList.add(product2);
-        returnCart.setReturnProductList(productList);
+        returns.setQuantityAndProductList(productList);
 
         // Act
-        ReturnCartDto returnCartDto = TransferModelToDto.transferToReturnCartDto(returnCart);
+        ReturnsDto returnsDto = TransferModelToDto.transferToReturnCartDto(returns);
 
         // Assert
-        assertEquals(returnCartDto.getId(), 1L);
-        assertEquals(returnCartDto.getTotalPrice(), 100);
-        assertTrue(returnCartDto.isProcessed());
-        assertEquals(returnCartDto.getReturnProductList().size(), returnCart.getReturnProductList().size());
+        assertEquals(returnsDto.getId(), 1L);
+        assertEquals(returnsDto.getTotalPrice(), 100);
+        assertTrue(returnsDto.isProcessed());
+        assertEquals(returnsDto.getReturnProductList().size(), returns.getQuantityAndProductList().size());
     }
 }

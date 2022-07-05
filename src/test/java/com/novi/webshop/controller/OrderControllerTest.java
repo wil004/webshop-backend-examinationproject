@@ -32,7 +32,7 @@ public class OrderControllerTest {
     ProductServiceImpl productService;
 
     @MockBean
-    ReturnCartServiceImpl returnCartService;
+    ReturnsServiceImpl returnCartService;
 
     @MockBean
     ShoppingCartServiceImpl shoppingCartService;
@@ -59,7 +59,7 @@ public class OrderControllerTest {
     ProductRepository productRepository;
 
     @MockBean
-    ReturnCartRepository returnCartRepository;
+    ReturnsRepository returnsRepository;
 
     @MockBean
     ShoppingCartRepository shoppingCartRepository;
@@ -88,11 +88,6 @@ public class OrderControllerTest {
     }
 
 
-    /* We never learned how to mock a list! We learned very little about this subject!
-    If testing will be graded low there will be a complaint, I am extremely dissapointed about this!
-    The internet provides very little information about this subject! I spend hours if it aren't days
-    to figure out how to test right (especially with testing on the service layer)*/
-
     @Test
     void getOrder() throws Exception {
         OrderDto orderDto = new OrderDto();
@@ -108,10 +103,6 @@ public class OrderControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id", is(1)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.processed", is(true)));
     }
-
-
-
-
 
 
     @Test

@@ -16,7 +16,7 @@ public class Employee extends User{
     private String lastName;
 
     @OneToMany(mappedBy = "employeeReturnCartList")
-    private List<ReturnCart> returnCartList;
+    private List<Returns> returnsList;
 
     @OneToMany(mappedBy = "employeeOrderList")
     private List<Orders> orderList;
@@ -87,12 +87,12 @@ public class Employee extends User{
         this.lastName = lastName;
     }
 
-    public List<ReturnCart> getReturnCartList() {
-        return returnCartList;
+    public List<Returns> getReturnCartList() {
+        return returnsList;
     }
 
-    public void setReturnCartList(List<ReturnCart> returnCartList) {
-        this.returnCartList = returnCartList;
+    public void setReturnCartList(List<Returns> returnsList) {
+        this.returnsList = returnsList;
     }
 
     public List<Orders> getOrderList() {

@@ -33,12 +33,6 @@ class ShoppingCartServiceImplTest {
     @Autowired
     ProductService productService;
 
-    /* If I keep going to test an application without the knowledge of relational testing, I will spend the
-     rest of my examination time just testing... I will not be able to finish this application like this,
-    for that reason I will stop testing. (I already spend more than 33% of my examination time on testing in total)!
-     googling and trying.*/
-
-
     @Test
     void createShoppingCard() {
     }

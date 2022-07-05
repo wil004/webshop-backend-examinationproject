@@ -19,6 +19,7 @@ public class EmployeeController {
     }
 
     @GetMapping("/all")
+
     public ResponseEntity<List<UserEmployeeDto>> getAllEmployees() {
         return ResponseEntity.ok(employeeService.getAllEmployees());
     }
@@ -43,7 +44,19 @@ public class EmployeeController {
 
     @PutMapping(value = "id={employeeId}/order-id={orderId}",
             consumes = {MediaType.APPLICATION_JSON_VALUE})
+
+    public ResponseEntity<UserEmployeeDto> addOrderToEmployeeList(@PathVariable Long employeeId,@PathVariable Long orderId) {
+        return ResponseEntity.ok(employeeService.addOrderToEmployeeList(employeeId, orderId));
+    }
+
+    @PutMapping(value = "divide-orders",
+            consumes = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<List<UserEmployeeDto>> divideOrdersOverEmployees() {
+        return ResponseEntity.ok(employeeService.divideOrdersOverEmployees());
+    }
+
     public ResponseEntity<UserEmployeeDto> divideOrdersOverEmployees(@PathVariable Long employeeId,@PathVariable Long orderId) {
         return ResponseEntity.ok(employeeService.addOrderToEmployeeList(employeeId, orderId));
     }
+
 }

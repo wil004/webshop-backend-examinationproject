@@ -1,4 +1,5 @@
 package com.novi.webshop.model;
+
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -23,13 +24,13 @@ public class Orders {
 
 
     @OneToMany(mappedBy = "customerOrder")
-    private List<ReturnCart> returnList;
+    private List<Returns> returnsList;
 
     @ManyToOne
     private Customer customer;
 
-    @ManyToMany
-    private List<Product> productList;
+    @OneToMany(mappedBy = "order")
+    List<QuantityAndProduct> quantityAndProductList;
 
     @ManyToOne
     private Employee employeeOrderList;
@@ -93,21 +94,21 @@ public class Orders {
         this.customer = customer;
     }
 
-    public List<Product> getProductList() {
-        return productList;
+
+    public List<QuantityAndProduct> getQuantityAndProductList() {
+        return quantityAndProductList;
     }
 
-    public void setProductList(List<Product> productList) {
-        this.productList = productList;
+    public void setQuantityAndProductList(List<QuantityAndProduct> quantityAndProductList) {
+        this.quantityAndProductList = quantityAndProductList;
     }
 
-
-    public List<ReturnCart> getReturnList() {
-        return returnList;
+    public List<Returns> getReturnList() {
+        return returnsList;
     }
 
-    public void setReturnList(List<ReturnCart> returnList) {
-        this.returnList = returnList;
+    public void setReturnList(List<Returns> returnsList) {
+        this.returnsList = returnsList;
     }
 
     public Employee getEmployeeOrderList() {
