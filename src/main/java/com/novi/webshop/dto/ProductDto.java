@@ -6,8 +6,7 @@ public class ProductDto {
     private String productName;
     private String category;
 
-    private double sellingPrice;
-    private double retailPrice;
+    private double price;
     private int amountOfProducts;
     private int amountOfReturningProducts;
 
@@ -37,20 +36,12 @@ public class ProductDto {
         this.category = category;
     }
 
-    public double getSellingPrice() {
-        return sellingPrice;
+    public double getPrice() {
+        return price;
     }
 
-    public void setSellingPrice(double sellingPrice) {
-        this.sellingPrice = sellingPrice;
-    }
-
-    public double getRetailPrice() {
-        return retailPrice;
-    }
-
-    public void setRetailPrice(double retailPrice) {
-        this.retailPrice = retailPrice;
+    public void setPrice(double price) {
+        this.price = price;
     }
 
     public int getAmountOfProducts() {

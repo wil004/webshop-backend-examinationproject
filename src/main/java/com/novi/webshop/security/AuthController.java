@@ -16,31 +16,30 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @RestController
+@RequestMapping("auth")
 public class AuthController {
     @Autowired
     private AuthenticationManager authManager;
 
-    private final AdminRepository adminRepository;
-    private final CustomerRepository customerRepository;
-    private final EmployeeRepository employeeRepository;
+    @Autowired
+    AdminRepository adminRepository;
+    @Autowired
+    CustomerRepository customerRepository;
+    @Autowired
+    EmployeeRepository employeeRepository;
 
     @Autowired
     JwtService jwtService;
 
-    @Autowired
-    public AuthController(AdminRepository adminRepository, CustomerRepository customerRepository, EmployeeRepository employeeRepository) {
-        this.adminRepository = adminRepository;
-        this.customerRepository = customerRepository;
-        this.employeeRepository = employeeRepository;
-    }
 
-    @PostMapping("/auth/admin")
+    @PostMapping("/admin")
     public ResponseEntity<Object> signInAdmin(@RequestBody AuthDto authDto) {
         boolean userNameDoesExist = false;
 
@@ -66,7 +65,7 @@ public class AuthController {
             throw new RecordNotFoundException("Username not found");
     }
 
-    @PostMapping("auth/employee")
+    @PostMapping("/employee")
     public ResponseEntity<Object> signInEmployee(@RequestBody AuthDto authDto) {
         boolean userNameDoesExist = false;
 
@@ -92,7 +91,7 @@ public class AuthController {
         throw new RecordNotFoundException("Username not found");
     }
 
-    @PostMapping("auth/customer")
+    @PostMapping("/customer")
     public ResponseEntity<Object> signInCustomer(@RequestBody AuthDto authDto) {
         boolean userNameDoesExist = false;
 

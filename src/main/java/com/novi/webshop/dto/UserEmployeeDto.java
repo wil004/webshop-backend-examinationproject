@@ -1,9 +1,5 @@
 package com.novi.webshop.dto;
 
-import com.novi.webshop.model.Orders;
-import com.novi.webshop.model.ReturnCart;
-import com.novi.webshop.model.ShoppingCart;
-
 import java.util.List;
 
 public class UserEmployeeDto extends UserDto {

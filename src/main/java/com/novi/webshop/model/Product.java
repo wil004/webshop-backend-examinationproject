@@ -12,13 +12,7 @@ public class Product {
     private String productName;
     private String category;
 
-    private int amountOfProducts;
-
-    private int amountOfReturningProducts;
-
-    private double sellingPrice;
-    private double retailPrice;
-
+    private double price;
 
     private String productPictureUrl;
 
@@ -50,36 +44,12 @@ public class Product {
         this.category = category;
     }
 
-    public int getAmountOfProducts() {
-        return amountOfProducts;
+    public double getPrice() {
+        return price;
     }
 
-    public void setAmountOfProducts(int amountOfProducts) {
-        this.amountOfProducts = amountOfProducts;
-    }
-
-    public int getAmountOfReturningProducts() {
-        return amountOfReturningProducts;
-    }
-
-    public void setAmountOfReturningProducts(int amountOfReturningProducts) {
-        this.amountOfReturningProducts = amountOfReturningProducts;
-    }
-
-    public double getSellingPrice() {
-        return sellingPrice;
-    }
-
-    public void setSellingPrice(double sellingPrice) {
-        this.sellingPrice = sellingPrice;
-    }
-
-    public double getRetailPrice() {
-        return retailPrice;
-    }
-
-    public void setRetailPrice(double buyingPrice) {
-        this.retailPrice = buyingPrice;
+    public void setPrice(double price) {
+        this.price = price;
     }
 
     public String getProductPictureUrl() {

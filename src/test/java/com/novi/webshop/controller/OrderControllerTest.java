@@ -15,13 +15,16 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.hamcrest.Matchers.is;
 
 @WebMvcTest
 public class OrderControllerTest {
+
     @Autowired
     MockMvc mockMvc;
-
 
     @MockBean
     OrderServiceImpl orderService;
@@ -38,6 +41,9 @@ public class OrderControllerTest {
     ShoppingCartServiceImpl shoppingCartService;
 
     @MockBean
+    AttachmentService attachmentService;
+
+    @MockBean
     UserServiceImpl userService;
 
     @MockBean
@@ -48,6 +54,13 @@ public class OrderControllerTest {
 
     @MockBean
     JwtService jwtService;
+
+    @MockBean
+    EmployeeServiceImpl employeeService;
+
+    @MockBean
+    PDFGeneratorService pdfGeneratorService;
+
 
     @MockBean
     CustomerRepository customerRepository;
@@ -70,6 +83,9 @@ public class OrderControllerTest {
     @MockBean
     EmployeeRepository employeeRepository;
 
+    @MockBean
+    AttachmentRepository attachmentRepository;
+
 
     @Test
     void getOrderById() throws Exception {
@@ -88,16 +104,19 @@ public class OrderControllerTest {
     }
 
 
+    // ???? The subject of testing has not been explained very detailed at our university, unfortunately.
     @Test
     void getOrder() throws Exception {
+        List<OrderDto> orderDtoList = new ArrayList<>();
         OrderDto orderDto = new OrderDto();
         orderDto.setId(1L);
         orderDto.setProcessed(true);
+        orderDtoList.add(orderDto);
 
-        Mockito.when(orderService.getAllProcessedOrNotProcessedOrders(true));
+        Mockito.when(orderService.getAllProcessedOrNotProcessedOrders(true)).thenReturn(orderDtoList);
 
         this.mockMvc
-                .perform(MockMvcRequestBuilders.get("/order/processed-status=true"))
+                .perform(MockMvcRequestBuilders.get("order/processed-status=true"))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id", is(1)))
@@ -105,12 +124,12 @@ public class OrderControllerTest {
     }
 
 
+    // ?????
     @Test
     void changeProcessedStatus() throws Exception {
-
-      OrderDto orderDto = new OrderDto();
-       orderDto.setId(1L);
-      orderDto.setProcessed(true);
+            OrderDto orderDto = new OrderDto();
+            orderDto.setId(1L);
+            orderDto.setProcessed(true);
 
         Mockito.when(orderService.changeProcessedStatus(1L, false)).thenReturn(orderDto);
 

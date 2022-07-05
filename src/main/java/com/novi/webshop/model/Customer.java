@@ -10,7 +10,6 @@ public class Customer extends User {
     private String emailAddress;
     private String username;
     private String password;
-    private String role;
     private String firstName;
     private String lastName;
     private String streetName;
@@ -27,6 +26,9 @@ public class Customer extends User {
     @OneToMany(mappedBy = "customer")
     private List<Orders> orderHistory;
 
+    public Customer() {
+        super.setRole("CUSTOMER");
+    }
 
     public Long getId() {
         return id;
@@ -64,16 +66,6 @@ public class Customer extends User {
     @Override
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    @Override
-    public String getRole() {
-        return role;
-    }
-
-    @Override
-    public void setRole(String role) {
-        this.role = role;
     }
 
     public String getFirstName() {

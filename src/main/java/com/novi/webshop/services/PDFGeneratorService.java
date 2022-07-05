@@ -69,9 +69,9 @@ public class PDFGeneratorService {
             String orderList = "";
             for (int i = 0; i < order.getQuantityAndProductList().size(); i++) {
                 orderList = orderList + "product: " + order.getQuantityAndProductList().get(i).getProduct().getProductName() + "         |         " + "Price per piece: " +
-                        order.getQuantityAndProductList().get(i).getProduct().getSellingPrice() + " | " +
+                        order.getQuantityAndProductList().get(i).getProduct().getPrice() + " | " +
                         "Amount: " + order.getQuantityAndProductList().get(i).getAmountOfProducts() + " | " +
-                        " Total price: " + order.getQuantityAndProductList().get(i).getProduct().getSellingPrice() * order.getQuantityAndProductList().get(i).getAmountOfProducts() + "\n";
+                        " Total price: " + order.getQuantityAndProductList().get(i).getProduct().getPrice() * order.getQuantityAndProductList().get(i).getAmountOfProducts() + "\n";
             }
             Paragraph products = new Paragraph(orderList, fontProducts);
             products.setAlignment(Paragraph.ALIGN_CENTER);
@@ -138,9 +138,9 @@ public class PDFGeneratorService {
             String returnsList = "";
             for (int i = 0; i < returns.getQuantityAndProductList().size(); i++) {
                 returnsList = returnsList + "product: " + returns.getQuantityAndProductList().get(i).getProduct().getProductName() + "         |         " + "Price per piece: " +
-                        returns.getQuantityAndProductList().get(i).getProduct().getSellingPrice() + " | " +
+                        returns.getQuantityAndProductList().get(i).getProduct().getPrice() + " | " +
                         "Amount: " + returns.getQuantityAndProductList().get(i).getAmountOfProducts() + " | " +
-                        " Total price of returns: " + returns.getQuantityAndProductList().get(i).getProduct().getSellingPrice() * returns.getQuantityAndProductList().get(i).getAmountOfProducts() + "\n";
+                        " Total price of returns: " + returns.getQuantityAndProductList().get(i).getProduct().getPrice() * returns.getQuantityAndProductList().get(i).getAmountOfProducts() + "\n";
             }
             Paragraph products = new Paragraph(returnsList, fontProducts);
             products.setAlignment(Paragraph.ALIGN_CENTER);

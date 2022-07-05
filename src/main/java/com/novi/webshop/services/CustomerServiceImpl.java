@@ -8,6 +8,8 @@ import com.novi.webshop.helpers.TransferModelToDto;
 import com.novi.webshop.model.*;
 import com.novi.webshop.repository.CustomerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -72,6 +74,10 @@ public class CustomerServiceImpl implements CustomerService {
                 Customer customer = TransferDtoToModel.transferToCustomer(customerDto);
                 if (!userServiceImpl.doesUsernameAlreadyExist(customer.getUsername())) {
                     if(customer.getUsername() != null && customer.getPassword() != null && customer.getEmailAddress() != null) {
+                        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+                        String password = passwordEncoder.encode(customerDto.getPassword());
+                        customerDto.setPassword(password);
+                        customer.setPassword(customerDto.getPassword());
                         Customer savedCustomer = customerRepository.save(customer);
                         shoppingCartServiceImpl.createShoppingCard(savedCustomer.getId());
                         return TransferModelToDto.transferToCustomerDto(savedCustomer);

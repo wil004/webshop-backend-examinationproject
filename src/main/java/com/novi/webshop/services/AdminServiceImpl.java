@@ -10,6 +10,8 @@ import com.novi.webshop.model.Employee;
 import com.novi.webshop.repository.AdminRepository;
 import com.novi.webshop.repository.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -32,7 +34,11 @@ public class AdminServiceImpl implements AdminService {
             Employee employee = new Employee();
             employee.setEmailAddress(userEmployeeInputDto.getEmailAddress());
             employee.setUsername(userEmployeeInputDto.getUsername());
+            PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+            String password = passwordEncoder.encode(userEmployeeInputDto.getPassword());
+            userEmployeeInputDto.setPassword(password);
             employee.setPassword(userEmployeeInputDto.getPassword());
+
             employee.setFirstName(userEmployeeInputDto.getFirstName());
             employee.setLastName(userEmployeeInputDto.getLastName());
             if (adminRepository.findById(adminId).isPresent()) {
@@ -53,14 +59,13 @@ public class AdminServiceImpl implements AdminService {
             throw new RecordNotFoundException("There is already an admin");
         } else {
             Admin admin = new Admin();
-
             admin.setEmailAddress(adminDto.getEmailAddress());
             admin.setUsername(adminDto.getUsername());
+            PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+            String password = passwordEncoder.encode(adminDto.getPassword());
+            adminDto.setPassword(password);
             admin.setPassword(adminDto.getPassword());
             admin.setBankAccount(adminDto.getBankAccount());
-
-            admin.setUsername(adminDto.getUsername());
-
             adminRepository.save(admin);
             return admin;
         }

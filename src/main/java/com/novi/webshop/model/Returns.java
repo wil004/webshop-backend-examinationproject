@@ -24,11 +24,6 @@ public class Returns {
     private Orders customerOrder;
 
     @ManyToOne
-    private Admin adminForProcessedList;
-    @ManyToOne
-    private Admin adminForUnProcessedList;
-
-    @ManyToOne
     private Employee employeeReturnCartList;
 
 
@@ -78,22 +73,6 @@ public class Returns {
 
     public void setCustomerOrder(Orders customerOrder) {
         this.customerOrder = customerOrder;
-    }
-
-    public Admin getAdminForProcessedList() {
-        return adminForProcessedList;
-    }
-
-    public void setAdminForProcessedList(Admin adminForProcessedList) {
-        this.adminForProcessedList = adminForProcessedList;
-    }
-
-    public Admin getAdminForUnProcessedList() {
-        return adminForUnProcessedList;
-    }
-
-    public void setAdminForUnProcessedList(Admin adminForUnProcessedList) {
-        this.adminForUnProcessedList = adminForUnProcessedList;
     }
 
     public Employee getEmployeeReturnCartList() {

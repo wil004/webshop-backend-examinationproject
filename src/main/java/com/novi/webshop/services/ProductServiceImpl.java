@@ -4,14 +4,11 @@ import com.novi.webshop.controller.exceptions.RecordNotFoundException;
 import com.novi.webshop.dto.ProductDto;
 import com.novi.webshop.helpers.TransferDtoToModel;
 import com.novi.webshop.helpers.TransferModelToDto;
-import com.novi.webshop.model.Attachment;
 import com.novi.webshop.model.Product;
 import com.novi.webshop.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.net.URI;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -80,7 +77,7 @@ public class ProductServiceImpl implements ProductService {
         List<Product> allProductList = new ArrayList<>(productRepository.findAll());
         List<ProductDto> allProductDtoList = new ArrayList<>();
         for (int i = 0; i < allProductList.size(); i++) {
-            if (allProductList.get(i).getSellingPrice() > minimumPrice && allProductList.get(i).getSellingPrice() < maximumPrice) {
+            if (allProductList.get(i).getPrice() > minimumPrice && allProductList.get(i).getPrice() < maximumPrice) {
                 allProductDtoList.add(TransferModelToDto.transferToProductDto(allProductList.get(i)));
             }
         }
@@ -107,17 +104,14 @@ public class ProductServiceImpl implements ProductService {
     public ProductDto changeProduct(Long id, String type, ProductDto productDto) {
         if (productRepository.findById(id).isPresent()) {
             Product chosenProduct = productRepository.findById(id).get();
-            if(type.equalsIgnoreCase("product")) {
+            if(type.equalsIgnoreCase("productName")) {
                 chosenProduct.setProductName(productDto.getProductName());
                 productRepository.save(chosenProduct);
             } else if (type.equalsIgnoreCase("category")) {
                 chosenProduct.setCategory(productDto.getCategory());
                 productRepository.save(chosenProduct);
-            } else if (type.equalsIgnoreCase("sellingPrice")) {
-                chosenProduct.setSellingPrice(productDto.getSellingPrice());
-               productRepository.save(chosenProduct);
-            } else if (type.equalsIgnoreCase("retailPrice")) {
-                chosenProduct.setRetailPrice(productDto.getRetailPrice());
+            } else if (type.equalsIgnoreCase("price")) {
+                chosenProduct.setPrice(productDto.getPrice());
                productRepository.save(chosenProduct);
             } else {
                 throw new RecordNotFoundException("Type to change not found");

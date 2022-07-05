@@ -1,10 +1,7 @@
 package com.novi.webshop.services;
 
 import com.novi.webshop.dto.ProductDto;
-import com.novi.webshop.helpers.TransferDtoToModel;
-import com.novi.webshop.model.Product;
 import com.novi.webshop.repository.ProductRepository;
-import org.h2.value.Transfer;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -23,6 +20,8 @@ class ProductServiceImplTest {
     private ProductServiceImpl productService;
     private ProductRepository productRepository;
 
+
+    // TESTS WORK IF YOU TEST THEM 1 BY 1
 
     @Test
     void testsIfAProductIsCreated() {
@@ -96,14 +95,13 @@ class ProductServiceImplTest {
         ProductDto product1 = new ProductDto();
         product.setProductName("test");
         product.setProductName("test1");
-        product.setSellingPrice(150);
-        product1.setSellingPrice(50);
+        product.setPrice(150);
+        product1.setPrice(50);
         productService.createProduct(product);
         productService.createProduct(product1);
 
         // Act
         List<ProductDto> productDtoToTest = productService.getProductsPriceRange(100, 300);
-
         // Assert
         assertEquals(productDtoToTest.size(), 1);
     }
@@ -114,18 +112,18 @@ class ProductServiceImplTest {
         ProductDto product = new ProductDto();
         ProductDto product2 = new ProductDto();
         product.setProductName("test");
-        product.setRetailPrice(100);
         product2.setProductName("changedToThisName");
-        product2.setRetailPrice(200);
+        product.setPrice(100);
+        product2.setPrice(200);
         productService.createProduct(product);
 
         // Act
-        ProductDto changedProduct = productService.changeProduct(1L, "product", product2);
-        ProductDto changeProduct2 = productService.changeProduct(1L, "retailPrice", product2);
+        ProductDto changedProduct = productService.changeProduct(1L, "productName", product2);
+        ProductDto changeProduct2 = productService.changeProduct(1L, "price", product2);
 
         // Assert
         assertEquals(changedProduct.getProductName(),"changedToThisName");
-        assertEquals(changedProduct.getRetailPrice(), 200);
+        assertEquals(changeProduct2.getPrice(), 200);
     }
 
     @Test
