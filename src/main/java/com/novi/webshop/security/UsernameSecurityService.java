@@ -33,22 +33,22 @@ public class UsernameSecurityService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         List<Admin> admins = new ArrayList<>(adminRepository.findAll());
-        Admin admin = null;
-        Employee employee = null;
-        Customer customer = null;
+        Admin admin = new Admin();
+        Employee employee = new Employee();
+        Customer customer = new Customer();
         for (int i = 0; i < admins.size(); i++) {
             if (admins.get(i).getUsername().equalsIgnoreCase(username)) {
                 admin = admins.get(i);
             }
         }
-        if(admin == null) {
+        if(admin.getUsername() == null) {
             List<Employee> employees = new ArrayList<>(employeeRepository.findAll());
             for (int i = 0; i < employees.size(); i++) {
                 if (employees.get(i).getUsername().equalsIgnoreCase(username)) {
                     employee = employees.get(i);
                 }
             }
-        } if (employee == null) {
+        } if (employee.getUsername() == null) {
             List<Customer> customers = new ArrayList<>(customerRepository.findAll());
             for (int i = 0; i < customers.size(); i++) {
                 if (customers.get(i).getUsername().equalsIgnoreCase(username)) {
@@ -59,15 +59,12 @@ public class UsernameSecurityService implements UserDetailsService {
 
 
 
-        if (admin != null) {
-            UserDetails userDetails = User.withUsername(admin.getUsername()).password(admin.getPassword()).authorities(admin.getRole()).build();
-            return userDetails;
-        } else if (employee != null) {
-            UserDetails userDetails = User.withUsername(employee.getUsername()).password(employee.getPassword()).authorities(employee.getRole()).build();
-            return userDetails;
-        } else if (customer != null) {
-            UserDetails userDetails = User.withUsername(customer.getUsername()).password(customer.getPassword()).authorities(customer.getRole()).build();
-            return userDetails;
+        if (admin.getUsername() != null) {
+            return User.withUsername(admin.getUsername()).password(admin.getPassword()).authorities(admin.getRole()).build();
+        } else if (employee.getUsername() != null) {
+            return User.withUsername(employee.getUsername()).password(employee.getPassword()).authorities(employee.getRole()).build();
+        } else if (customer.getUsername() != null) {
+            return User.withUsername(customer.getUsername()).password(customer.getPassword()).authorities(customer.getRole()).build();
         } else {
             throw new UsernameNotFoundException(username);
         }

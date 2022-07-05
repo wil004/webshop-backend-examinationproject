@@ -25,10 +25,8 @@ public class TransferDtoToModel {
 
     public static ShoppingCart transferToShoppingCart(ShoppingCartDto shoppingCartDto) {
         ShoppingCart shoppingCart = new ShoppingCart();
-        shoppingCart.setId(shoppingCartDto.getId());
         shoppingCart.setTotalPrice(shoppingCartDto.getTotalPrice());
         if(shoppingCartDto.getProductList() != null) {
-
             List<QuantityAndProduct> productList = new ArrayList<>();
             for(int i = 0; i < shoppingCartDto.getProductList().size(); i++) {
                 QuantityAndProduct quantityAndProduct = new QuantityAndProduct();
@@ -36,11 +34,6 @@ public class TransferDtoToModel {
                 quantityAndProduct.setAmountOfProducts(shoppingCartDto.getProductList().get(i).getAmountOfProducts());
                 quantityAndProduct.setAmountOfReturningProducts(shoppingCartDto.getProductList().get(i).getAmountOfReturningProducts());
                 productList.add(quantityAndProduct);
-
-            List<Product> productList = new ArrayList<>();
-            for(int i = 0; i < shoppingCartDto.getProductList().size(); i++) {
-                productList.add(transferToProduct(shoppingCartDto.getProductList().get(i)));
-
             }
             shoppingCart.setQuantityAndProductList(productList);
         }
@@ -49,7 +42,6 @@ public class TransferDtoToModel {
 
     public static Returns transferToReturnCart(ReturnsDto returnsDto) {
         Returns returns = new Returns();
-        returns.setId(returns.getId());
         returns.setTotalPrice(returnsDto.getTotalPrice());
         returns.setProcessed(returnsDto.isProcessed());
         returns.setBankAccountForReturn(returnsDto.getBankAccountForReturn());
@@ -72,20 +64,15 @@ public class TransferDtoToModel {
 
     public static Product transferToProduct(ProductDto productDto) {
         Product product = new Product();
-        product.setId(productDto.getId());
         product.setProductName(productDto.getProductName());
         product.setCategory(productDto.getCategory());
-        product.setSellingPrice(productDto.getSellingPrice());
-        product.setRetailPrice(productDto.getRetailPrice());
-        product.setAmountOfProducts(productDto.getAmountOfProducts());
-        product.setAmountOfReturningProducts(productDto.getAmountOfReturningProducts());
+        product.setPrice(productDto.getPrice());
         product.setProductPictureUrl(productDto.getProductPictureUrl());
         return product;
     }
 
     public static Orders transferToOrder(OrderDto orderDto) {
         Orders order = new Orders();
-        order.setId(orderDto.getId());
         order.setProcessed(orderDto.isProcessed());
         order.setPaid(orderDto.isPaid());
         order.setOrderDate(orderDto.getOrderDate());
@@ -94,7 +81,6 @@ public class TransferDtoToModel {
             order.setCustomer(TransferDtoToModel.transferToCustomer(orderDto.getCustomerDto()));
         }
         if(orderDto.getProductDtoList() != null) {
-
             List<QuantityAndProduct> productList = new ArrayList<>();
             for (int i = 0; i < order.getQuantityAndProductList().size(); i++) {
                 QuantityAndProduct quantityAndProduct = new QuantityAndProduct();
@@ -104,13 +90,6 @@ public class TransferDtoToModel {
                 productList.add(quantityAndProduct);
             }
             order.setQuantityAndProductList(productList);
-
-            List<Product> productList = new ArrayList<>();
-            for (int i = 0; i < order.getProductList().size(); i++) {
-                productList.add(transferToProduct(orderDto.getProductDtoList().get(i)));
-            }
-            order.setProductList(productList);
-
         }
         return order;
     }

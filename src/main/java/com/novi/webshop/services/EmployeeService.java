@@ -15,7 +15,9 @@ public interface EmployeeService {
 
     UserEmployeeDto addOrderToEmployeeList(Long employeeId, Long orderId);
 
-
     List<UserEmployeeDto> divideOrdersOverEmployees();
 
+    public UserEmployeeDto addReturnsToEmployeeList(Long employeeId, Long returnsId);
+
+    public List<UserEmployeeDto> divideReturnsOverEmployees();
 }

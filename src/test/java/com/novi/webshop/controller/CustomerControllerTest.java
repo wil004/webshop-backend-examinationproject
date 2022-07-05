@@ -20,15 +20,14 @@ import static org.hamcrest.Matchers.is;
 
 @WebMvcTest
 public class CustomerControllerTest {
+
     @Autowired
     MockMvc mockMvc;
 
-
-    @MockBean
-    CustomerServiceImpl customerService;
-
     @MockBean
     OrderServiceImpl orderService;
+    @MockBean
+    CustomerServiceImpl customerService;
 
     @MockBean
     ProductServiceImpl productService;
@@ -38,6 +37,9 @@ public class CustomerControllerTest {
 
     @MockBean
     ShoppingCartServiceImpl shoppingCartService;
+
+    @MockBean
+    AttachmentService attachmentService;
 
     @MockBean
     UserServiceImpl userService;
@@ -50,6 +52,13 @@ public class CustomerControllerTest {
 
     @MockBean
     JwtService jwtService;
+
+    @MockBean
+    EmployeeServiceImpl employeeService;
+
+    @MockBean
+    PDFGeneratorService pdfGeneratorService;
+
 
     @MockBean
     CustomerRepository customerRepository;
@@ -71,6 +80,10 @@ public class CustomerControllerTest {
 
     @MockBean
     EmployeeRepository employeeRepository;
+
+    @MockBean
+    AttachmentRepository attachmentRepository;
+
 
 
     @Test

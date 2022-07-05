@@ -14,7 +14,6 @@ import com.novi.webshop.repository.QuantityAndProductRepository;
 import com.novi.webshop.repository.ShoppingCartRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -58,7 +57,7 @@ private final QuantityAndProductRepository quantityAndProductRepository;
 
             quantityAndProductRepository.save(quantityAndProduct);
             shoppingCart.setQuantityAndProductList(productsInShoppingCartObject);
-            shoppingCart.setTotalPrice(shoppingCart.getTotalPrice() + product.getSellingPrice() * productDto.getAmountOfProducts());
+            shoppingCart.setTotalPrice(shoppingCart.getTotalPrice() + product.getPrice() * productDto.getAmountOfProducts());
             shoppingCartRepository.save(shoppingCart);
 
 

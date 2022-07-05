@@ -20,15 +20,14 @@ import static org.hamcrest.Matchers.is;
 
 @WebMvcTest
 class ProductControllerTest {
+
         @Autowired
         MockMvc mockMvc;
 
-
-        @MockBean
-        CustomerServiceImpl customerService;
-
         @MockBean
         OrderServiceImpl orderService;
+        @MockBean
+        CustomerServiceImpl customerService;
 
         @MockBean
         ProductServiceImpl productService;
@@ -38,6 +37,9 @@ class ProductControllerTest {
 
         @MockBean
         ShoppingCartServiceImpl shoppingCartService;
+
+        @MockBean
+        AttachmentService attachmentService;
 
         @MockBean
         UserServiceImpl userService;
@@ -50,6 +52,13 @@ class ProductControllerTest {
 
         @MockBean
         JwtService jwtService;
+
+        @MockBean
+        EmployeeServiceImpl employeeService;
+
+        @MockBean
+        PDFGeneratorService pdfGeneratorService;
+
 
         @MockBean
         CustomerRepository customerRepository;
@@ -72,10 +81,13 @@ class ProductControllerTest {
         @MockBean
         EmployeeRepository employeeRepository;
 
+        @MockBean
+        AttachmentRepository attachmentRepository;
+
 
         @Test
         @WithMockUser
-        void getCustomer() throws Exception {
+        void getProduct() throws Exception {
             ProductDto productDto = new ProductDto();
             productDto.setId(1L);
             productDto.setProductName("test");
@@ -86,6 +98,7 @@ class ProductControllerTest {
                     .perform(MockMvcRequestBuilders.get("/product/name/test"))
                     .andDo(MockMvcResultHandlers.print())
                     .andExpect(MockMvcResultMatchers.status().isOk())
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.id", is(1)))
                     .andExpect(MockMvcResultMatchers.jsonPath("$.productName", is("test")));
         }
 }

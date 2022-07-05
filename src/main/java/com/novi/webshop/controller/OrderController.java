@@ -2,7 +2,6 @@ package com.novi.webshop.controller;
 
 import com.novi.webshop.dto.OrderDto;
 import com.novi.webshop.dto.ShoppingCartDto;
-import com.novi.webshop.dto.UserEmployeeDto;
 import com.novi.webshop.services.OrderServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -76,11 +75,6 @@ public class OrderController {
     public ResponseEntity<OrderDto> createOrderFromGuest(@PathVariable Long customerId, @RequestBody ShoppingCartDto shoppingCartDto) {
         final URI location = URI.create("/order" + customerId);
         return ResponseEntity.created(location).body(orderServiceImpl.createOrderFromGuestCustomer(customerId, shoppingCartDto));
-    }
-
-    @DeleteMapping("/delete={orderId}")
-    public void deleteOrder(@PathVariable Long orderId) {
-        orderServiceImpl.deleteOrder(orderId);
     }
 
 }

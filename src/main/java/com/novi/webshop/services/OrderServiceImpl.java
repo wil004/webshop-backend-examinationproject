@@ -18,27 +18,17 @@ public class OrderServiceImpl implements OrderService{
 
     private final OrderRepository orderRepository;
     private final CustomerRepository customerRepository;
-
     private final EmployeeRepository employeeRepository;
     private final QuantityAndProductRepository quantityAndProductRepository;
+    private final ProductRepository productRepository;
 
     @Autowired
-    public OrderServiceImpl(OrderRepository orderRepository, CustomerRepository customerRepository, EmployeeRepository employeeRepository, QuantityAndProductRepository quantityAndProductRepository) {
+    public OrderServiceImpl(OrderRepository orderRepository, CustomerRepository customerRepository, EmployeeRepository employeeRepository, QuantityAndProductRepository quantityAndProductRepository, ProductRepository productRepository) {
         this.orderRepository = orderRepository;
         this.customerRepository = customerRepository;
         this.employeeRepository = employeeRepository;
         this.quantityAndProductRepository = quantityAndProductRepository;
-
-    private final ProductRepository productRepository;
-    private final EmployeeRepository employeeRepository;
-
-    @Autowired
-    public OrderServiceImpl(OrderRepository orderRepository, CustomerRepository customerRepository, ProductRepository productRepository, EmployeeRepository employeeRepository) {
-        this.orderRepository = orderRepository;
-        this.customerRepository = customerRepository;
         this.productRepository = productRepository;
-        this.employeeRepository = employeeRepository;
-
     }
 
     @Override
@@ -69,9 +59,6 @@ public class OrderServiceImpl implements OrderService{
         if(orderRepository.findById(orderId).isPresent()) {
             Orders order = orderRepository.findById(orderId).orElseThrow();
             if(order.isPaid()) {
-
-                // deleteOrdeInEmployee makes sure the order will not be prepared twice!
-
                 deleteOrderInEmployee(orderId);
                 order.setProcessed(processed);
                 Orders savedOrder = orderRepository.save(order);
@@ -94,6 +81,8 @@ public class OrderServiceImpl implements OrderService{
                     if (order.equals(employeeList.get(i).getOrderList().get(j))) {
                         employeeList.get(i).getOrderList().remove(j);
                         employeeRepository.save(employeeList.get(i));
+                        order.setEmployeeOrderList(null);
+                        orderRepository.save(order);
                         break;
                     }
                 }
@@ -196,7 +185,6 @@ public class OrderServiceImpl implements OrderService{
         order.setCustomer(customer);
         order.setTotalPrice(customer.getShoppingCart().getTotalPrice());
 
-
         if(customer.getShoppingCart().getQuantityAndProductList().size() > 0) {
             for(int i = 0; i < customer.getShoppingCart().getQuantityAndProductList().size(); i++) {
                 QuantityAndProduct quantityAndProduct = new QuantityAndProduct();
@@ -210,26 +198,10 @@ public class OrderServiceImpl implements OrderService{
             customer.getShoppingCart().setTotalPrice(0);
             orderHistory.add(order);
             customer.setOrderHistory(orderHistory);
+            customer.getShoppingCart().setQuantityAndProductList(null);
             quantityAndProductRepository.saveAll(quantityAndProductList);
             Orders savedOrder = orderRepository.save(order);
             customerRepository.save(customer);
-
-        if(customer.getShoppingCart().getProductList().size() > 0) {
-            for (int i = 0; i < customer.getShoppingCart().getProductList().size(); i++) {
-                if (productRepository.findById(customer.getShoppingCart().getProductList().get(i).getId()).isPresent()) {
-                    productList.add(productRepository.findById(customer.getShoppingCart().getProductList().get(i).getId()).orElseThrow());
-                }
-            }
-            order.setProductList(productList);
-            List<Orders> orderHistory = customer.getOrderHistory();
-
-            customer.getShoppingCart().setProductList(null);
-            customer.getShoppingCart().setTotalPrice(0);
-            orderHistory.add(order);
-            customer.setOrderHistory(orderHistory);
-            customerRepository.save(customer);
-            Orders savedOrder = orderRepository.save(order);
-
             OrderDto orderDto = TransferModelToDto.transferToOrderDto(savedOrder);
             orderDto.setCustomerDto(TransferModelToDto.transferToCustomerDto(customer));
             return orderDto;
@@ -241,7 +213,6 @@ public class OrderServiceImpl implements OrderService{
     @Override
     public OrderDto createOrderFromGuestCustomer(Long customerId, ShoppingCartDto shoppingCartDto) {
         Customer customer = customerRepository.findById(customerId).orElseThrow();
-        ShoppingCart shoppingCart = TransferDtoToModel.transferToShoppingCart(shoppingCartDto);
         List<QuantityAndProduct> quantityAndProductList = new ArrayList<>();
 
 
@@ -250,27 +221,26 @@ public class OrderServiceImpl implements OrderService{
         order.setOrderDate(LocalDateTime.now());
         order.setOrderDateInMilliSeconds(System.currentTimeMillis());
         order.setCustomer(customer);
+        order.setTotalPrice(shoppingCartDto.getTotalPrice());
+
         if(shoppingCartDto.getProductList().size() > 0) {
             for (int i = 0; i < shoppingCartDto.getProductList().size(); i++) {
+                if (productRepository.findById(shoppingCartDto.getProductList().get(i).getId()).isPresent()) {
                 QuantityAndProduct quantityAndProduct = new QuantityAndProduct();
-                quantityAndProduct.setProduct(customer.getShoppingCart().getQuantityAndProductList().get(i).getProduct());
-                quantityAndProduct.setAmountOfProducts(customer.getShoppingCart().getQuantityAndProductList().get(i).getAmountOfProducts());
-                quantityAndProductList.add(quantityAndProduct);
-                quantityAndProductList.get(i).setOrder(order);
+                    quantityAndProduct.setProduct(productRepository.findById(shoppingCartDto.getProductList().get(i).getId()).orElseThrow());
+                    quantityAndProduct.setAmountOfProducts(shoppingCartDto.getProductList().get(i).getAmountOfProducts());
+                    quantityAndProductList.add(quantityAndProduct);
+                    quantityAndProductList.get(i).setOrder(order);
+                } else {
+                    throw new RecordNotFoundException("Product not found");
+                }
                     if(shoppingCartDto.getProductList().get(i).getAmountOfProducts() <= 0) {
                         throw new RecordNotFoundException("No valid amount of products!");
                 }
             }
         }
-        if(quantityAndProductList.size() > 0) {
+        if(shoppingCartDto.getProductList().size() > 0) {
             order.setQuantityAndProductList(quantityAndProductList);
-                if (productRepository.findById(shoppingCartDto.getProductList().get(i).getId()).isPresent()) {
-                    productList.add(productRepository.findById(shoppingCartDto.getProductList().get(i).getId()).orElseThrow());
-                }
-            }
-        }
-        if(productList.size() > 0) {
-            order.setProductList(productList);
         } else {
             throw new RecordNotFoundException("No products in shoppingcart!");
         }
@@ -285,16 +255,10 @@ public class OrderServiceImpl implements OrderService{
         return orderDto;
     }
 
-
     private void saveQuantityAndProduct(Orders order, QuantityAndProduct quantityAndProduct) {
         quantityAndProduct.setOrder(order);
         quantityAndProductRepository.save(quantityAndProduct);
         orderRepository.save(order);
-    }
-
-    @Override
-    public void deleteOrder(Long orderId) {
-        orderRepository.deleteById(orderId);
     }
 
 }

@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class ReturnsServiceImpl implements ReturnsService {
@@ -159,26 +160,19 @@ public class ReturnsServiceImpl implements ReturnsService {
         if (returnsRepository.findById(returnCartId).isPresent() && productRepository.findById(productId).isPresent() &&
                 orderRepository.findById(returns.getCustomerOrder().getId()).isPresent()) {
             for (int i = 0; i < order.getQuantityAndProductList().size(); i++) {
-                if (order.getQuantityAndProductList().get(i).getProduct() == product) {
-                    int returningProductsAmount = 0;
-                    for(int j = 0; j < returns.getQuantityAndProductList().size(); j++) {
-                        if (returns.getQuantityAndProductList().get(j).getId() == product.getId()) {
-                            returningProductsAmount = returningProductsAmount + returns.getQuantityAndProductList().get(j).getAmountOfReturningProducts();
-                        }
-                    }
-                    returningProductsAmount = productDto.getAmountOfReturningProducts() + returningProductsAmount;
+                if (Objects.equals(order.getQuantityAndProductList().get(i).getProduct().getProductName(), product.getProductName())) {
+
+                    int returningProductsAmount = productDto.getAmountOfReturningProducts();
                     if (returningProductsAmount <= order.getQuantityAndProductList().get(i).getAmountOfProducts()) {
-
-
                         List<QuantityAndProduct> productList = returns.getQuantityAndProductList();
                         QuantityAndProduct quantityAndProduct = order.getQuantityAndProductList().get(i);
                         quantityAndProduct.setReturns(returns);
-                        product.setAmountOfReturningProducts(returningProductsAmount);
+                        quantityAndProduct.setAmountOfReturningProducts(returningProductsAmount + order.getQuantityAndProductList().get(i).getAmountOfReturningProducts());
                         productList.add(quantityAndProduct);
                         returns.setQuantityAndProductList(productList);
-                        returns.setTotalPrice(returns.getTotalPrice() + product.getSellingPrice() * productDto.getAmountOfReturningProducts());
+                        returns.setTotalPrice(returns.getTotalPrice() + product.getPrice() * productDto.getAmountOfReturningProducts());
                         order.getQuantityAndProductList().get(i).setAmountOfProducts(quantityAndProduct.getAmountOfProducts() - productDto.getAmountOfReturningProducts());
-                        order.setTotalPrice(order.getTotalPrice() - product.getSellingPrice() * productDto.getAmountOfReturningProducts());
+                        order.setTotalPrice(order.getTotalPrice() - product.getPrice() * productDto.getAmountOfReturningProducts());
                         quantityAndProductRepository.save(quantityAndProduct);
                         orderRepository.save(order);
                         returnsRepository.save(returns);
