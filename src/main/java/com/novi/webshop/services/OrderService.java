@@ -11,7 +11,7 @@ public interface OrderService {
 
     OrderDto orderIsPaid(Long orderId);
 
-    OrderDto changeProcessedStatus(Long id, boolean processed);
+    Object changeProcessedStatus(Long id, boolean processed, String orderOrReturn);
 
     List<OrderDto> getAllProcessedOrNotProcessedOrders(boolean processedOrNotProcessed);
 
@@ -21,7 +21,7 @@ public interface OrderService {
 
     List<OrderDto> getOrdersByNameAndAddress(String firstName, String lastName, String zipcode, int houseNumber, String additionalHouseNumber);
 
-    OrderDto createOrderFromCustomer(Long customerId);
+    OrderDto createOrder(Long customerId);
 
     OrderDto createOrderFromGuestCustomer(Long customerId, ShoppingCartDto shoppingCartDto);
 

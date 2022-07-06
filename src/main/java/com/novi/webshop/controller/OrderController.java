@@ -52,22 +52,27 @@ public class OrderController {
         return ResponseEntity.ok(orderServiceImpl.getOrdersByNameAndAddress(firstName, lastName, zipcode, houseNumber, additionalHouseNumber));
     }
 
-    @PutMapping(value = "paid-order/id={id}", consumes = {MediaType.APPLICATION_JSON_VALUE})
+    @PutMapping(value = "/paid-order/id={id}", consumes = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<OrderDto> confirmThatOrderIsPaid(@PathVariable Long id) {
         return ResponseEntity.ok(orderServiceImpl.orderIsPaid(id));
     }
 
-    @PutMapping(value = "change-processed-status={processed}/id={id}",
+    @PutMapping(value = "/change-order-processed-status={processed}/id={id}",
             consumes = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<OrderDto> changeProcessedStatus(@PathVariable Long id, @PathVariable boolean processed) {
-        return ResponseEntity.ok(orderServiceImpl.changeProcessedStatus(id, processed));
+    public ResponseEntity<Object> changeOrdersProcessedStatus(@PathVariable Long id, @PathVariable boolean processed) {
+        return ResponseEntity.ok(orderServiceImpl.changeProcessedStatus(id, processed, "order"));
     }
 
+    @PutMapping(value = "/change-returns-processed-status={processed}/id={id}",
+            consumes = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<Object> changeReturnsProcessedStatus(@PathVariable Long id, @PathVariable boolean processed) {
+        return ResponseEntity.ok(orderServiceImpl.changeProcessedStatus(id, processed, "return"));
+    }
 
     @PostMapping(path = "/customer={customerId}",consumes = { MediaType.APPLICATION_JSON_VALUE })
     public ResponseEntity<OrderDto> createOrderFromCustomer(@PathVariable Long customerId) {
         final URI location = URI.create("/order" + customerId);
-        return ResponseEntity.created(location).body(orderServiceImpl.createOrderFromCustomer(customerId));
+        return ResponseEntity.created(location).body(orderServiceImpl.createOrder(customerId));
     }
 
 

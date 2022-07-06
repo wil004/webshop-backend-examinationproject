@@ -17,10 +17,10 @@ public class ShoppingCartController {
         this.shoppingCartServiceImpl = shoppingCartServiceImpl;
     }
 
-    @PutMapping(value = "id={shoppingCartId}/productid={productId}",
+    @PutMapping(value = "id={customerId}/productid={productId}",
             consumes = { MediaType.APPLICATION_JSON_VALUE })
-    public ResponseEntity<ShoppingCartDto> addProductToShoppingCart(@PathVariable Long shoppingCartId ,@PathVariable Long productId, @RequestBody ProductDto productDto) {
-        return ResponseEntity.ok(shoppingCartServiceImpl.connectProductWithShoppingCart(shoppingCartId, productId, productDto));
+    public ResponseEntity<ShoppingCartDto> addProductToShoppingCart(@PathVariable Long customerId ,@PathVariable Long productId, @RequestBody ProductDto productDto) {
+        return ResponseEntity.ok(shoppingCartServiceImpl.connectProductWithShoppingCart(customerId, productId, productDto));
     }
 
     @DeleteMapping("/{id}")

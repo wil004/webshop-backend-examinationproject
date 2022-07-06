@@ -1,5 +1,7 @@
 package com.novi.webshop.model;
 
+import com.sun.istack.NotNull;
+
 import javax.persistence.*;
 import java.util.List;
 
@@ -9,14 +11,16 @@ public class Employee extends User{
     @GeneratedValue
     private Long id;
 
+    @NotNull
     private String emailAddress;
+    @NotNull
     private String username;
+    @NotNull
     private String password;
+    @NotNull
     private String firstName;
+    @NotNull
     private String lastName;
-
-    @OneToMany(mappedBy = "employeeReturnCartList")
-    private List<Returns> returnsList;
 
     @OneToMany(mappedBy = "employeeOrderList")
     private List<Orders> orderList;
@@ -24,6 +28,11 @@ public class Employee extends User{
     @OneToMany(mappedBy = "employeeFinishedOrderList")
     private List<Orders> finishedOrders;
 
+    @OneToMany(mappedBy = "employeeReturnsList")
+    private List<Returns> returnsList;
+
+    @OneToMany(mappedBy = "employeeFinishedReturnsList")
+    private List<Returns> finishedReturns;
 
     @ManyToOne
     private Admin admin;
@@ -87,14 +96,6 @@ public class Employee extends User{
         this.lastName = lastName;
     }
 
-    public List<Returns> getReturnCartList() {
-        return returnsList;
-    }
-
-    public void setReturnCartList(List<Returns> returnsList) {
-        this.returnsList = returnsList;
-    }
-
     public List<Orders> getOrderList() {
         return orderList;
     }
@@ -109,6 +110,22 @@ public class Employee extends User{
 
     public void setFinishedOrders(List<Orders> finishedOrders) {
         this.finishedOrders = finishedOrders;
+    }
+
+    public List<Returns> getReturnsList() {
+        return returnsList;
+    }
+
+    public void setReturnsList(List<Returns> returnsList) {
+        this.returnsList = returnsList;
+    }
+
+    public List<Returns> getFinishedReturns() {
+        return finishedReturns;
+    }
+
+    public void setFinishedReturns(List<Returns> finishedReturns) {
+        this.finishedReturns = finishedReturns;
     }
 
     public Admin getAdmin() {

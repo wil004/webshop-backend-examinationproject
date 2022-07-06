@@ -1,4 +1,7 @@
 package com.novi.webshop.model;
+import com.sun.istack.NotNull;
+import org.springframework.lang.Nullable;
+
 import javax.persistence.*;
 import java.util.List;
 
@@ -7,16 +10,25 @@ public class Customer extends User {
     @Id
     @GeneratedValue
     private Long id;
+    @NotNull
     private String emailAddress;
+
     private String username;
     private String password;
+    @NotNull
     private String firstName;
+    @NotNull
     private String lastName;
+    @NotNull
     private String streetName;
+    @NotNull
     private int houseNumber;
+
     private String additionalToHouseNumber;
 
+    @NotNull
     private String city;
+    @NotNull
     private String zipcode;
 
     @OneToOne

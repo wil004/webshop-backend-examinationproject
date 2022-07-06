@@ -10,6 +10,4 @@ public interface ShoppingCartService {
     ShoppingCartDto createShoppingCard(Long customerId);
 
     void deleteShoppingCart(Long id);
-
-    ShoppingCart transferToShoppingCart(ShoppingCartDto shoppingCartDto);
 }

@@ -10,6 +10,7 @@ public class UserEmployeeDto extends UserDto {
     private String firstName;
     private String lastName;
     private List<ReturnsDto> returnsDtoList;
+    private List<ReturnsDto> finishedReturns;
 
     private List<OrderDto> orderDtoList;
 
@@ -75,6 +76,22 @@ public class UserEmployeeDto extends UserDto {
 
     public void setReturnCartDtoList(List<ReturnsDto> returnsDtoList) {
         this.returnsDtoList = returnsDtoList;
+    }
+
+    public List<ReturnsDto> getReturnsDtoList() {
+        return returnsDtoList;
+    }
+
+    public void setReturnsDtoList(List<ReturnsDto> returnsDtoList) {
+        this.returnsDtoList = returnsDtoList;
+    }
+
+    public List<ReturnsDto> getFinishedReturns() {
+        return finishedReturns;
+    }
+
+    public void setFinishedReturns(List<ReturnsDto> finishedReturns) {
+        this.finishedReturns = finishedReturns;
     }
 
     public List<OrderDto> getOrderDtoList() {

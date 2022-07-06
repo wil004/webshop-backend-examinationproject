@@ -52,7 +52,7 @@ public class TransferModelToDto {
         return shoppingCartDto;
     }
 
-    public static ReturnsDto transferToReturnCartDto(Returns returns) {
+    public static ReturnsDto transferToReturnsDto(Returns returns) {
         ReturnsDto returnsDto = new ReturnsDto();
         returnsDto.setId(returns.getId());
         returnsDto.setTotalPrice(returns.getTotalPrice());
@@ -66,7 +66,7 @@ public class TransferModelToDto {
                 returnCartDtoProductList.get(i).setAmountOfProducts(returns.getQuantityAndProductList().get(i).getAmountOfProducts());
                 returnCartDtoProductList.get(i).setAmountOfReturningProducts(returns.getQuantityAndProductList().get(i).getAmountOfReturningProducts());
             }
-            returnsDto.setReturnProductList(returnCartDtoProductList);
+            returnsDto.setReturnedProducts(returnCartDtoProductList);
         }
         return returnsDto;
     }
@@ -124,25 +124,33 @@ public class TransferModelToDto {
         userEmployeeDto.setFirstName(employee.getFirstName());
         userEmployeeDto.setLastName(employee.getLastName());
         List<OrderDto> orderDtoList = new ArrayList<>();
-        if(employee.getOrderList() != null) {
+        if(employee.getOrderList() != null && employee.getOrderList().size() > 0) {
             for (int i = 0; i < employee.getOrderList().size(); i++) {
                 orderDtoList.add(TransferModelToDto.transferToOrderDto(employee.getOrderList().get(i)));
             }
             userEmployeeDto.setOrderDtoList(orderDtoList);
         }
-        if(employee.getFinishedOrders() != null) {
+        if(employee.getFinishedOrders() != null && employee.getFinishedOrders().size() > 0) {
             List<OrderDto> orderDtoList2 = new ArrayList<>();
             for (int i = 0; i < employee.getFinishedOrders().size(); i++) {
                 orderDtoList2.add(TransferModelToDto.transferToOrderDto(employee.getFinishedOrders().get(i)));
             }
             userEmployeeDto.setFinishedOrders(orderDtoList2);
         }
-        if(employee.getReturnCartList() != null) {
+        if(employee.getReturnsList() != null && employee.getReturnsList().size() > 0) {
             List<ReturnsDto> returnsDtoList = new ArrayList<>();
-            for (int i = 0; i < employee.getReturnCartList().size(); i++) {
-                returnsDtoList.add(TransferModelToDto.transferToReturnCartDto(employee.getReturnCartList().get(i)));
+            for (int i = 0; i < employee.getReturnsList().size(); i++) {
+                returnsDtoList.add(TransferModelToDto.transferToReturnsDto(employee.getReturnsList().get(i)));
             }
             userEmployeeDto.setReturnCartDtoList(returnsDtoList);
+        }
+
+        if(employee.getFinishedReturns() != null && employee.getFinishedReturns().size() > 0) {
+            List<ReturnsDto> returnsDtoList2 = new ArrayList<>();
+            for (int i = 0; i < employee.getFinishedOrders().size(); i++) {
+                returnsDtoList2.add(TransferModelToDto.transferToReturnsDto(employee.getFinishedReturns().get(i)));
+            }
+            userEmployeeDto.setFinishedReturns(returnsDtoList2);
         }
         return userEmployeeDto;
     }

@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface AdminService {
 
-    UserEmployeeDto createEmployeeAccount(UserEmployeeInputDto userEmployeeInputDto, Long adminId);
+    UserEmployeeDto createEmployeeAccount(UserEmployeeInputDto userEmployeeInputDto);
 
     Admin createAdmin(AdminDto adminDto);
 }

@@ -1,5 +1,7 @@
 package com.novi.webshop.model;
 
+import com.sun.istack.NotNull;
+
 import javax.persistence.*;
 import java.util.List;
 
@@ -15,6 +17,7 @@ public class Returns {
 
     private boolean processed;
 
+    @NotNull
     private String bankAccountForReturn;
 
     @OneToMany(mappedBy = "returns")
@@ -24,7 +27,10 @@ public class Returns {
     private Orders customerOrder;
 
     @ManyToOne
-    private Employee employeeReturnCartList;
+    private Employee employeeReturnsList;
+
+    @ManyToOne
+    private Employee employeeFinishedReturnsList;
 
 
     public Long getId() {
@@ -75,11 +81,19 @@ public class Returns {
         this.customerOrder = customerOrder;
     }
 
-    public Employee getEmployeeReturnCartList() {
-        return employeeReturnCartList;
+    public Employee getEmployeeReturnsList() {
+        return employeeReturnsList;
     }
 
-    public void setEmployeeReturnCartList(Employee employeeReturnCartList) {
-        this.employeeReturnCartList = employeeReturnCartList;
+    public void setEmployeeReturnsList(Employee employeeReturnsList) {
+        this.employeeReturnsList = employeeReturnsList;
+    }
+
+    public Employee getEmployeeFinishedReturnsList() {
+        return employeeFinishedReturnsList;
+    }
+
+    public void setEmployeeFinishedReturnsList(Employee employeeFinishedReturnsList) {
+        this.employeeFinishedReturnsList = employeeFinishedReturnsList;
     }
 }

@@ -4,9 +4,11 @@ package com.novi.webshop.security;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -63,4 +65,8 @@ public class JwtService {
         return username.equals(userDetails.getUsername()) &&
                 !isTokenExpired(token);
     }
+
+
+
+
 }

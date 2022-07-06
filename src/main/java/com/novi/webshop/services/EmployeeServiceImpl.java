@@ -11,6 +11,7 @@ import com.novi.webshop.model.Returns;
 import com.novi.webshop.repository.EmployeeRepository;
 import com.novi.webshop.repository.OrderRepository;
 import com.novi.webshop.repository.ReturnsRepository;
+import com.novi.webshop.security.JwtRequestFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,14 +27,16 @@ public class EmployeeServiceImpl implements EmployeeService {
     private final OrderRepository orderRepository;
     private final ReturnsService returnsService;
     private final ReturnsRepository returnsRepository;
+    private final UserServiceImpl userServiceImpl;
 
     @Autowired
-    public EmployeeServiceImpl(EmployeeRepository employeeRepository, OrderServiceImpl orderService, OrderRepository orderRepository, ReturnsService returnsService, ReturnsRepository returnsRepository) {
+    public EmployeeServiceImpl(EmployeeRepository employeeRepository, OrderServiceImpl orderService, OrderRepository orderRepository, ReturnsService returnsService, ReturnsRepository returnsRepository, UserServiceImpl userServiceImpl) {
         this.employeeRepository = employeeRepository;
         this.orderService = orderService;
         this.orderRepository = orderRepository;
         this.returnsService = returnsService;
         this.returnsRepository = returnsRepository;
+        this.userServiceImpl = userServiceImpl;
     }
 
     @Override
@@ -47,6 +50,10 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
     @Override
     public UserEmployeeDto getEmployeeById(Long employeeId) {
+        if(!Objects.equals(employeeId, userServiceImpl.findIdFromUsername(JwtRequestFilter.getUsername()))
+                && !Objects.equals(userServiceImpl.findRoleFromUsername(JwtRequestFilter.getUsername()), "ADMIN")) {
+            throw new RecordNotFoundException("Employee has only acces to his own data");
+        }
         if(employeeRepository.findById(employeeId).isPresent()) {
             Employee employee = employeeRepository.findById(employeeId).orElseThrow();
             return TransferModelToDto.transferToUserEmployeeDto(employee);
@@ -57,6 +64,10 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public UserEmployeeDto confirmIfOrderIsPaid(Long employeeId, Long orderId, boolean isPaid) {
+        if(!Objects.equals(employeeId, userServiceImpl.findIdFromUsername(JwtRequestFilter.getUsername()))
+                && !Objects.equals(userServiceImpl.findRoleFromUsername(JwtRequestFilter.getUsername()), "ADMIN")) {
+            throw new RecordNotFoundException("Employee has only acces to his own data");
+        }
         if(employeeRepository.findById(employeeId).isPresent()) {
             Employee employee = employeeRepository.findById(employeeId).orElseThrow();
             List<Orders> orders = employee.getOrderList();
@@ -103,6 +114,33 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
     }
 
+    @Override
+    public UserEmployeeDto processReturn(Long employeeId, Long returnId) {
+        if(employeeRepository.findById(employeeId).isPresent()) {
+            Employee employee = employeeRepository.findById(employeeId).orElseThrow();
+            List<Returns> returnsList = new ArrayList<>(employee.getReturnsList());
+            List<Returns> finishedReturns = new ArrayList<>(employee.getFinishedReturns());
+            for (int i = 0; i < returnsList.size(); i++) {
+                if(returnsList.get(i).getId().equals(returnId)) {
+                    Returns returns = returnsList.get(i);
+                    returns.setEmployeeReturnsList(employee);
+                    returnsList.get(i).setProcessed(true);
+                    finishedReturns.add(returnsList.get(i));
+                    returnsList.remove(i);
+                    employee.setReturnsList(returnsList);
+                    employee.setFinishedReturns(finishedReturns);
+                    returns.setEmployeeFinishedReturnsList(employee);
+                    returns.setEmployeeReturnsList(null);
+                    returnsRepository.save(returns);
+                    Employee savedEmployee = employeeRepository.save(employee);
+                    return TransferModelToDto.transferToUserEmployeeDto(savedEmployee);
+                }
+            } throw new RecordNotFoundException("Couldn't find the order in this employee");
+        } else {
+            throw new RecordNotFoundException("Couldn't find employee");
+        }
+    }
+
 
     @Override
     public UserEmployeeDto addOrderToEmployeeList(Long employeeId, Long orderId) {
@@ -124,22 +162,25 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public List<UserEmployeeDto> divideOrdersOverEmployees() {
         List<Employee> employeeList = employeeRepository.findAll();
-        List<OrderDto> orderList = orderService.getAllProcessedOrNotProcessedOrders(false);
+        List<OrderDto> orderDtoList = orderService.getAllProcessedOrNotProcessedOrders(false);
         int ordersPerEmployee = 0;
-        if(orderList.size() > employeeList.size()) {
-           ordersPerEmployee = orderList.size() / employeeList.size() + 1;
+        if(orderDtoList.size() > employeeList.size()) {
+           ordersPerEmployee = (int) Math.ceil(orderDtoList.size() / employeeList.size());
         } else {
             ordersPerEmployee = 1;
         }
         int jIndex= 0;
         for(int i = 0; i < employeeList.size(); i++) {
-                for (int j = jIndex; j < orderList.size(); j++) {
+                for (int j = jIndex; j < orderDtoList.size(); j++) {
                     if(employeeList.get(i).getOrderList().size() < ordersPerEmployee) {
-                        addOrderToEmployeeList(employeeList.get(i).getId(), orderList.get(j).getId());
+                        addOrderToEmployeeList(employeeList.get(i).getId(), orderDtoList.get(j).getId());
                     } else {
-                        jIndex = j;
                         break;
                     }
+            }
+            jIndex = jIndex + ordersPerEmployee;
+            if(jIndex >= orderDtoList.size()) {
+                break;
             }
         }
         List<UserEmployeeDto> employeeDtoList = new ArrayList<>();
@@ -154,11 +195,11 @@ public class EmployeeServiceImpl implements EmployeeService {
         if (employeeRepository.findById(employeeId).isPresent() && returnsRepository.findById(returnsId).isPresent()) {
             Employee employee = employeeRepository.findById(employeeId).orElseThrow();
             Returns returns = returnsRepository.findById(returnsId).orElseThrow();
-            returns.setEmployeeReturnCartList(employee);
+            returns.setEmployeeReturnsList(employee);
             returnsRepository.save(returns);
-            List<Returns> returnsList = employee.getReturnCartList();
+            List<Returns> returnsList = employee.getReturnsList();
             returnsList.add(returns);
-            employee.setReturnCartList(returnsList);
+            employee.setReturnsList(returnsList);
             employeeRepository.save(employee);
             return TransferModelToDto.transferToUserEmployeeDto(employee);
         } else {
@@ -172,19 +213,22 @@ public class EmployeeServiceImpl implements EmployeeService {
         List<ReturnsDto> returnsDtoList = returnsService.getProcessedOrNotProcessedReturns(false);
         int returnsPerEmployee = 0;
         if(returnsDtoList.size() > employeeList.size()) {
-            returnsPerEmployee = returnsDtoList.size() / employeeList.size() + 1;
+            returnsPerEmployee = (int) Math.ceil(returnsDtoList.size() / employeeList.size());
         } else {
             returnsPerEmployee = 1;
         }
         int jIndex= 0;
         for(int i = 0; i < employeeList.size(); i++) {
             for (int j = jIndex; j < returnsDtoList.size(); j++) {
-                if(employeeList.get(i).getReturnCartList().size() < returnsPerEmployee) {
-                    addOrderToEmployeeList(employeeList.get(i).getId(), returnsDtoList.get(j).getId());
+                if(employeeList.get(i).getReturnsList().size() < returnsPerEmployee) {
+                    addReturnsToEmployeeList(employeeList.get(i).getId(), returnsDtoList.get(j).getId());
                 } else {
-                    jIndex = j;
                     break;
                 }
+            }
+            jIndex = jIndex + returnsPerEmployee;
+            if(jIndex >= returnsDtoList.size()) {
+                break;
             }
         }
         List<UserEmployeeDto> employeeDtoList = new ArrayList<>();

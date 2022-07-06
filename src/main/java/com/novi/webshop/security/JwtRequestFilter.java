@@ -22,9 +22,15 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
 
+    private static String username;
+
     public JwtRequestFilter(JwtService jwtService, UserDetailsService udService) {
         this.jwtService = jwtService;
         this.userDetailsService = udService;
+    }
+
+    public static String getUsername() {
+        return username;
     }
 
     @Override
@@ -36,17 +42,18 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                                             filterChain) throws ServletException, IOException {
         final String authorizationHeader =
                 request.getHeader("Authorization");
-        String username = null;
         String jwt = null;
+        String usernameJwt = null;
         if (authorizationHeader != null &&
                 authorizationHeader.startsWith("Bearer ")) {
             jwt = authorizationHeader.substring(7);
-            username = jwtService.extractUsername(jwt);
+            usernameJwt = jwtService.extractUsername(jwt);
+            username = usernameJwt;
         }
-        if (username != null &&
+        if (usernameJwt != null &&
                 SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails =
-                    this.userDetailsService.loadUserByUsername(username);
+                    this.userDetailsService.loadUserByUsername(usernameJwt);
             if (jwtService.validateToken(jwt, userDetails)) {
                 UsernamePasswordAuthenticationToken
                         usernamePasswordAuthenticationToken = new
@@ -61,5 +68,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         }
         filterChain.doFilter(request, response);
     }
+
 }
 

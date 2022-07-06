@@ -9,10 +9,14 @@ import com.novi.webshop.model.Admin;
 import com.novi.webshop.model.Employee;
 import com.novi.webshop.repository.AdminRepository;
 import com.novi.webshop.repository.EmployeeRepository;
+import com.novi.webshop.security.JwtRequestFilter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import javax.servlet.http.HttpServletRequest;
 
 @Service
 public class AdminServiceImpl implements AdminService {
@@ -29,7 +33,8 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public UserEmployeeDto createEmployeeAccount(UserEmployeeInputDto userEmployeeInputDto, Long adminId) {
+    public UserEmployeeDto createEmployeeAccount(UserEmployeeInputDto userEmployeeInputDto) {
+        Long adminId = userService.findIdFromUsername(JwtRequestFilter.getUsername());
         if (!userService.doesUsernameAlreadyExist(userEmployeeInputDto.getUsername())) {
             Employee employee = new Employee();
             employee.setEmailAddress(userEmployeeInputDto.getEmailAddress());
@@ -44,7 +49,7 @@ public class AdminServiceImpl implements AdminService {
             if (adminRepository.findById(adminId).isPresent()) {
                 employee.setAdmin(adminRepository.findById(adminId).orElseThrow());
             } else {
-                throw new RecordNotFoundException("Employee must be connected with an admin");
+                throw new RecordNotFoundException("There is no admin account!");
             }
             Employee savedEmployee = employeeRepository.save(employee);
             return TransferModelToDto.transferToUserEmployeeDto(savedEmployee);

@@ -131,7 +131,7 @@ public class OrderControllerTest {
             orderDto.setId(1L);
             orderDto.setProcessed(true);
 
-        Mockito.when(orderService.changeProcessedStatus(1L, false)).thenReturn(orderDto);
+        Mockito.when(orderService.changeProcessedStatus(1L, false, "order")).thenReturn(orderDto);
 
        this.mockMvc
                 .perform(MockMvcRequestBuilders.put("/order/change-processed-status=false/id=1"))
