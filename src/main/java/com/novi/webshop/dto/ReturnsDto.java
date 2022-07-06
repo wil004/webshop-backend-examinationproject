@@ -16,7 +16,6 @@ public class ReturnsDto {
 
     private List<ProductDto> returnedProducts;
 
-    private List<ProductDto> finishedReturnedProducts;
 
     public Long getId() {
         return id;
@@ -66,12 +65,5 @@ public class ReturnsDto {
         this.returnedProducts = returnedProducts;
     }
 
-    public List<ProductDto> getFinishedReturnedProducts() {
-        return finishedReturnedProducts;
-    }
-
-    public void setFinishedReturnedProducts(List<ProductDto> finishedReturnedProducts) {
-        this.finishedReturnedProducts = finishedReturnedProducts;
-    }
 }
 

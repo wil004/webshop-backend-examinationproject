@@ -43,8 +43,8 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public CustomerDto getCustomerById(Long id) {
-        if(!Objects.equals(userServiceImpl.findIdFromUsername(JwtRequestFilter.getUsername()), id) &&
-                !Objects.equals(userServiceImpl.findRoleFromUsername(JwtRequestFilter.getUsername()), "ADMIN") ||
+        if(!Objects.equals(id, userServiceImpl.findIdFromUsername(JwtRequestFilter.getUsername())) &&
+                !Objects.equals(userServiceImpl.findRoleFromUsername(JwtRequestFilter.getUsername()), "ADMIN") &&
                 !Objects.equals(userServiceImpl.findRoleFromUsername(JwtRequestFilter.getUsername()), "EMPLOYEE")) {
             throw new RecordNotFoundException("Customer has only acces to his own data");
         }
@@ -58,7 +58,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public List<OrderDto> getCustomerOrderHistory(Long id) {
-        if(!Objects.equals(id, userServiceImpl.findIdFromUsername(JwtRequestFilter.getUsername())) && userServiceImpl.findRoleFromUsername(JwtRequestFilter.getUsername()) != "ADMIN" ||
+        if(!Objects.equals(id, userServiceImpl.findIdFromUsername(JwtRequestFilter.getUsername())) && userServiceImpl.findRoleFromUsername(JwtRequestFilter.getUsername()) != "ADMIN" &&
                 userServiceImpl.findRoleFromUsername(JwtRequestFilter.getUsername()) != "EMPLOYEE") {
                 throw new RecordNotFoundException("Customer has only acces to his own data");
         }

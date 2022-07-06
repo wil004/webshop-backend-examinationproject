@@ -44,19 +44,19 @@ public class ReturnsController {
 
     @PutMapping(value = "/change-processed-status={processed}/id={id}",
             consumes = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<ReturnsDto> changeProcessedStatus(@PathVariable Long id, @PathVariable boolean processed) {
+    public ResponseEntity<Object> changeProcessedStatus(@PathVariable Long id, @PathVariable boolean processed) {
         return ResponseEntity.ok(returnCartServiceImpl.changeProcessedStatus(id, processed));
     }
 
-    @PutMapping(value = "/id={returnCartId}/productid={productId}",
+    @PutMapping(value = "/id={returnsId}/productid={productId}",
             consumes = { MediaType.APPLICATION_JSON_VALUE })
-    public ResponseEntity<ReturnsDto> addProductToReturnCart(@PathVariable Long returnCartId , @PathVariable Long productId, @RequestBody ProductDto productDto) {
-        return ResponseEntity.ok(returnCartServiceImpl.connectProductWithReturn(returnCartId, productId, productDto));
+    public ResponseEntity<ReturnsDto> addProductToReturnCart(@PathVariable Long returnsId , @PathVariable Long productId, @RequestBody ProductDto productDto) {
+        return ResponseEntity.ok(returnCartServiceImpl.connectProductWithReturn(returnsId, productId, productDto));
     }
 
     @PostMapping(path = "/{orderId}", consumes = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<ReturnsDto> createReturnCart(@PathVariable Long orderId) {
+    public ResponseEntity<ReturnsDto> createReturnCart(@PathVariable Long orderId, @RequestBody ReturnsDto returnsDto) {
         final URI location = URI.create("/returncart" + orderId);
-        return ResponseEntity.created(location).body(returnCartServiceImpl.createReturnProducts(orderId));
+        return ResponseEntity.created(location).body(returnCartServiceImpl.createReturnProducts(orderId, returnsDto));
     }
 }

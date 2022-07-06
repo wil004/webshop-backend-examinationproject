@@ -63,12 +63,6 @@ public class OrderController {
         return ResponseEntity.ok(orderServiceImpl.changeProcessedStatus(id, processed, "order"));
     }
 
-    @PutMapping(value = "/change-returns-processed-status={processed}/id={id}",
-            consumes = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<Object> changeReturnsProcessedStatus(@PathVariable Long id, @PathVariable boolean processed) {
-        return ResponseEntity.ok(orderServiceImpl.changeProcessedStatus(id, processed, "return"));
-    }
-
     @PostMapping(path = "/customer={customerId}",consumes = { MediaType.APPLICATION_JSON_VALUE })
     public ResponseEntity<OrderDto> createOrderFromCustomer(@PathVariable Long customerId) {
         final URI location = URI.create("/order" + customerId);

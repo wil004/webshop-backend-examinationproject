@@ -2,6 +2,7 @@ package com.novi.webshop.helpers;
 
 import com.novi.webshop.dto.*;
 import com.novi.webshop.model.*;
+import com.novi.webshop.repository.ProductRepository;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -106,21 +106,14 @@ public class ReturnsServiceImpl implements ReturnsService {
     }
 
     @Override
-    public ReturnsDto changeProcessedStatus(Long id, boolean processed) {
-        if(returnsRepository.findById(id).isPresent()) {
-            Returns returns = returnsRepository.findById(id).orElseThrow();
-            returns.setProcessed(processed);
-            Returns savedReturns = returnsRepository.save(returns);
-            return TransferModelToDto.transferToReturnsDto(savedReturns);
-        }
-        else {
-            throw new RecordNotFoundException("Couldn't find return-cart");
-        }
+    public Object changeProcessedStatus(Long id, boolean processed) {
+      return orderServiceImpl.changeProcessedStatus(id, processed, "return");
     }
 
     @Override
-    public ReturnsDto createReturnProducts(Long orderId) {
+    public ReturnsDto createReturnProducts(Long orderId, ReturnsDto returnsDto) {
         Returns returns = new Returns();
+        returns.setBankAccountForReturn(returnsDto.getBankAccountForReturn());
         Orders order = orderRepository.findById(orderId).orElseThrow();
         if (orderRepository.findById(orderId).isPresent()) {
             returns.setCustomerOrder(order);
@@ -160,6 +153,12 @@ public class ReturnsServiceImpl implements ReturnsService {
         if (returnsRepository.findById(returnCartId).isPresent() && productRepository.findById(productId).isPresent() &&
                 orderRepository.findById(returns.getCustomerOrder().getId()).isPresent()) {
             within30DaysReturnTime(order);
+            for(int i = 0; i < returns.getQuantityAndProductList().size(); i++) {
+                if (returns.getQuantityAndProductList().get(i).getProduct().getProductName().equalsIgnoreCase(product.getProductName())) {
+                    throw new RecordNotFoundException("Product is already returned! If you want to return a bigger amount then please wait" +
+                            "till the return is processed!");
+                }
+            }
             for (int i = 0; i < order.getQuantityAndProductList().size(); i++) {
                 if (Objects.equals(order.getQuantityAndProductList().get(i).getProduct().getProductName(), product.getProductName())) {
 
@@ -177,7 +176,7 @@ public class ReturnsServiceImpl implements ReturnsService {
                         }
                         returns.setTotalPrice(totalPrice);
                         order.getQuantityAndProductList().get(i).setAmountOfProducts(quantityAndProduct.getAmountOfProducts() - productDto.getAmountOfReturningProducts());
-                        order.setTotalPrice(order.getTotalPrice() - totalPrice);
+                        order.setTotalPrice(order.getTotalPrice() - product.getPrice() * productDto.getAmountOfReturningProducts());
                         quantityAndProductRepository.save(quantityAndProduct);
                         orderRepository.save(order);
                         returnsRepository.save(returns);

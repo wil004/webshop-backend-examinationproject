@@ -14,9 +14,9 @@ public interface ReturnsService {
 
     List<ReturnsDto> getReturnByNameAndAddress(String firstName, String lastName, String zipcode, int houseNumber, String additionalHouseNumber);
 
-    ReturnsDto changeProcessedStatus(Long id, boolean processed);
+    Object changeProcessedStatus(Long id, boolean processed);
 
-    ReturnsDto createReturnProducts(Long orderId);
+    ReturnsDto createReturnProducts(Long orderId, ReturnsDto returnsDto);
 
     ReturnsDto connectProductWithReturn(Long returnCartId, Long productId, ProductDto productDto);
 
