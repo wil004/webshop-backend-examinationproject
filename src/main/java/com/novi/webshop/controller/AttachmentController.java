@@ -19,7 +19,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
-@RequestMapping("attachment")
 public class AttachmentController {
 
     private final AttachmentService attachmentService;
@@ -31,7 +30,7 @@ public class AttachmentController {
         this.productService = productService;
     }
 
-    @PostMapping("/upload")
+    @PostMapping("attachment/upload")
     public AttachmentInputDto uploadPictureFile(@RequestParam(value = "file")MultipartFile file) throws Exception {
         Attachment attachment = null;
         attachment = attachmentService.saveAttachment(file);
@@ -40,11 +39,10 @@ public class AttachmentController {
                 .path("/download/")
                 .path(attachment.getId())
                 .toUriString();
-        System.out.println("This works kind off");
         return new AttachmentInputDto(attachment.getId(), attachment.getFileName(), downloadUrl, file.getContentType(), file.getSize());
     }
 
-    @PutMapping("/upload/product={productId}/file={fileId}")
+    @PutMapping("attachment/product={productId}/file={fileId}")
     public ResponseEntity<ProductDto> uploadProductPictureUrl(@PathVariable Long productId , @PathVariable String fileId){
         return ResponseEntity.ok(productService.uploadPicture(productId, "http://localhost:8080/download/" +  fileId));
     }

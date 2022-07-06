@@ -29,37 +29,43 @@ public class EmployeeController {
     }
 
 
-    @PutMapping(value = "confirm-payment/employee-id={employeeId}/order-id={orderId}/ispaid={isPaid}",
+    @PutMapping(value = "/confirm-payment/employee-id={employeeId}/order-id={orderId}/ispaid={isPaid}",
             consumes = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<UserEmployeeDto> confirmIfOrderIsPaid(@PathVariable Long employeeId, @PathVariable Long orderId, @PathVariable boolean isPaid) {
         return ResponseEntity.ok(employeeService.confirmIfOrderIsPaid(employeeId, orderId, isPaid));
     }
 
-    @PutMapping(value = "process-order/employee-id={employeeId}/order-id={orderId}",
+    @PutMapping(value = "/process-order/employee-id={employeeId}/order-id={orderId}",
             consumes = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<UserEmployeeDto> processOrder(@PathVariable Long employeeId, @PathVariable Long orderId) {
         return ResponseEntity.ok(employeeService.processOrder(employeeId, orderId));
     }
 
-    @PutMapping(value = "id={employeeId}/order-id={orderId}",
+    @PutMapping(value = "/process-returns/employee-id={employeeId}/returns-id={returnsId}",
+            consumes = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<UserEmployeeDto> processReturns(@PathVariable Long employeeId, @PathVariable Long returnsId) {
+        return ResponseEntity.ok(employeeService.processReturn(employeeId, returnsId));
+    }
+
+    @PutMapping(value = "/id={employeeId}/order-id={orderId}",
             consumes = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<UserEmployeeDto> addOrderToEmployeeList(@PathVariable Long employeeId,@PathVariable Long orderId) {
         return ResponseEntity.ok(employeeService.addOrderToEmployeeList(employeeId, orderId));
     }
 
-    @PutMapping(value = "divide-orders",
+    @PutMapping(value = "/divide-orders",
             consumes = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<List<UserEmployeeDto>> divideOrdersOverEmployees() {
         return ResponseEntity.ok(employeeService.divideOrdersOverEmployees());
     }
 
-    @PutMapping(value = "id={employeeId}/returns-id={orderId}",
+    @PutMapping(value = "/id={employeeId}/returns-id={returnsId}",
             consumes = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<UserEmployeeDto> addReturnToEmployeeList(@PathVariable Long employeeId,@PathVariable Long returnsId) {
         return ResponseEntity.ok(employeeService.addReturnsToEmployeeList(employeeId, returnsId));
     }
 
-    @PutMapping(value = "divide-returns",
+    @PutMapping(value = "/divide-returns",
             consumes = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<List<UserEmployeeDto>> divideReturnsOverEmployees() {
         return ResponseEntity.ok(employeeService.divideReturnsOverEmployees());

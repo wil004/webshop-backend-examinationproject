@@ -33,37 +33,39 @@ public class UsernameSecurityService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         List<Admin> admins = new ArrayList<>(adminRepository.findAll());
-        Admin admin = new Admin();
-        Employee employee = new Employee();
-        Customer customer = new Customer();
+        Admin admin = null;
+        Employee employee = null;
+        Customer customer = null;
         for (int i = 0; i < admins.size(); i++) {
             if (admins.get(i).getUsername().equalsIgnoreCase(username)) {
                 admin = admins.get(i);
             }
         }
-        if(admin.getUsername() == null) {
+        if(admin == null) {
             List<Employee> employees = new ArrayList<>(employeeRepository.findAll());
             for (int i = 0; i < employees.size(); i++) {
                 if (employees.get(i).getUsername().equalsIgnoreCase(username)) {
                     employee = employees.get(i);
                 }
             }
-        } if (employee.getUsername() == null) {
+        } if (employee == null) {
             List<Customer> customers = new ArrayList<>(customerRepository.findAll());
             for (int i = 0; i < customers.size(); i++) {
-                if (customers.get(i).getUsername().equalsIgnoreCase(username)) {
-                    customer = customers.get(i);
+                if(customers.get(i).getUsername() != null) {
+                    if (customers.get(i).getUsername().equalsIgnoreCase(username)) {
+                        customer = customers.get(i);
+                    }
                 }
             }
         }
 
 
 
-        if (admin.getUsername() != null) {
+        if (admin != null) {
             return User.withUsername(admin.getUsername()).password(admin.getPassword()).authorities(admin.getRole()).build();
-        } else if (employee.getUsername() != null) {
+        } else if (employee != null) {
             return User.withUsername(employee.getUsername()).password(employee.getPassword()).authorities(employee.getRole()).build();
-        } else if (customer.getUsername() != null) {
+        } else if (customer != null) {
             return User.withUsername(customer.getUsername()).password(customer.getPassword()).authorities(customer.getRole()).build();
         } else {
             throw new UsernameNotFoundException(username);

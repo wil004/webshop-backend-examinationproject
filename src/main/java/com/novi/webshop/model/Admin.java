@@ -1,5 +1,7 @@
 package com.novi.webshop.model;
 
+import com.sun.istack.NotNull;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -13,10 +15,13 @@ public class Admin extends User {
     @GeneratedValue
     private Long id;
 
+    @NotNull
     private String emailAddress;
+    @NotNull
     private String username;
+    @NotNull
     private String password;
-
+    @NotNull
     private String bankAccount;
 
     @OneToMany(mappedBy = "admin")

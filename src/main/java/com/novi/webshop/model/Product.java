@@ -1,5 +1,7 @@
 package com.novi.webshop.model;
 
+import com.sun.istack.NotNull;
+
 import javax.persistence.*;
 import java.util.List;
 
@@ -9,9 +11,11 @@ public class Product {
     @GeneratedValue
     private Long id;
 
+    @NotNull
     private String productName;
     private String category;
 
+    @NotNull
     private double price;
 
     private String productPictureUrl;

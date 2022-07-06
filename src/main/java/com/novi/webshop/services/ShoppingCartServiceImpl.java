@@ -12,9 +12,11 @@ import com.novi.webshop.repository.CustomerRepository;
 import com.novi.webshop.repository.ProductRepository;
 import com.novi.webshop.repository.QuantityAndProductRepository;
 import com.novi.webshop.repository.ShoppingCartRepository;
+import com.novi.webshop.security.JwtRequestFilter;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class ShoppingCartServiceImpl implements ShoppingCartService {
@@ -23,19 +25,35 @@ private final ShoppingCartRepository shoppingCartRepository;
 private final ProductRepository productRepository;
 private final CustomerRepository customerRepository;
 private final QuantityAndProductRepository quantityAndProductRepository;
+private final UserServiceImpl userServiceImpl;
 
-    public ShoppingCartServiceImpl(ShoppingCartRepository shoppingCartRepository, ProductRepository productRepository, CustomerRepository customerRepository, QuantityAndProductRepository quantityAndProductRepository) {
+    public ShoppingCartServiceImpl(ShoppingCartRepository shoppingCartRepository, ProductRepository productRepository, CustomerRepository customerRepository, QuantityAndProductRepository quantityAndProductRepository, UserServiceImpl userServiceImpl) {
         this.shoppingCartRepository = shoppingCartRepository;
         this.productRepository = productRepository;
         this.customerRepository = customerRepository;
         this.quantityAndProductRepository = quantityAndProductRepository;
+        this.userServiceImpl = userServiceImpl;
     }
 
     @Override
-    public ShoppingCartDto connectProductWithShoppingCart(Long shoppingCartId, Long productId, ProductDto productDto) {
+    public ShoppingCartDto connectProductWithShoppingCart(Long customerId, Long productId, ProductDto productDto) {
+        if(!Objects.equals(customerId, userServiceImpl.findIdFromUsername(JwtRequestFilter.getUsername()))
+                && !Objects.equals(userServiceImpl.findRoleFromUsername(JwtRequestFilter.getUsername()), "ADMIN")) {
+            throw new RecordNotFoundException("Customer has only acces to his own data");
+        }
+        Long shoppingCartId;
+        if(customerRepository.findById(customerId).isPresent()) {
+            Customer customer = customerRepository.findById(customerId).orElseThrow();
+            if(customer.getShoppingCart().getId() != null) {
+                shoppingCartId = customer.getShoppingCart().getId();
+            } else {
+                throw new RecordNotFoundException("This customer has no shoppingcart because he is a guest");
+            }
+        } else {
+            throw new RecordNotFoundException("Customer doesn't exist");
+        }
         Product product = productRepository.findById(productId).orElseThrow();
         ShoppingCart shoppingCart = shoppingCartRepository.findById(shoppingCartId).orElseThrow();
-
 
         if (productRepository.findById(productId).isPresent() && shoppingCartRepository.findById(shoppingCartId).isPresent()) {
 
@@ -59,7 +77,6 @@ private final QuantityAndProductRepository quantityAndProductRepository;
             shoppingCart.setQuantityAndProductList(productsInShoppingCartObject);
             shoppingCart.setTotalPrice(shoppingCart.getTotalPrice() + product.getPrice() * productDto.getAmountOfProducts());
             shoppingCartRepository.save(shoppingCart);
-
 
             return TransferModelToDto.transferToShoppingCartDto(shoppingCart);
         } else {
@@ -90,15 +107,6 @@ private final QuantityAndProductRepository quantityAndProductRepository;
         } else {
             throw new RecordNotFoundException("You cannot delete a shopping cart that does not exists");
         }
-    }
-
-    @Override
-    public ShoppingCart transferToShoppingCart(ShoppingCartDto shoppingCartDto) {
-        ShoppingCart shoppingCart = new ShoppingCart();
-        shoppingCart.setId(shoppingCartDto.getId());
-        shoppingCart.setTotalPrice(shoppingCartDto.getTotalPrice());
-
-        return shoppingCart;
     }
 
 }

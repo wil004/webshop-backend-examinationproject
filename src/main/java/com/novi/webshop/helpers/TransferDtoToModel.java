@@ -40,7 +40,7 @@ public class TransferDtoToModel {
         return shoppingCart;
     }
 
-    public static Returns transferToReturnCart(ReturnsDto returnsDto) {
+    public static Returns transferToReturns(ReturnsDto returnsDto) {
         Returns returns = new Returns();
         returns.setTotalPrice(returnsDto.getTotalPrice());
         returns.setProcessed(returnsDto.isProcessed());
@@ -48,13 +48,13 @@ public class TransferDtoToModel {
         if (returnsDto.getOrderDto() != null) {
             returns.setCustomerOrder(transferToOrder(returnsDto.getOrderDto()));
         }
-        if(returnsDto.getReturnProductList() != null) {
+        if(returnsDto.getReturnedProducts() != null) {
             List<QuantityAndProduct> returnCartProductList = new ArrayList<>();
-            for (int i = 0; i < returnsDto.getReturnProductList().size(); i++) {
+            for (int i = 0; i < returnsDto.getReturnedProducts().size(); i++) {
                 QuantityAndProduct quantityAndProduct = new QuantityAndProduct();
-                quantityAndProduct.setProduct(TransferDtoToModel.transferToProduct(returnsDto.getReturnProductList().get(i)));
-                quantityAndProduct.setAmountOfProducts(returnsDto.getReturnProductList().get(i).getAmountOfProducts());
-                quantityAndProduct.setAmountOfReturningProducts(returnsDto.getReturnProductList().get(i).getAmountOfReturningProducts());
+                quantityAndProduct.setProduct(TransferDtoToModel.transferToProduct(returnsDto.getReturnedProducts().get(i)));
+                quantityAndProduct.setAmountOfProducts(returnsDto.getReturnedProducts().get(i).getAmountOfProducts());
+                quantityAndProduct.setAmountOfReturningProducts(returnsDto.getReturnedProducts().get(i).getAmountOfReturningProducts());
                 returnCartProductList.add(quantityAndProduct);
             }
             returns.setQuantityAndProductList(returnCartProductList);

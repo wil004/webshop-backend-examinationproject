@@ -7,6 +7,7 @@ import com.novi.webshop.helpers.TransferDtoToModel;
 import com.novi.webshop.helpers.TransferModelToDto;
 import com.novi.webshop.model.*;
 import com.novi.webshop.repository.CustomerRepository;
+import com.novi.webshop.security.JwtRequestFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class CustomerServiceImpl implements CustomerService {
@@ -41,6 +43,11 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public CustomerDto getCustomerById(Long id) {
+        if(!Objects.equals(userServiceImpl.findIdFromUsername(JwtRequestFilter.getUsername()), id) &&
+                !Objects.equals(userServiceImpl.findRoleFromUsername(JwtRequestFilter.getUsername()), "ADMIN") ||
+                !Objects.equals(userServiceImpl.findRoleFromUsername(JwtRequestFilter.getUsername()), "EMPLOYEE")) {
+            throw new RecordNotFoundException("Customer has only acces to his own data");
+        }
         Customer customer = customerRepository.findById(id).orElseThrow();
         if(customerRepository.findById(id).isPresent()) {
             return TransferModelToDto.transferToCustomerDto(customer);
@@ -51,6 +58,10 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public List<OrderDto> getCustomerOrderHistory(Long id) {
+        if(!Objects.equals(id, userServiceImpl.findIdFromUsername(JwtRequestFilter.getUsername())) && userServiceImpl.findRoleFromUsername(JwtRequestFilter.getUsername()) != "ADMIN" ||
+                userServiceImpl.findRoleFromUsername(JwtRequestFilter.getUsername()) != "EMPLOYEE") {
+                throw new RecordNotFoundException("Customer has only acces to his own data");
+        }
         Customer customer = customerRepository.findById(id).orElseThrow();
         List<OrderDto> orderDtoList = new ArrayList<>();
         if(customerRepository.findById(id).isPresent()) {
@@ -69,11 +80,12 @@ public class CustomerServiceImpl implements CustomerService {
             return createCustomerGuest(customerDto);
         }
     }
+
     @Override
     public CustomerDto createCustomerAccount(CustomerDto customerDto) {
                 Customer customer = TransferDtoToModel.transferToCustomer(customerDto);
-                if (!userServiceImpl.doesUsernameAlreadyExist(customer.getUsername())) {
-                    if(customer.getUsername() != null && customer.getPassword() != null && customer.getEmailAddress() != null) {
+                    if(customer.getUsername() != null && customer.getPassword() != null) {
+                        if (!userServiceImpl.doesUsernameAlreadyExist(customer.getUsername())) {
                         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
                         String password = passwordEncoder.encode(customerDto.getPassword());
                         customerDto.setPassword(password);
@@ -81,13 +93,12 @@ public class CustomerServiceImpl implements CustomerService {
                         Customer savedCustomer = customerRepository.save(customer);
                         shoppingCartServiceImpl.createShoppingCard(savedCustomer.getId());
                         return TransferModelToDto.transferToCustomerDto(savedCustomer);
+                    } else {
+                            throw new RecordNotFoundException("Username already exists!");
+                        }
+                    } else {
+                        throw new RecordNotFoundException("You need a username and a password to make an account!");
                     }
-                    else {
-                        throw new RecordNotFoundException("You need a username password and email-address to make an account!");
-                    }
-        } else {
-                    throw new RecordNotFoundException("Username already exists!");
-        }
             }
 
     @Override

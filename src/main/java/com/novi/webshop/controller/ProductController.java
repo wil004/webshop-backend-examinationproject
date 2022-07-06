@@ -42,18 +42,19 @@ public class ProductController {
         return ResponseEntity.ok(productServiceImpl.getProductsPriceRange(minimumPrice, maximumPrice));
     }
 
-    @PostMapping(consumes = { MediaType.APPLICATION_JSON_VALUE })
-        public ResponseEntity<ProductDto> createProduct(@RequestBody ProductDto productDto) {
-        final URI location = URI.create("/product" + productDto.getId());
-        return ResponseEntity.created(location).body(productServiceImpl.createProduct(productDto));
-        }
-
     @PutMapping(value = "/change/{id}/{type}",
             consumes = { MediaType.APPLICATION_JSON_VALUE })
     public ResponseEntity<ProductDto> updateTelevision(@PathVariable Long id , @PathVariable String type, @RequestBody ProductDto productDto) {
         return ResponseEntity.ok(productServiceImpl.changeProduct(id, type, productDto));
     }
 
+    @PostMapping(consumes = { MediaType.APPLICATION_JSON_VALUE })
+        public ResponseEntity<ProductDto> createProduct(@RequestBody ProductDto productDto) {
+        final URI location = URI.create("/product" + productDto.getId());
+        return ResponseEntity.created(location).body(productServiceImpl.createProduct(productDto));
+        }
+
+    // You can only delete a product before you created relationships!
     @DeleteMapping("/{id}")
     public void deleteProduct(@PathVariable Long id) {
         productServiceImpl.deleteProduct(id);

@@ -13,11 +13,13 @@ public interface EmployeeService {
 
     UserEmployeeDto processOrder(Long employeeId, Long orderId);
 
+    UserEmployeeDto processReturn(Long employeeId, Long returnId);
+
     UserEmployeeDto addOrderToEmployeeList(Long employeeId, Long orderId);
 
     List<UserEmployeeDto> divideOrdersOverEmployees();
 
-    public UserEmployeeDto addReturnsToEmployeeList(Long employeeId, Long returnsId);
+    UserEmployeeDto addReturnsToEmployeeList(Long employeeId, Long returnsId);
 
-    public List<UserEmployeeDto> divideReturnsOverEmployees();
+   List<UserEmployeeDto> divideReturnsOverEmployees();
 }

@@ -129,7 +129,7 @@ public class PDFGeneratorService {
                     "send a card with your return number with the products" + "\n" +
                     "Once we receive the products we will send the money to the following bankaccount" + "\n"
                     + returns.getBankAccountForReturn() +
-                     "The total price of your returns: €" + returns.getTotalPrice() + "\n" + "We will process your returns within 7 working days after receiving the products!" +
+                     "The total price of your returns: € " + returns.getTotalPrice() + "\n" + "We will process your returns within 7 working days after receiving the products!" +
                     "\n" + "\n");
 
             Paragraph productTitle = new Paragraph("RETURNED PRODUCTS", fontProductTitle);
@@ -139,8 +139,8 @@ public class PDFGeneratorService {
             for (int i = 0; i < returns.getQuantityAndProductList().size(); i++) {
                 returnsList = returnsList + "product: " + returns.getQuantityAndProductList().get(i).getProduct().getProductName() + "         |         " + "Price per piece: " +
                         returns.getQuantityAndProductList().get(i).getProduct().getPrice() + " | " +
-                        "Amount: " + returns.getQuantityAndProductList().get(i).getAmountOfProducts() + " | " +
-                        " Total price of returns: " + returns.getQuantityAndProductList().get(i).getProduct().getPrice() * returns.getQuantityAndProductList().get(i).getAmountOfProducts() + "\n";
+                        "Amount: " + returns.getQuantityAndProductList().get(i).getAmountOfReturningProducts() + " | " +
+                        " Total price of returns: " + returns.getTotalPrice() + "\n";
             }
             Paragraph products = new Paragraph(returnsList, fontProducts);
             products.setAlignment(Paragraph.ALIGN_CENTER);

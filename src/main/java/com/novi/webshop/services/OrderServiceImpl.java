@@ -3,32 +3,37 @@ package com.novi.webshop.services;
 import com.novi.webshop.controller.exceptions.RecordNotFoundException;
 import com.novi.webshop.dto.OrderDto;
 import com.novi.webshop.dto.ShoppingCartDto;
-import com.novi.webshop.helpers.TransferDtoToModel;
 import com.novi.webshop.helpers.TransferModelToDto;
 import com.novi.webshop.model.*;
 import com.novi.webshop.repository.*;
+import com.novi.webshop.security.JwtRequestFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class OrderServiceImpl implements OrderService{
 
     private final OrderRepository orderRepository;
+    private final ReturnsRepository returnsRepository;
     private final CustomerRepository customerRepository;
     private final EmployeeRepository employeeRepository;
     private final QuantityAndProductRepository quantityAndProductRepository;
     private final ProductRepository productRepository;
+    private final UserServiceImpl userServiceImpl;
 
     @Autowired
-    public OrderServiceImpl(OrderRepository orderRepository, CustomerRepository customerRepository, EmployeeRepository employeeRepository, QuantityAndProductRepository quantityAndProductRepository, ProductRepository productRepository) {
+    public OrderServiceImpl(OrderRepository orderRepository, ReturnsRepository returnsRepository, CustomerRepository customerRepository, EmployeeRepository employeeRepository, QuantityAndProductRepository quantityAndProductRepository, ProductRepository productRepository, UserServiceImpl userServiceImpl) {
         this.orderRepository = orderRepository;
+        this.returnsRepository = returnsRepository;
         this.customerRepository = customerRepository;
         this.employeeRepository = employeeRepository;
         this.quantityAndProductRepository = quantityAndProductRepository;
         this.productRepository = productRepository;
+        this.userServiceImpl = userServiceImpl;
     }
 
     @Override
@@ -55,27 +60,37 @@ public class OrderServiceImpl implements OrderService{
     }
 
     @Override
-    public OrderDto changeProcessedStatus(Long orderId, boolean processed) {
-        if(orderRepository.findById(orderId).isPresent()) {
-            Orders order = orderRepository.findById(orderId).orElseThrow();
-            if(order.isPaid()) {
-                deleteOrderInEmployee(orderId);
-                order.setProcessed(processed);
-                Orders savedOrder = orderRepository.save(order);
-                return TransferModelToDto.transferToOrderDto(savedOrder);
+    public Object changeProcessedStatus(Long id, boolean processed, String orderOrReturn) {
+        if(orderOrReturn.equalsIgnoreCase("order")) {
+            if (orderRepository.findById(id).isPresent()) {
+                Orders order = orderRepository.findById(id).orElseThrow();
+                if (order.isPaid()) {
+                    deleteOrderOrReturnInEmployee(id, orderOrReturn);
+                    order.setProcessed(processed);
+                    Orders savedOrder = orderRepository.save(order);
+                    return TransferModelToDto.transferToOrderDto(savedOrder);
+                } else {
+                    throw new RecordNotFoundException("Please check if the order is paid first!");
+                }
             } else {
-                throw new RecordNotFoundException("Please check if the order is paid first!");
+                throw new RecordNotFoundException("Couldn't find order");
             }
+        } else if(returnsRepository.findById(id).isPresent() && orderOrReturn.equalsIgnoreCase("return")) {
+            Returns returns = returnsRepository.findById(id).orElseThrow();
+            deleteOrderOrReturnInEmployee(id, orderOrReturn);
+            returns.setProcessed(processed);
+            Returns savedReturn = returnsRepository.save(returns);
+            return TransferModelToDto.transferToReturnsDto(savedReturn);
         }
         else {
-            throw new RecordNotFoundException("Couldn't find order");
+            throw new RecordNotFoundException("Couldn't find return");
         }
     }
 
-    private void deleteOrderInEmployee(Long orderId) {
-        if (orderRepository.findById(orderId).isPresent()) {
-            Orders order = orderRepository.findById(orderId).orElseThrow();
-            List<Employee> employeeList = employeeRepository.findAll();
+    private void deleteOrderOrReturnInEmployee(Long id, String orderOrReturn) {
+        List<Employee> employeeList = employeeRepository.findAll();
+        if (orderRepository.findById(id).isPresent() && orderOrReturn.equalsIgnoreCase("order")) {
+            Orders order = orderRepository.findById(id).orElseThrow();
             for (int i = 0; i < employeeList.size(); i++) {
                 for (int j = 0; j < employeeList.get(i).getOrderList().size(); j++) {
                     if (order.equals(employeeList.get(i).getOrderList().get(j))) {
@@ -83,6 +98,19 @@ public class OrderServiceImpl implements OrderService{
                         employeeRepository.save(employeeList.get(i));
                         order.setEmployeeOrderList(null);
                         orderRepository.save(order);
+                        break;
+                    }
+                }
+            }
+        } else if(returnsRepository.findById(id).isPresent() && orderOrReturn.equalsIgnoreCase("return")) {
+            Returns returns = returnsRepository.findById(id).orElseThrow();
+            for (int i = 0; i < employeeList.size(); i++) {
+                for (int j = 0; j < employeeList.get(i).getReturnsList().size(); j++) {
+                    if (returns.equals(employeeList.get(i).getReturnsList().get(j))) {
+                        employeeList.get(i).getReturnsList().remove(j);
+                        employeeRepository.save(employeeList.get(i));
+                        returns.setEmployeeReturnsList(null);
+                        returnsRepository.save(returns);
                         break;
                     }
                 }
@@ -175,7 +203,11 @@ public class OrderServiceImpl implements OrderService{
 
 
     @Override
-    public OrderDto createOrderFromCustomer(Long customerId) {
+    public OrderDto createOrder(Long customerId) {
+        if(!Objects.equals(customerId, userServiceImpl.findIdFromUsername(JwtRequestFilter.getUsername()))
+                && !Objects.equals(userServiceImpl.findRoleFromUsername(JwtRequestFilter.getUsername()), "ADMIN")) {
+            throw new RecordNotFoundException("Customer has only acces to his own data");
+        }
         Customer customer = customerRepository.findById(customerId).orElseThrow();
         List<QuantityAndProduct> quantityAndProductList = new ArrayList<>();
         Orders order = new Orders();
@@ -193,6 +225,7 @@ public class OrderServiceImpl implements OrderService{
                 quantityAndProductList.add(quantityAndProduct);
                 quantityAndProductList.get(i).setOrder(order);
             }
+
             order.setQuantityAndProductList(quantityAndProductList);
             List<Orders> orderHistory = customer.getOrderHistory();
             customer.getShoppingCart().setTotalPrice(0);
@@ -204,25 +237,26 @@ public class OrderServiceImpl implements OrderService{
             customerRepository.save(customer);
             OrderDto orderDto = TransferModelToDto.transferToOrderDto(savedOrder);
             orderDto.setCustomerDto(TransferModelToDto.transferToCustomerDto(customer));
+            orderDto.getCustomerDto().setOrderHistoryDto(null);
             return orderDto;
         } else {
             throw new RecordNotFoundException("Shoppingcart is empty");
         }
     }
 
+
+    // Code had to be duplicate because of the ShoppingCartDto parameter!
     @Override
     public OrderDto createOrderFromGuestCustomer(Long customerId, ShoppingCartDto shoppingCartDto) {
         Customer customer = customerRepository.findById(customerId).orElseThrow();
         List<QuantityAndProduct> quantityAndProductList = new ArrayList<>();
-
-
         Orders order = new Orders();
         order.setProcessed(false);
         order.setOrderDate(LocalDateTime.now());
         order.setOrderDateInMilliSeconds(System.currentTimeMillis());
         order.setCustomer(customer);
-        order.setTotalPrice(shoppingCartDto.getTotalPrice());
 
+        double totalPrice = 0;
         if(shoppingCartDto.getProductList().size() > 0) {
             for (int i = 0; i < shoppingCartDto.getProductList().size(); i++) {
                 if (productRepository.findById(shoppingCartDto.getProductList().get(i).getId()).isPresent()) {
@@ -231,6 +265,7 @@ public class OrderServiceImpl implements OrderService{
                     quantityAndProduct.setAmountOfProducts(shoppingCartDto.getProductList().get(i).getAmountOfProducts());
                     quantityAndProductList.add(quantityAndProduct);
                     quantityAndProductList.get(i).setOrder(order);
+                    totalPrice = totalPrice + quantityAndProduct.getAmountOfProducts() * quantityAndProduct.getProduct().getPrice();
                 } else {
                     throw new RecordNotFoundException("Product not found");
                 }
@@ -239,6 +274,11 @@ public class OrderServiceImpl implements OrderService{
                 }
             }
         }
+
+
+
+        order.setTotalPrice(totalPrice);
+
         if(shoppingCartDto.getProductList().size() > 0) {
             order.setQuantityAndProductList(quantityAndProductList);
         } else {
@@ -252,13 +292,8 @@ public class OrderServiceImpl implements OrderService{
         customerRepository.save(customer);
         OrderDto orderDto = TransferModelToDto.transferToOrderDto(savedOrder);
         orderDto.setCustomerDto(TransferModelToDto.transferToCustomerDto(customer));
+        orderDto.getCustomerDto().setOrderHistoryDto(null);
         return orderDto;
-    }
-
-    private void saveQuantityAndProduct(Orders order, QuantityAndProduct quantityAndProduct) {
-        quantityAndProduct.setOrder(order);
-        quantityAndProductRepository.save(quantityAndProduct);
-        orderRepository.save(order);
     }
 
 }

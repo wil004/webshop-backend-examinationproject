@@ -14,7 +14,9 @@ public class ReturnsDto {
 
     private OrderDto orderDto;
 
-    private List<ProductDto> returnProductList;
+    private List<ProductDto> returnedProducts;
+
+    private List<ProductDto> finishedReturnedProducts;
 
     public Long getId() {
         return id;
@@ -56,12 +58,20 @@ public class ReturnsDto {
         this.orderDto = orderDto;
     }
 
-    public List<ProductDto> getReturnProductList() {
-        return returnProductList;
+    public List<ProductDto> getReturnedProducts() {
+        return returnedProducts;
     }
 
-    public void setReturnProductList(List<ProductDto> returnProductList) {
-        this.returnProductList = returnProductList;
+    public void setReturnedProducts(List<ProductDto> returnedProducts) {
+        this.returnedProducts = returnedProducts;
+    }
+
+    public List<ProductDto> getFinishedReturnedProducts() {
+        return finishedReturnedProducts;
+    }
+
+    public void setFinishedReturnedProducts(List<ProductDto> finishedReturnedProducts) {
+        this.finishedReturnedProducts = finishedReturnedProducts;
     }
 }
 

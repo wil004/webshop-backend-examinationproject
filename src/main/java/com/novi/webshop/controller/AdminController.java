@@ -21,10 +21,10 @@ public class AdminController {
         this.adminServiceImpl = adminServiceImpl;
     }
 
-    @PostMapping(path = "create-employee/admin={adminId}", consumes = { MediaType.APPLICATION_JSON_VALUE })
-    public ResponseEntity<UserEmployeeDto> createEmployeeAccount(@PathVariable Long adminId, @RequestBody UserEmployeeInputDto userEmployeeInputDto) {
+    @PostMapping(path = "create-employee", consumes = { MediaType.APPLICATION_JSON_VALUE })
+    public ResponseEntity<UserEmployeeDto> createEmployeeAccount( @RequestBody UserEmployeeInputDto userEmployeeInputDto) {
         final URI location = URI.create("/employee" + userEmployeeInputDto.getUsername());
-        return ResponseEntity.created(location).body(adminServiceImpl.createEmployeeAccount(userEmployeeInputDto, adminId));
+        return ResponseEntity.created(location).body(adminServiceImpl.createEmployeeAccount(userEmployeeInputDto));
     }
 
     @PostMapping(path = "create-admin", consumes = { MediaType.APPLICATION_JSON_VALUE })

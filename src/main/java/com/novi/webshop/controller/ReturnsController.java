@@ -42,13 +42,13 @@ public class ReturnsController {
         return ResponseEntity.ok(returnCartServiceImpl.getReturnByNameAndAddress(firstName, lastName, zipcode, houseNumber, additionalHouseNumber));
     }
 
-    @PutMapping(value = "change-processed-status={processed}/id={id}",
+    @PutMapping(value = "/change-processed-status={processed}/id={id}",
             consumes = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<ReturnsDto> changeProcessedStatus(@PathVariable Long id, @PathVariable boolean processed) {
         return ResponseEntity.ok(returnCartServiceImpl.changeProcessedStatus(id, processed));
     }
 
-    @PutMapping(value = "id={returnCartId}/productid={productId}",
+    @PutMapping(value = "/id={returnCartId}/productid={productId}",
             consumes = { MediaType.APPLICATION_JSON_VALUE })
     public ResponseEntity<ReturnsDto> addProductToReturnCart(@PathVariable Long returnCartId , @PathVariable Long productId, @RequestBody ProductDto productDto) {
         return ResponseEntity.ok(returnCartServiceImpl.connectProductWithReturn(returnCartId, productId, productDto));
