@@ -1,5 +1,5 @@
 <img width="588" alt="image" src="https://user-images.githubusercontent.com/79720969/177656306-cefed91e-57f3-45ff-905f-0b6a76300e9c.png">
-<img width="596" alt="image" src="https://user-images.githubusercontent.com/79720969/178163533-bbc83fb8-7156-4ad9-9f9a-a3079111a336.png">
+<img width="595" alt="image" src="https://user-images.githubusercontent.com/79720969/178163572-62de0feb-1539-4ed9-be8d-37cc131a99a4.png">
 *For the urls you need the pdf file! Contact me for the real pdf file!*
 <img width="596" alt="image" src="https://user-images.githubusercontent.com/79720969/178163554-30e023f7-4ada-4b93-b2c4-6eab611b6815.png">
 <img width="594" alt="image" src="https://user-images.githubusercontent.com/79720969/177656428-3d3ba5a2-9586-4407-a973-4251116df502.png">
