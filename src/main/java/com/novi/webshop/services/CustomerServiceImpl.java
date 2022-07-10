@@ -23,12 +23,16 @@ public class CustomerServiceImpl implements CustomerService {
     private final CustomerRepository customerRepository;
     private final UserServiceImpl userServiceImpl;
     private final ShoppingCartServiceImpl shoppingCartServiceImpl;
+    private final TransferModelToDto transferModelToDto;
+    private final TransferDtoToModel transferDtoToModel;
 
     @Autowired
-    public CustomerServiceImpl(CustomerRepository customerRepository, UserServiceImpl userServiceImpl, ShoppingCartServiceImpl shoppingCartServiceImpl) {
+    public CustomerServiceImpl(CustomerRepository customerRepository, UserServiceImpl userServiceImpl, ShoppingCartServiceImpl shoppingCartServiceImpl, TransferModelToDto transferModelToDto, TransferDtoToModel transferDtoToModel) {
         this.customerRepository = customerRepository;
         this.userServiceImpl = userServiceImpl;
         this.shoppingCartServiceImpl = shoppingCartServiceImpl;
+        this.transferModelToDto = transferModelToDto;
+        this.transferDtoToModel = transferDtoToModel;
     }
 
     @Override
@@ -36,7 +40,7 @@ public class CustomerServiceImpl implements CustomerService {
         List<Customer> allCustomerList = new ArrayList<>(customerRepository.findAll());
         List<CustomerDto> allCustomerDtoList = new ArrayList<>();
         for (Customer customer : allCustomerList) {
-            allCustomerDtoList.add(TransferModelToDto.transferToCustomerDto(customer));
+            allCustomerDtoList.add(transferModelToDto.transferToCustomerDto(customer));
         }
         return allCustomerDtoList;
     }
@@ -50,7 +54,7 @@ public class CustomerServiceImpl implements CustomerService {
         }
         Customer customer = customerRepository.findById(id).orElseThrow();
         if(customerRepository.findById(id).isPresent()) {
-            return TransferModelToDto.transferToCustomerDto(customer);
+            return transferModelToDto.transferToCustomerDto(customer);
         } else {
             throw new RecordNotFoundException("Couldn't find customer");
         }
@@ -66,7 +70,7 @@ public class CustomerServiceImpl implements CustomerService {
         List<OrderDto> orderDtoList = new ArrayList<>();
         if(customerRepository.findById(id).isPresent()) {
             for (int i = 0; i < customer.getOrderHistory().size(); i++) {
-                orderDtoList.add(TransferModelToDto.transferToOrderDto(customer.getOrderHistory().get(i)));
+                orderDtoList.add(transferModelToDto.transferToOrderDto(customer.getOrderHistory().get(i)));
             }
         }
         return orderDtoList;
@@ -83,7 +87,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public CustomerDto createCustomerAccount(CustomerDto customerDto) {
-                Customer customer = TransferDtoToModel.transferToCustomer(customerDto);
+                Customer customer = transferDtoToModel.transferToCustomer(customerDto);
                     if(customer.getUsername() != null && customer.getPassword() != null) {
                         if (!userServiceImpl.doesUsernameAlreadyExist(customer.getUsername())) {
                         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
@@ -92,7 +96,7 @@ public class CustomerServiceImpl implements CustomerService {
                         customer.setPassword(customerDto.getPassword());
                         Customer savedCustomer = customerRepository.save(customer);
                         shoppingCartServiceImpl.createShoppingCard(savedCustomer.getId());
-                        return TransferModelToDto.transferToCustomerDto(savedCustomer);
+                        return transferModelToDto.transferToCustomerDto(savedCustomer);
                     } else {
                             throw new RecordNotFoundException("Username already exists!");
                         }
@@ -103,9 +107,9 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public CustomerDto createCustomerGuest(CustomerDto customerDto) {
-        Customer customer = TransferDtoToModel.transferToCustomer(customerDto);
+        Customer customer = transferDtoToModel.transferToCustomer(customerDto);
         final Customer savedCustomer = customerRepository.save(customer);
-        return TransferModelToDto.transferToCustomerDto(savedCustomer);
+        return transferModelToDto.transferToCustomerDto(savedCustomer);
     }
 
 }

@@ -24,9 +24,10 @@ public class OrderServiceImpl implements OrderService{
     private final QuantityAndProductRepository quantityAndProductRepository;
     private final ProductRepository productRepository;
     private final UserServiceImpl userServiceImpl;
+    private final TransferModelToDto transferModelToDto;
 
     @Autowired
-    public OrderServiceImpl(OrderRepository orderRepository, ReturnsRepository returnsRepository, CustomerRepository customerRepository, EmployeeRepository employeeRepository, QuantityAndProductRepository quantityAndProductRepository, ProductRepository productRepository, UserServiceImpl userServiceImpl) {
+    public OrderServiceImpl(OrderRepository orderRepository, ReturnsRepository returnsRepository, CustomerRepository customerRepository, EmployeeRepository employeeRepository, QuantityAndProductRepository quantityAndProductRepository, ProductRepository productRepository, UserServiceImpl userServiceImpl, TransferModelToDto transferModelToDto) {
         this.orderRepository = orderRepository;
         this.returnsRepository = returnsRepository;
         this.customerRepository = customerRepository;
@@ -34,6 +35,7 @@ public class OrderServiceImpl implements OrderService{
         this.quantityAndProductRepository = quantityAndProductRepository;
         this.productRepository = productRepository;
         this.userServiceImpl = userServiceImpl;
+        this.transferModelToDto = transferModelToDto;
     }
 
     @Override
@@ -41,7 +43,7 @@ public class OrderServiceImpl implements OrderService{
         List<Orders> orderList = orderRepository.findAll();
         List<OrderDto> orderDtoList = new ArrayList<>();
         for (int i = 0; i < orderList.size(); i++) {
-            orderDtoList.add(TransferModelToDto.transferToOrderDto(orderList.get(i)));;
+            orderDtoList.add(transferModelToDto.transferToOrderDto(orderList.get(i)));;
         }
 
         return orderDtoList;
@@ -53,7 +55,7 @@ public class OrderServiceImpl implements OrderService{
         if(orderRepository.findById(orderId).isPresent()) {
             order.setPaid(true);
         Orders savedOrder = orderRepository.save(order);
-        return TransferModelToDto.transferToOrderDto(savedOrder);
+        return transferModelToDto.transferToOrderDto(savedOrder);
         } else {
             throw new RecordNotFoundException("Order doesn't exist");
         }
@@ -65,10 +67,12 @@ public class OrderServiceImpl implements OrderService{
             if (orderRepository.findById(id).isPresent()) {
                 Orders order = orderRepository.findById(id).orElseThrow();
                 if (order.isPaid()) {
-                    deleteOrderOrReturnInEmployee(id, orderOrReturn);
+                    if(employeeRepository.findAll().get(0) != null) {
+                        deleteOrderOrReturnInEmployee(id, orderOrReturn);
+                    }
                     order.setProcessed(processed);
                     Orders savedOrder = orderRepository.save(order);
-                    return TransferModelToDto.transferToOrderDto(savedOrder);
+                    return transferModelToDto.transferToOrderDto(savedOrder);
                 } else {
                     throw new RecordNotFoundException("Please check if the order is paid first!");
                 }
@@ -77,10 +81,12 @@ public class OrderServiceImpl implements OrderService{
             }
         } else if(returnsRepository.findById(id).isPresent() && orderOrReturn.equalsIgnoreCase("return")) {
             Returns returns = returnsRepository.findById(id).orElseThrow();
-            deleteOrderOrReturnInEmployee(id, orderOrReturn);
+            if(employeeRepository.findAll().get(0) != null) {
+                deleteOrderOrReturnInEmployee(id, orderOrReturn);
+            }
             returns.setProcessed(processed);
             Returns savedReturn = returnsRepository.save(returns);
-            return TransferModelToDto.transferToReturnsDto(savedReturn);
+            return transferModelToDto.transferToReturnsDto(savedReturn);
         }
         else {
             throw new RecordNotFoundException("Couldn't find return");
@@ -143,7 +149,7 @@ public class OrderServiceImpl implements OrderService{
         }
         List<OrderDto> orderDtoList = new ArrayList<>();
         for (int i = 0; i < allOrdersWithProcessedStatus.size(); i++) {
-            orderDtoList.add(TransferModelToDto.transferToOrderDto(allOrdersWithProcessedStatus.get(i)));
+            orderDtoList.add(transferModelToDto.transferToOrderDto(allOrdersWithProcessedStatus.get(i)));
         }
         return orderDtoList;
     }
@@ -153,7 +159,7 @@ public class OrderServiceImpl implements OrderService{
         Orders order = orderRepository.findById(id).orElseThrow();
         if(orderRepository.findById(id).isPresent()) {
             System.out.println(order);
-            return TransferModelToDto.transferToOrderDto(order);
+            return transferModelToDto.transferToOrderDto(order);
         } else {
             throw new RecordNotFoundException("Couldn't find order");
         }
@@ -175,7 +181,7 @@ public class OrderServiceImpl implements OrderService{
         }
         List<OrderDto> orderDtoList = new ArrayList<>();
         for (int i = 0; i < foundOrders.size(); i++) {
-            orderDtoList.add(TransferModelToDto.transferToOrderDto(foundOrders.get(i)));
+            orderDtoList.add(transferModelToDto.transferToOrderDto(foundOrders.get(i)));
         }
         return orderDtoList;
     }
@@ -196,7 +202,7 @@ public class OrderServiceImpl implements OrderService{
         }
         List<OrderDto> orderDtoList = new ArrayList<>();
         for (int i = 0; i < foundOrders.size(); i++) {
-            orderDtoList.add(TransferModelToDto.transferToOrderDto(foundOrders.get(i)));
+            orderDtoList.add(transferModelToDto.transferToOrderDto(foundOrders.get(i)));
         }
         return orderDtoList;
     }
@@ -204,10 +210,10 @@ public class OrderServiceImpl implements OrderService{
 
     @Override
     public OrderDto createOrder(Long customerId) {
-        if(!Objects.equals(customerId, userServiceImpl.findIdFromUsername(JwtRequestFilter.getUsername()))
-                && !Objects.equals(userServiceImpl.findRoleFromUsername(JwtRequestFilter.getUsername()), "ADMIN")) {
-            throw new RecordNotFoundException("Customer has only acces to his own data");
-        }
+            if (!Objects.equals(customerId, userServiceImpl.findIdFromUsername(JwtRequestFilter.getUsername()))
+                    && !Objects.equals(userServiceImpl.findRoleFromUsername(JwtRequestFilter.getUsername()), "ADMIN")) {
+                throw new RecordNotFoundException("Customer has only acces to his own data");
+            }
         Customer customer = customerRepository.findById(customerId).orElseThrow();
         List<QuantityAndProduct> quantityAndProductList = new ArrayList<>();
         Orders order = new Orders();
@@ -235,8 +241,8 @@ public class OrderServiceImpl implements OrderService{
             quantityAndProductRepository.saveAll(quantityAndProductList);
             Orders savedOrder = orderRepository.save(order);
             customerRepository.save(customer);
-            OrderDto orderDto = TransferModelToDto.transferToOrderDto(savedOrder);
-            orderDto.setCustomerDto(TransferModelToDto.transferToCustomerDto(customer));
+            OrderDto orderDto = transferModelToDto.transferToOrderDto(savedOrder);
+            orderDto.setCustomerDto(transferModelToDto.transferToCustomerDto(customer));
             orderDto.getCustomerDto().setOrderHistoryDto(null);
             return orderDto;
         } else {
@@ -290,8 +296,8 @@ public class OrderServiceImpl implements OrderService{
         quantityAndProductRepository.saveAll(quantityAndProductList);
         Orders savedOrder = orderRepository.save(order);
         customerRepository.save(customer);
-        OrderDto orderDto = TransferModelToDto.transferToOrderDto(savedOrder);
-        orderDto.setCustomerDto(TransferModelToDto.transferToCustomerDto(customer));
+        OrderDto orderDto = transferModelToDto.transferToOrderDto(savedOrder);
+        orderDto.setCustomerDto(transferModelToDto.transferToCustomerDto(customer));
         orderDto.getCustomerDto().setOrderHistoryDto(null);
         return orderDto;
     }

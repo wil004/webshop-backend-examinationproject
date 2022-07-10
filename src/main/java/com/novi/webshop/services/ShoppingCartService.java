@@ -8,6 +8,4 @@ public interface ShoppingCartService {
     ShoppingCartDto connectProductWithShoppingCart(Long shoppingCartId, Long productId, ProductDto productDto);
 
     ShoppingCartDto createShoppingCard(Long customerId);
-
-    void deleteShoppingCart(Long id);
 }

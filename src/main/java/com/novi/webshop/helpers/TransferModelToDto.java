@@ -2,13 +2,15 @@ package com.novi.webshop.helpers;
 
 import com.novi.webshop.dto.*;
 import com.novi.webshop.model.*;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Component
 public class TransferModelToDto {
 
-    public static CustomerDto transferToCustomerDto(Customer customer) {
+    public CustomerDto transferToCustomerDto(Customer customer) {
         CustomerDto customerDto = new CustomerDto();
         customerDto.setId(customer.getId());
         customerDto.setEmailAddress(customer.getEmailAddress());
@@ -26,7 +28,7 @@ public class TransferModelToDto {
         if(customer.getOrderHistory() != null) {
             List<OrderDto> orderHistoryList = new ArrayList<>();
             for (int i = 0; i < customer.getOrderHistory().size(); i++) {
-                OrderDto orderDto = TransferModelToDto.transferToOrderDto(customer.getOrderHistory().get(i));
+                OrderDto orderDto = transferToOrderDto(customer.getOrderHistory().get(i));
 
                orderHistoryList.add(orderDto);
                orderHistoryList.get(i).setCustomerDto(null);
@@ -37,7 +39,7 @@ public class TransferModelToDto {
         return customerDto;
     }
 
-    public static ShoppingCartDto transferToShoppingCartDto(ShoppingCart shoppingCart) {
+    public ShoppingCartDto transferToShoppingCartDto(ShoppingCart shoppingCart) {
         ShoppingCartDto shoppingCartDto = new ShoppingCartDto();
         shoppingCartDto.setId(shoppingCart.getId());
         shoppingCartDto.setTotalPrice(shoppingCart.getTotalPrice());
@@ -52,13 +54,13 @@ public class TransferModelToDto {
         return shoppingCartDto;
     }
 
-    public static ReturnsDto transferToReturnsDto(Returns returns) {
+    public ReturnsDto transferToReturnsDto(Returns returns) {
         ReturnsDto returnsDto = new ReturnsDto();
         returnsDto.setId(returns.getId());
         returnsDto.setTotalPrice(returns.getTotalPrice());
         returnsDto.setProcessed(returns.isProcessed());
         returnsDto.setBankAccountForReturn(returns.getBankAccountForReturn());
-        returnsDto.setOrderDto(TransferModelToDto.transferToOrderDto(returns.getCustomerOrder()));
+        returnsDto.setOrderDto(transferToOrderDto(returns.getCustomerOrder()));
         if(returns.getQuantityAndProductList() != null) {
             List<ProductDto> returnCartDtoProductList = new ArrayList<>();
             for (int i = 0; i < returns.getQuantityAndProductList().size(); i++) {
@@ -71,7 +73,7 @@ public class TransferModelToDto {
         return returnsDto;
     }
 
-    public static ProductDto transferToProductDto(Product product) {
+    public ProductDto transferToProductDto(Product product) {
         ProductDto productDto = new ProductDto();
         productDto.setId(product.getId());
         productDto.setProductName(product.getProductName());
@@ -82,7 +84,7 @@ public class TransferModelToDto {
     }
 
 
-    public static OrderDto transferToOrderDto(Orders order) {
+    public OrderDto transferToOrderDto(Orders order) {
         OrderDto orderDto = new OrderDto();
         orderDto.setId(order.getId());
         orderDto.setProcessed(order.isProcessed());
@@ -116,7 +118,7 @@ public class TransferModelToDto {
         return orderDto;
     }
 
-    public static UserEmployeeDto transferToUserEmployeeDto(Employee employee) {
+    public UserEmployeeDto transferToUserEmployeeDto(Employee employee) {
         UserEmployeeDto userEmployeeDto = new UserEmployeeDto();
         userEmployeeDto.setId(employee.getId());
         userEmployeeDto.setUsername(employee.getUsername());
@@ -126,21 +128,21 @@ public class TransferModelToDto {
         List<OrderDto> orderDtoList = new ArrayList<>();
         if(employee.getOrderList() != null && employee.getOrderList().size() > 0) {
             for (int i = 0; i < employee.getOrderList().size(); i++) {
-                orderDtoList.add(TransferModelToDto.transferToOrderDto(employee.getOrderList().get(i)));
+                orderDtoList.add(transferToOrderDto(employee.getOrderList().get(i)));
             }
             userEmployeeDto.setOrderDtoList(orderDtoList);
         }
         if(employee.getFinishedOrders() != null && employee.getFinishedOrders().size() > 0) {
             List<OrderDto> orderDtoList2 = new ArrayList<>();
             for (int i = 0; i < employee.getFinishedOrders().size(); i++) {
-                orderDtoList2.add(TransferModelToDto.transferToOrderDto(employee.getFinishedOrders().get(i)));
+                orderDtoList2.add(transferToOrderDto(employee.getFinishedOrders().get(i)));
             }
             userEmployeeDto.setFinishedOrders(orderDtoList2);
         }
         if(employee.getReturnsList() != null && employee.getReturnsList().size() > 0) {
             List<ReturnsDto> returnsDtoList = new ArrayList<>();
             for (int i = 0; i < employee.getReturnsList().size(); i++) {
-                returnsDtoList.add(TransferModelToDto.transferToReturnsDto(employee.getReturnsList().get(i)));
+                returnsDtoList.add(transferToReturnsDto(employee.getReturnsList().get(i)));
             }
             userEmployeeDto.setReturnCartDtoList(returnsDtoList);
         }
@@ -148,7 +150,7 @@ public class TransferModelToDto {
         if(employee.getFinishedReturns() != null && employee.getFinishedReturns().size() > 0) {
             List<ReturnsDto> returnsDtoList2 = new ArrayList<>();
             for (int i = 0; i < employee.getFinishedOrders().size(); i++) {
-                returnsDtoList2.add(TransferModelToDto.transferToReturnsDto(employee.getFinishedReturns().get(i)));
+                returnsDtoList2.add(transferToReturnsDto(employee.getFinishedReturns().get(i)));
             }
             userEmployeeDto.setFinishedReturns(returnsDtoList2);
         }

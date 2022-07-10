@@ -23,16 +23,12 @@ public class UserServiceImpl implements UserService {
     private final AdminRepository adminRepository;
     private final EmployeeRepository employeeRepository;
     private final CustomerRepository customerRepository;
-    private final JwtService jwtService;
-    private final JwtRequestFilter jwtRequestFilter;
 
 
-    public UserServiceImpl(AdminRepository adminRepository, EmployeeRepository employeeRepository, CustomerRepository customerRepository, JwtService jwtService, JwtRequestFilter jwtRequestFilter) {
+    public UserServiceImpl(AdminRepository adminRepository, EmployeeRepository employeeRepository, CustomerRepository customerRepository) {
         this.adminRepository = adminRepository;
         this.employeeRepository = employeeRepository;
         this.customerRepository = customerRepository;
-        this.jwtService = jwtService;
-        this.jwtRequestFilter = jwtRequestFilter;
     }
 
     @Override

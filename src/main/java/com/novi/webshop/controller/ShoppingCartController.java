@@ -18,13 +18,8 @@ public class ShoppingCartController {
     }
 
     @PutMapping(value = "id={customerId}/productid={productId}",
-            consumes = { MediaType.APPLICATION_JSON_VALUE })
-    public ResponseEntity<ShoppingCartDto> addProductToShoppingCart(@PathVariable Long customerId ,@PathVariable Long productId, @RequestBody ProductDto productDto) {
+            consumes = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<ShoppingCartDto> addProductToShoppingCart(@PathVariable Long customerId, @PathVariable Long productId, @RequestBody ProductDto productDto) {
         return ResponseEntity.ok(shoppingCartServiceImpl.connectProductWithShoppingCart(customerId, productId, productDto));
-    }
-
-    @DeleteMapping("/{id}")
-    public void deleteShoppingCart(@PathVariable long id) {
-        shoppingCartServiceImpl.deleteShoppingCart(id);
     }
 }

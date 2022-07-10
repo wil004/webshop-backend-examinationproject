@@ -28,15 +28,17 @@ public class EmployeeServiceImpl implements EmployeeService {
     private final ReturnsService returnsService;
     private final ReturnsRepository returnsRepository;
     private final UserServiceImpl userServiceImpl;
+    private final TransferModelToDto transferModelToDto;
 
     @Autowired
-    public EmployeeServiceImpl(EmployeeRepository employeeRepository, OrderServiceImpl orderService, OrderRepository orderRepository, ReturnsService returnsService, ReturnsRepository returnsRepository, UserServiceImpl userServiceImpl) {
+    public EmployeeServiceImpl(EmployeeRepository employeeRepository, OrderServiceImpl orderService, OrderRepository orderRepository, ReturnsService returnsService, ReturnsRepository returnsRepository, UserServiceImpl userServiceImpl, TransferModelToDto transferModelToDto) {
         this.employeeRepository = employeeRepository;
         this.orderService = orderService;
         this.orderRepository = orderRepository;
         this.returnsService = returnsService;
         this.returnsRepository = returnsRepository;
         this.userServiceImpl = userServiceImpl;
+        this.transferModelToDto = transferModelToDto;
     }
 
     @Override
@@ -44,7 +46,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         List<Employee> employeeList = employeeRepository.findAll();
         List<UserEmployeeDto> employeeDtoList = new ArrayList<>();
         for(int i = 0; i < employeeList.size(); i++) {
-            employeeDtoList.add(TransferModelToDto.transferToUserEmployeeDto(employeeList.get(i)));
+            employeeDtoList.add(transferModelToDto.transferToUserEmployeeDto(employeeList.get(i)));
         }
         return employeeDtoList;
     }
@@ -56,7 +58,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
         if(employeeRepository.findById(employeeId).isPresent()) {
             Employee employee = employeeRepository.findById(employeeId).orElseThrow();
-            return TransferModelToDto.transferToUserEmployeeDto(employee);
+            return transferModelToDto.transferToUserEmployeeDto(employee);
         } else {
             throw new RecordNotFoundException("Employee doesn't exist");
         }
@@ -79,7 +81,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                     if(!orders.get(i).isPaid()) {
                         throw new RecordNotFoundException("Wait till the order is paid! skip this order for now!");
                     }
-                    return TransferModelToDto.transferToUserEmployeeDto(savedEmployee);
+                    return transferModelToDto.transferToUserEmployeeDto(savedEmployee);
                 }
             } throw new RecordNotFoundException("Couldn't find the order in this employee");
         } else {
@@ -106,7 +108,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                     order.setEmployeeOrderList(null);
                     orderRepository.save(order);
                     Employee savedEmployee = employeeRepository.save(employee);
-                    return TransferModelToDto.transferToUserEmployeeDto(savedEmployee);
+                    return transferModelToDto.transferToUserEmployeeDto(savedEmployee);
                 }
             } throw new RecordNotFoundException("Couldn't find the order in this employee");
         } else {
@@ -133,7 +135,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                     returns.setEmployeeReturnsList(null);
                     returnsRepository.save(returns);
                     Employee savedEmployee = employeeRepository.save(employee);
-                    return TransferModelToDto.transferToUserEmployeeDto(savedEmployee);
+                    return transferModelToDto.transferToUserEmployeeDto(savedEmployee);
                 }
             } throw new RecordNotFoundException("Couldn't find the order in this employee");
         } else {
@@ -153,7 +155,7 @@ public class EmployeeServiceImpl implements EmployeeService {
             orderList.add(order);
             employee.setOrderList(orderList);
             employeeRepository.save(employee);
-            return TransferModelToDto.transferToUserEmployeeDto(employee);
+            return transferModelToDto.transferToUserEmployeeDto(employee);
         } else {
             throw new RecordNotFoundException("Employee or order doesn't exist");
         }
@@ -185,7 +187,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
         List<UserEmployeeDto> employeeDtoList = new ArrayList<>();
         for(int i = 0; i < employeeList.size(); i++) {
-            employeeDtoList.add(TransferModelToDto.transferToUserEmployeeDto(employeeList.get(i)));
+            employeeDtoList.add(transferModelToDto.transferToUserEmployeeDto(employeeList.get(i)));
         }
         return employeeDtoList;
     }
@@ -201,7 +203,7 @@ public class EmployeeServiceImpl implements EmployeeService {
             returnsList.add(returns);
             employee.setReturnsList(returnsList);
             employeeRepository.save(employee);
-            return TransferModelToDto.transferToUserEmployeeDto(employee);
+            return transferModelToDto.transferToUserEmployeeDto(employee);
         } else {
             throw new RecordNotFoundException("Employee or returns doesn't exist");
         }
@@ -233,7 +235,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
         List<UserEmployeeDto> employeeDtoList = new ArrayList<>();
         for(int i = 0; i < employeeList.size(); i++) {
-            employeeDtoList.add(TransferModelToDto.transferToUserEmployeeDto(employeeList.get(i)));
+            employeeDtoList.add(transferModelToDto.transferToUserEmployeeDto(employeeList.get(i)));
         }
         return employeeDtoList;
     }

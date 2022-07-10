@@ -13,6 +13,7 @@ public class Product {
 
     @NotNull
     private String productName;
+
     private String category;
 
     @NotNull

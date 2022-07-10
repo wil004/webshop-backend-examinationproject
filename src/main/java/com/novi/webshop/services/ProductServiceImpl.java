@@ -16,10 +16,14 @@ import java.util.List;
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
+    private final TransferModelToDto transferModelToDto;
+    private final TransferDtoToModel transferDtoToModel;
 
     @Autowired
-    public ProductServiceImpl(ProductRepository productRepository) {
+    public ProductServiceImpl(ProductRepository productRepository, TransferModelToDto transferModelToDto, TransferDtoToModel transferDtoToModel) {
         this.productRepository = productRepository;
+        this.transferModelToDto = transferModelToDto;
+        this.transferDtoToModel = transferDtoToModel;
     }
 
     @Override
@@ -27,7 +31,7 @@ public class ProductServiceImpl implements ProductService {
         List<Product> allProductList = new ArrayList<>(productRepository.findAll());
         List<ProductDto> allProductDtoList = new ArrayList<>();
         for (Product allProduct : allProductList) {
-            allProductDtoList.add(TransferModelToDto.transferToProductDto(allProduct));
+            allProductDtoList.add(transferModelToDto.transferToProductDto(allProduct));
         }
         return allProductDtoList;
     }
@@ -37,7 +41,7 @@ public class ProductServiceImpl implements ProductService {
         List<Product> allProductList = new ArrayList<>(productRepository.findAll());
         for (Product product : allProductList) {
             if (product.getProductName().equalsIgnoreCase(productName)) {
-                return TransferModelToDto.transferToProductDto(product);
+                return transferModelToDto.transferToProductDto(product);
             }
         }
         // Doesn't return a RecordNotFoundException because this method is nested in the createProduct method!
@@ -50,7 +54,7 @@ public class ProductServiceImpl implements ProductService {
         if(productRepository.findById(productId).isPresent()) {
             product.setProductPictureUrl(downloadUrl);
             Product savedProduct = productRepository.save(product);
-            return TransferModelToDto.transferToProductDto(savedProduct);
+            return transferModelToDto.transferToProductDto(savedProduct);
         } else {
             throw new RecordNotFoundException("Couldn't find product");
         }
@@ -62,7 +66,7 @@ public class ProductServiceImpl implements ProductService {
         List<ProductDto> allProductDtoList = new ArrayList<>();
         for (int i = 0; i < allProductList.size(); i++) {
             if(allProductList.get(i).getCategory().equalsIgnoreCase(categoryName)) {
-                allProductDtoList.add(TransferModelToDto.transferToProductDto(allProductList.get(i)));
+                allProductDtoList.add(transferModelToDto.transferToProductDto(allProductList.get(i)));
             }
         }
         if(allProductDtoList.size() > 0) {
@@ -78,7 +82,7 @@ public class ProductServiceImpl implements ProductService {
         List<ProductDto> allProductDtoList = new ArrayList<>();
         for (int i = 0; i < allProductList.size(); i++) {
             if (allProductList.get(i).getPrice() > minimumPrice && allProductList.get(i).getPrice() < maximumPrice) {
-                allProductDtoList.add(TransferModelToDto.transferToProductDto(allProductList.get(i)));
+                allProductDtoList.add(transferModelToDto.transferToProductDto(allProductList.get(i)));
             }
         }
         if (allProductDtoList.size() > 0) {
@@ -93,10 +97,10 @@ public class ProductServiceImpl implements ProductService {
         if (getProductByName(productDto.getProductName()) != null) {
             throw new RecordNotFoundException("Product already exists");
         } else {
-            Product product = TransferDtoToModel.transferToProduct(productDto);
-            final Product savedProduct = productRepository.save(product);
+            Product product = transferDtoToModel.transferToProduct(productDto);
+            Product savedProduct = productRepository.save(product);
 
-            return TransferModelToDto.transferToProductDto(savedProduct);
+            return transferModelToDto.transferToProductDto(savedProduct);
         }
     }
 
