@@ -27,15 +27,16 @@ public class ReturnsServiceImpl implements ReturnsService {
     private final ProductRepository productRepository;
     private final QuantityAndProductRepository quantityAndProductRepository;
     private final OrderRepository orderRepository;
-
+    private final TransferModelToDto transferModelToDto;
     private final OrderServiceImpl orderServiceImpl;
 
     @Autowired
-    public ReturnsServiceImpl(ReturnsRepository returnsRepository, ProductRepository productRepository, QuantityAndProductRepository quantityAndProductRepository, OrderRepository orderRepository, OrderServiceImpl orderServiceImpl) {
+    public ReturnsServiceImpl(ReturnsRepository returnsRepository, ProductRepository productRepository, QuantityAndProductRepository quantityAndProductRepository, OrderRepository orderRepository, TransferModelToDto transferModelToDto, OrderServiceImpl orderServiceImpl) {
         this.returnsRepository = returnsRepository;
         this.productRepository = productRepository;
         this.quantityAndProductRepository = quantityAndProductRepository;
         this.orderRepository = orderRepository;
+        this.transferModelToDto = transferModelToDto;
         this.orderServiceImpl = orderServiceImpl;
     }
 
@@ -44,7 +45,7 @@ public class ReturnsServiceImpl implements ReturnsService {
         List<Returns> returnsList = returnsRepository.findAll();
         List<ReturnsDto> returnsDtoList = new ArrayList<>();
         for (int i = 0; i < returnsList.size(); i++) {
-            returnsDtoList.add(TransferModelToDto.transferToReturnsDto(returnsList.get(i)));
+            returnsDtoList.add(transferModelToDto.transferToReturnsDto(returnsList.get(i)));
         }
         return returnsDtoList;
     }
@@ -67,7 +68,7 @@ public class ReturnsServiceImpl implements ReturnsService {
 
             List<ReturnsDto> returnsDtoList = new ArrayList<>();
             for (int i = 0; i < allReturnsCartsWithProcessedStatuses.size(); i++) {
-                returnsDtoList.add(TransferModelToDto.transferToReturnsDto(allReturnsCartsWithProcessedStatuses.get(i)));
+                returnsDtoList.add(transferModelToDto.transferToReturnsDto(allReturnsCartsWithProcessedStatuses.get(i)));
             }
 
             return returnsDtoList;
@@ -83,7 +84,7 @@ public class ReturnsServiceImpl implements ReturnsService {
                 orderList.add(orderRepository.findById(orderDtoList.get(i).getId()).orElseThrow());
             }
             for (int j = 0; j < orderList.get(i).getReturnList().size(); j++) {
-                returnsDtoList.add(TransferModelToDto.transferToReturnsDto(orderList.get(i).getReturnList().get(j)));
+                returnsDtoList.add(transferModelToDto.transferToReturnsDto(orderList.get(i).getReturnList().get(j)));
             }
         }
         return returnsDtoList;
@@ -99,7 +100,7 @@ public class ReturnsServiceImpl implements ReturnsService {
                 orderList.add(orderRepository.findById(orderDtoList.get(i).getId()).orElseThrow());
             }
             for (int j = 0; j < orderList.get(i).getReturnList().size(); j++) {
-                returnsDtoList.add(TransferModelToDto.transferToReturnsDto(orderList.get(i).getReturnList().get(j)));
+                returnsDtoList.add(transferModelToDto.transferToReturnsDto(orderList.get(i).getReturnList().get(j)));
             }
         }
         return returnsDtoList;
@@ -120,7 +121,7 @@ public class ReturnsServiceImpl implements ReturnsService {
             if (within30DaysReturnTime(returns.getCustomerOrder())) {
                 if(returns.getCustomerOrder().isProcessed()) {
                     Returns savedReturns = returnsRepository.save(returns);
-                    return TransferModelToDto.transferToReturnsDto(savedReturns);
+                    return transferModelToDto.transferToReturnsDto(savedReturns);
                 } else {
                     throw new RecordNotFoundException("The order is not processed yet wait till you receive your products to return!");
                 }
@@ -144,43 +145,55 @@ public class ReturnsServiceImpl implements ReturnsService {
     }
 
     @Override
-    public ReturnsDto connectProductWithReturn(Long returnCartId, Long productId, ProductDto productDto) {
-        Returns returns = returnsRepository.findById(returnCartId).orElseThrow();
+    public ReturnsDto connectProductWithReturn(Long returnsId, Long productId, ProductDto productDto) {
+        Returns returns = returnsRepository.findById(returnsId).orElseThrow();
         Product product = productRepository.findById(productId).orElseThrow();
 
         Orders order = returns.getCustomerOrder();
 
-        if (returnsRepository.findById(returnCartId).isPresent() && productRepository.findById(productId).isPresent() &&
+        if (returnsRepository.findById(returnsId).isPresent() && productRepository.findById(productId).isPresent() &&
                 orderRepository.findById(returns.getCustomerOrder().getId()).isPresent()) {
             within30DaysReturnTime(order);
-            for(int i = 0; i < returns.getQuantityAndProductList().size(); i++) {
-                if (returns.getQuantityAndProductList().get(i).getProduct().getProductName().equalsIgnoreCase(product.getProductName())) {
-                    throw new RecordNotFoundException("Product is already returned! If you want to return a bigger amount then please wait" +
-                            "till the return is processed!");
-                }
-            }
+
+            int returningProductsAmount = 0;
+
             for (int i = 0; i < order.getQuantityAndProductList().size(); i++) {
                 if (Objects.equals(order.getQuantityAndProductList().get(i).getProduct().getProductName(), product.getProductName())) {
-
-                    int returningProductsAmount = productDto.getAmountOfReturningProducts();
+                    returningProductsAmount = order.getQuantityAndProductList().get(i).getAmountOfReturningProducts() + productDto.getAmountOfReturningProducts();
                     if (returningProductsAmount <= order.getQuantityAndProductList().get(i).getAmountOfProducts()) {
                         List<QuantityAndProduct> productList = returns.getQuantityAndProductList();
                         QuantityAndProduct quantityAndProduct = order.getQuantityAndProductList().get(i);
                         quantityAndProduct.setReturns(returns);
-                        quantityAndProduct.setAmountOfReturningProducts(returningProductsAmount + order.getQuantityAndProductList().get(i).getAmountOfReturningProducts());
-                        productList.add(quantityAndProduct);
+                        quantityAndProduct.setAmountOfReturningProducts(returningProductsAmount);
+
+                        if(productList.contains(quantityAndProduct)) {
+                            boolean foundObject = false;
+                            for (int j = 0; j < productList.size(); j++) {
+                                for (int k = 0; k < productList.size(); k++) {
+                                    if (productList.get(j).equals(productList.get(k))) {
+                                        productList.set(j, quantityAndProduct);
+                                        foundObject = true;
+                                        break;
+                                    }
+                                }
+                                if(foundObject) {
+                                    break;
+                                }
+                            }
+                        } else {
+                            productList.add(quantityAndProduct);
+                        }
+
                         returns.setQuantityAndProductList(productList);
                         double totalPrice = 0;
                         for(int j = 0; j < productList.size();j++) {
-                            totalPrice = totalPrice + productList.get(j).getProduct().getPrice() * productList.get(j).getAmountOfReturningProducts();
+                                totalPrice = totalPrice + productList.get(j).getProduct().getPrice() * productList.get(j).getAmountOfReturningProducts();
                         }
                         returns.setTotalPrice(totalPrice);
-                        order.getQuantityAndProductList().get(i).setAmountOfProducts(quantityAndProduct.getAmountOfProducts() - productDto.getAmountOfReturningProducts());
-                        order.setTotalPrice(order.getTotalPrice() - product.getPrice() * productDto.getAmountOfReturningProducts());
                         quantityAndProductRepository.save(quantityAndProduct);
                         orderRepository.save(order);
                         returnsRepository.save(returns);
-                        return TransferModelToDto.transferToReturnsDto(returns);
+                        return transferModelToDto.transferToReturnsDto(returns);
                     } else {
                         throw new RecordNotFoundException("You cannot return more products then you ordered");
                     }
@@ -193,8 +206,4 @@ public class ReturnsServiceImpl implements ReturnsService {
         }
         throw new RecordNotFoundException("Couldn't find return cart");
     }
-
-
-
-
 }

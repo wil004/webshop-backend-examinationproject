@@ -26,13 +26,15 @@ private final ProductRepository productRepository;
 private final CustomerRepository customerRepository;
 private final QuantityAndProductRepository quantityAndProductRepository;
 private final UserServiceImpl userServiceImpl;
+private final TransferModelToDto transferModelToDto;
 
-    public ShoppingCartServiceImpl(ShoppingCartRepository shoppingCartRepository, ProductRepository productRepository, CustomerRepository customerRepository, QuantityAndProductRepository quantityAndProductRepository, UserServiceImpl userServiceImpl) {
+    public ShoppingCartServiceImpl(ShoppingCartRepository shoppingCartRepository, ProductRepository productRepository, CustomerRepository customerRepository, QuantityAndProductRepository quantityAndProductRepository, UserServiceImpl userServiceImpl, TransferModelToDto transferModelToDto) {
         this.shoppingCartRepository = shoppingCartRepository;
         this.productRepository = productRepository;
         this.customerRepository = customerRepository;
         this.quantityAndProductRepository = quantityAndProductRepository;
         this.userServiceImpl = userServiceImpl;
+        this.transferModelToDto = transferModelToDto;
     }
 
     @Override
@@ -78,7 +80,7 @@ private final UserServiceImpl userServiceImpl;
             shoppingCart.setTotalPrice(shoppingCart.getTotalPrice() + product.getPrice() * productDto.getAmountOfProducts());
             shoppingCartRepository.save(shoppingCart);
 
-            return TransferModelToDto.transferToShoppingCartDto(shoppingCart);
+            return transferModelToDto.transferToShoppingCartDto(shoppingCart);
         } else {
             throw new RecordNotFoundException("ShoppingCart Id Or Product Id doesn't exist!");
         }
@@ -94,18 +96,9 @@ private final UserServiceImpl userServiceImpl;
             ShoppingCart savedShoppingCart = shoppingCartRepository.save(shoppingCart);
 
             customerRepository.save(customer);
-            return TransferModelToDto.transferToShoppingCartDto(savedShoppingCart);
+            return transferModelToDto.transferToShoppingCartDto(savedShoppingCart);
         } else {
             throw new RecordNotFoundException("Customer account doesn't exist or is a guest.");
-        }
-    }
-
-    @Override
-    public void deleteShoppingCart(Long id) {
-        if (shoppingCartRepository.findById(id).isPresent()) {
-            shoppingCartRepository.deleteById(id);
-        } else {
-            throw new RecordNotFoundException("You cannot delete a shopping cart that does not exists");
         }
     }
 
